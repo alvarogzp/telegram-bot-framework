@@ -11,7 +11,7 @@ class Bot:
         self.api = TelegramBotApi(self.config.get_auth_token())
 
     def run(self):
-        self.api.send_message(self.config.get_user_id(), "test")
+        self.api.send_message(self.config.get_admin_user_id(), "test")
 
 
 class TelegramBotApi:
@@ -32,8 +32,8 @@ class Config:
     def get_auth_token(self):
         return self.__get_config_value("auth_token")
 
-    def get_user_id(self):
-        return self.__get_config_value("user_id")
+    def get_admin_user_id(self):
+        return self.__get_config_value("admin_user_id")
 
     def __get_config_value(self, config_key):
         return open(self.config_dir + config_key).read().strip()
