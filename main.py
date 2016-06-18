@@ -5,6 +5,15 @@ import requests
 CONFIG_DIR = "config"
 
 
+class Bot:
+    def __init__(self):
+        self.config = Config(CONFIG_DIR)
+        self.api = TelegramBotApi(self.config.get_auth_token())
+
+    def run(self):
+        self.api.send_message(self.config.get_user_id(), "test")
+
+
 class TelegramBotApi:
     def __init__(self, auth_token):
         self.base_url = "https://api.telegram.org/bot" + auth_token + "/"
@@ -30,7 +39,5 @@ class Config:
         return open(self.config_dir + config_key).read().strip()
 
 
-config = Config(CONFIG_DIR)
-api = TelegramBotApi(config.get_auth_token())
-
-api.send_message(config.get_user_id(), "test")
+if __name__ == "__main__":
+    Bot().run()
