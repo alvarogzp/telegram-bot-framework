@@ -2,18 +2,35 @@
 
 import requests
 
-AUTH_TOKEN = open("config/auth_token").read().strip()
-USER_ID = open("config/user_id").read().strip()
-
-BASE_URL = "https://api.telegram.org/bot" + AUTH_TOKEN + "/"
+CONFIG_DIR = "config"
 
 
-def send_request(command, **params):
-    requests.get(BASE_URL + command, params=params)
+class TelegramBotApi:
+    def __init__(self, auth_token):
+        self.base_url = "https://api.telegram.org/bot" + auth_token + "/"
+
+    def send_message(self, chat_id, text):
+        self.__send_request("sendMessage", chat_id=chat_id, text=text)
+
+    def __send_request(self, command, **params):
+        requests.get(self.base_url + command, params=params)
 
 
-def send_message(chat_id, text):
-    send_request("sendMessage", chat_id=chat_id, text=text)
+class Config:
+    def __init__(self, config_dir):
+        self.config_dir = config_dir + "/"
+
+    def get_auth_token(self):
+        return self.__get_config_value("auth_token")
+
+    def get_user_id(self):
+        return self.__get_config_value("user_id")
+
+    def __get_config_value(self, config_key):
+        return open(self.config_dir + config_key).read().strip()
 
 
-send_message(USER_ID, "test")
+config = Config(CONFIG_DIR)
+api = TelegramBotApi(config.get_auth_token())
+
+api.send_message(config.get_user_id(), "test")
