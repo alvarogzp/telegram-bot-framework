@@ -24,6 +24,8 @@ class Bot:
         self.send_to_admin("Started")
         try:
             self.main_loop()
+        except KeyboardInterrupt:
+            self.send_to_admin("KeyboardInterrupt")
         except BaseException as e:
             self.send_to_admin("Fatal error: " + str(e))
             raise e
