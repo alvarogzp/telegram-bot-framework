@@ -1,8 +1,8 @@
 import traceback
 
 from bot.api.api import Api
+from bot.api.domain import Chat, Message
 from bot.api.telegram import TelegramBotApi
-from bot.domain import Message, Chat
 from bot.storage import Config
 from bot.storage import State
 
@@ -17,7 +17,7 @@ class Bot:
         self.state = State(STATE_DIR)
         telegram_api = TelegramBotApi(self.config.get_auth_token(), self.config.is_debug_enabled())
         self.api = Api(telegram_api, self.state)
-        self.admin_chat = Chat(self.config.get_admin_user_id())
+        self.admin_chat = Chat.create(id=self.config.get_admin_user_id())
         self.bot_info = self.api.get_me()
 
     def run(self):
@@ -51,10 +51,10 @@ class Bot:
         if message.text is not None:
             self.process_text_message(message)
 
-    def process_text_message(self, message: Message):
+    def process_text_message(self, message):
         print(message.text)
         self.api.send_message(message.reply_message("test response"))
 
     def send_to_admin(self, message):
         message_to_admin = "[admin] " + message
-        self.api.send_message(Message(self.admin_chat, message_to_admin))
+        self.api.send_message(Message.create(chat=self.admin_chat, text=message_to_admin))
