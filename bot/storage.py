@@ -37,3 +37,17 @@ class State:
     def __set_state_value(self, state_key, state_value):
         with open(self.state_dir + state_key, "w") as f:
             f.write(state_value)
+
+
+class Cache:
+    def __init__(self):
+        self.cache = {}
+
+    def __getattr__(self, item):
+        return self.cache.get(item)
+
+    def __setattr__(self, key, value):
+        if key == "cache":
+            super().__setattr__(key, value)
+        else:
+            self.cache[key] = value
