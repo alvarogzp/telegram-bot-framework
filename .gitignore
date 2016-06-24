@@ -1,3 +1,4 @@
 /.idea
 /config
 /state
+__pycache__/
