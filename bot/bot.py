@@ -20,6 +20,11 @@ class Bot:
         self.api = Api(telegram_api, self.state)
         self.cache.admin_chat = Chat.create(id=self.config.get_admin_user_id())
         self.cache.bot_info = self.api.get_me()
+        self.actions = []
+
+    def add_action(self, action):
+        action.setup(self.api, self.config, self.state, self.cache)
+        self.actions.append(action)
 
     def run(self):
         self.send_to_admin("Started")
@@ -41,12 +46,12 @@ class Bot:
                 self.process_update(update)
 
     def process_update(self, update, is_pending=False):
-        try:
-            if update.message is not None:
-                self.process_message(update.message)
-        except BaseException as e:
-            self.send_to_admin("Error while processing update: " + str(e))
-            traceback.print_exc()
+        for action in self.actions:
+            try:
+                action.process_update(update, is_pending)
+            except BaseException as e:
+                self.send_to_admin("Error while processing update. Action " + action.get_name() + " failed with error: " + str(e))
+                traceback.print_exc()
 
     def process_message(self, message):
         if message.text is not None:
