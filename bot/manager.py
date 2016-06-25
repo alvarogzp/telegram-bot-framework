@@ -1,3 +1,4 @@
+from bot.actions.admin import AdminAction, StopAction
 from bot.actions.answer import AnswerAction
 from bot.actions.command import CommandAction
 from bot.actions.filter import NoPendingAction, MessageAction, TextMessageAction
@@ -21,6 +22,11 @@ class BotManager:
             TextMessageAction().then(
                 CommandAction("start").then(
                     AnswerAction("Hello! I am " + self.bot.cache.bot_info.first_name + " and I am here to serve you.\nSorry if I cannot do too much for you now, I am still under construction.")
+                ),
+                AdminAction().then(
+                    CommandAction("shutdown").then(
+                        StopAction()
+                    )
                 )
             )
         )

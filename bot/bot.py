@@ -49,6 +49,8 @@ class Bot:
         for action in self.actions:
             try:
                 action.process_update(update, is_pending)
+            except KeyboardInterrupt:
+                raise  # to stop main loop
             except BaseException as e:
                 self.send_to_admin("Error while processing update. Action " + action.get_name() + " failed with error: " + str(e))
                 traceback.print_exc()
