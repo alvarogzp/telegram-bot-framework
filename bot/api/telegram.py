@@ -18,7 +18,7 @@ class TelegramBotApi:
         return self.__send_request("getUpdates", offset=offset, timeout=timeout)
 
     def __send_request(self, command, **params):
-        request = requests.get(self.base_url + command, params=params)
+        request = requests.get(self.base_url + command, params=params, timeout=60)
         self.__log_request(request)
         response = request.json()
         self.__log_response(response)
