@@ -14,6 +14,10 @@ class Action:
         self.config = config
         self.state = state
         self.cache = cache
+        self.post_setup()
+
+    def post_setup(self):
+        pass
 
     def process_update(self, update, is_pending_update):
         pass

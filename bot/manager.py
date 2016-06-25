@@ -1,4 +1,6 @@
-from bot.actions.filter import NoPendingAction, MessageAction
+from bot.actions.answer import AnswerAction
+from bot.actions.command import CommandAction
+from bot.actions.filter import NoPendingAction, MessageAction, TextMessageAction
 from bot.actions.greet import GreetAction
 from bot.actions.leave import LeaveAction
 from bot.bot import Bot
@@ -15,7 +17,15 @@ class BotManager:
                 LeaveAction(),
             )
         )
+        message_actions = MessageAction().then(
+            TextMessageAction().then(
+                CommandAction("start").then(
+                    AnswerAction("Hello! I am " + self.bot.cache.bot_info.first_name + " and I am here to serve you.\nSorry if I cannot do too much for you now, I am still under construction.")
+                )
+            )
+        )
         self.bot.add_action(no_pending_message_actions)
+        self.bot.add_action(message_actions)
 
     def run(self):
         self.bot.run()
