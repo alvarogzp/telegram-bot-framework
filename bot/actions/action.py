@@ -4,7 +4,7 @@ from bot.storage import Config, State, Cache
 
 class Action:
     def __init__(self):
-        self.discard_pending_updates = True
+        pass
 
     def get_name(self):
         return self.__class__.__name__
@@ -16,10 +16,22 @@ class Action:
         self.cache = cache
 
     def process_update(self, update, is_pending_update):
-        if is_pending_update and self.discard_pending_updates:
-            return
-        if update.message is not None:
-            self.process_message(update.message)
-
-    def process_message(self, message):
         pass
+
+
+class IntermediateAction(Action):
+    def __init__(self):
+        super().__init__()
+        self.next_actions = []
+
+    def then(self, *next_actions):
+        self.next_actions = next_actions
+        return self
+
+    def setup(self, *args):
+        super().setup(*args)
+        self._continue(lambda action: action.setup(*args))
+
+    def _continue(self, func):
+        for action in self.next_actions:
+            func(action)
