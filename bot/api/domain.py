@@ -14,8 +14,8 @@ class ApiObject:
         return self.wrap_api_object(value)
 
     def __getattr__(self, item):
-        if len(item) > 1 and item[0] == "_" and item[1] != "_":
-            item = item[1:]
+        if len(item) > 1 and item[-1] == "_":
+            item = item[:-1]
         return self.get_or_default(item)
 
     @staticmethod
