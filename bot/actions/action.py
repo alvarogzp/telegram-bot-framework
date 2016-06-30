@@ -51,7 +51,8 @@ class ActionGroup(Action):
         self.for_each(lambda action: action.process(event._copy()))
 
     def for_each(self, func):
-        map(func, self.actions)
+        for action in self.actions:
+            func(action)
 
 
 class IntermediateAction(ActionGroup):
