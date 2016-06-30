@@ -1,4 +1,4 @@
-from bot.actions.admin import AdminAction, StopAction
+from bot.actions.admin import AdminAction, StopAction, EvalAction
 from bot.actions.answer import AnswerAction
 from bot.actions.command import CommandAction
 from bot.actions.filter import NoPendingAction, MessageAction, TextMessageAction
@@ -26,6 +26,9 @@ class BotManager:
                 AdminAction().then(
                     CommandAction("shutdown").then(
                         StopAction()
+                    ),
+                    CommandAction("eval").then(
+                        EvalAction()
                     )
                 )
             )
