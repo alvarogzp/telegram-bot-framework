@@ -1,5 +1,17 @@
 from bot.api.api import Api
 from bot.storage import Config, State, Cache
+from bot.utils.dictionaryobject import DictionaryObject
+
+
+class Event(DictionaryObject):
+    pass
+
+
+class Update(Event):
+    def __init__(self, update, is_pending):
+        super().__init__()
+        self.update = update
+        self.is_pending = is_pending
 
 
 class Action:
@@ -19,23 +31,36 @@ class Action:
     def post_setup(self):
         pass
 
-    def process_update(self, update, is_pending_update):
+    def process(self, event):
         pass
 
 
-class IntermediateAction(Action):
-    def __init__(self):
+class ActionGroup(Action):
+    def __init__(self, *actions):
         super().__init__()
-        self.next_actions = []
+        self.actions = list(actions)
 
-    def then(self, *next_actions):
-        self.next_actions = next_actions
-        return self
+    def add(self, *actions):
+        self.actions.extend(actions)
 
     def setup(self, *args):
+        self.for_each(lambda action: action.setup(*args))
         super().setup(*args)
-        self._continue(lambda action: action.setup(*args))
 
-    def _continue(self, func):
-        for action in self.next_actions:
-            func(action)
+    def process(self, event):
+        self.for_each(lambda action: action.process(event._copy()))
+
+    def for_each(self, func):
+        map(func, self.actions)
+
+
+class IntermediateAction(ActionGroup):
+    def __init__(self):
+        super().__init__()
+
+    def then(self, *next_actions):
+        self.add(*next_actions)
+        return self
+
+    def _continue(self, event):
+        super().process(event)

@@ -2,18 +2,22 @@ from bot.actions.action import IntermediateAction
 
 
 class TextMessageAction(IntermediateAction):
-    def process_message(self, message):
-        if message.text is not None:
-            self._continue(lambda action: action.process_message(message))
+    def process(self, event):
+        text = event.message.text
+        if text is not None:
+            event.text = text
+            self._continue(event)
 
 
 class MessageAction(IntermediateAction):
-    def process_update(self, update, is_pending_update):
-        if update.message is not None:
-            self._continue(lambda action: action.process_message(update.message))
+    def process(self, event):
+        message = event.update.message
+        if message is not None:
+            event.message = message
+            self._continue(event)
 
 
 class NoPendingAction(IntermediateAction):
-    def process_update(self, update, is_pending_update):
-        if not is_pending_update:
-            self._continue(lambda action: action.process_update(update, is_pending_update))
+    def process(self, event):
+        if not event.is_pending:
+            self._continue(event)

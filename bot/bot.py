@@ -1,5 +1,6 @@
 import traceback
 
+from bot.actions.action import Update
 from bot.api.api import Api
 from bot.api.domain import Chat, Message
 from bot.api.telegram import TelegramBotApi
@@ -48,7 +49,7 @@ class Bot:
     def process_update(self, update, is_pending=False):
         for action in self.actions:
             try:
-                action.process_update(update, is_pending)
+                action.process(Update(update, is_pending))
             except KeyboardInterrupt:
                 raise  # to stop main loop
             except BaseException as e:
