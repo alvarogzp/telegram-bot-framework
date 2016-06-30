@@ -42,12 +42,12 @@ class ApiObjectList:
 
 class Message:
     @staticmethod
-    def create(chat, text):
-        return ApiObject(_type=Message, chat=chat, text=text)
+    def create(chat, text, reply_to_message_id=None):
+        return ApiObject(_type=Message, chat=chat, text=text, reply_to_message_id=reply_to_message_id)
 
     @staticmethod
     def create_reply(message, reply_text):
-        return Message.create(message.chat, reply_text)
+        return Message.create(message.chat, reply_text, message.message_id)
 
 
 class Chat(ApiObject):
