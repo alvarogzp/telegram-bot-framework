@@ -1,6 +1,6 @@
 import traceback
 
-from bot.actions.core.action import Update
+from bot.action.core.action import Update
 from bot.api.api import Api
 from bot.api.domain import Chat, Message
 from bot.api.telegram import TelegramBotApi
