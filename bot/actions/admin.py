@@ -1,4 +1,4 @@
-from bot.actions.action import Action, IntermediateAction
+from bot.actions.core.action import Action, IntermediateAction
 from bot.api.domain import Message
 
 

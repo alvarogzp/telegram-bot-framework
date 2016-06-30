@@ -1,6 +1,6 @@
 import re
 
-from bot.actions.action import IntermediateAction
+from bot.actions.core.action import IntermediateAction
 
 
 class CommandAction(IntermediateAction):
