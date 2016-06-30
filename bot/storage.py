@@ -1,5 +1,7 @@
 import os
 
+from bot.utils.dictionaryobject import DictionaryObject
+
 
 class Config:
     def __init__(self, config_dir):
@@ -39,15 +41,5 @@ class State:
             f.write(state_value)
 
 
-class Cache:
-    def __init__(self):
-        self.cache = {}
-
-    def __getattr__(self, item):
-        return self.cache.get(item)
-
-    def __setattr__(self, key, value):
-        if key == "cache":
-            super().__setattr__(key, value)
-        else:
-            self.cache[key] = value
+class Cache(DictionaryObject):
+    pass
