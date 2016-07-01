@@ -1,6 +1,6 @@
 from bot.api.api import Api
 from bot.storage import Config, State, Cache
-from bot.utils.dictionaryobject import DictionaryObject
+from bot.utils.attributeobject import DictionaryObject
 
 
 class Event(DictionaryObject):

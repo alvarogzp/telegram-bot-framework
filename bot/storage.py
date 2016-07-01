@@ -1,6 +1,6 @@
 import os
 
-from bot.utils.dictionaryobject import DictionaryObject
+from bot.utils.attributeobject import DictionaryObject
 
 
 class Config:
