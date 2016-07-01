@@ -14,6 +14,7 @@ class MessageAction(IntermediateAction):
         message = event.update.message
         if message is not None:
             event.message = message
+            event.chat = message.chat
             self._continue(event)
 
 
