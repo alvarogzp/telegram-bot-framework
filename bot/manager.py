@@ -1,9 +1,8 @@
-from bot.actions.admin import AdminAction, StopAction, EvalAction
-from bot.actions.answer import AnswerAction
-from bot.actions.command import CommandAction
-from bot.actions.filter import NoPendingAction, MessageAction, TextMessageAction
-from bot.actions.greet import GreetAction
-from bot.actions.leave import LeaveAction
+from bot.action.admin import AdminAction, StopAction, EvalAction
+from bot.action.answer import AnswerAction
+from bot.action.core.action import ActionGroup
+from bot.action.core.command import CommandAction
+from bot.action.core.filter import MessageAction, TextMessageAction, NoPendingAction
 from bot.bot import Bot
 
 
@@ -12,29 +11,33 @@ class BotManager:
         self.bot = Bot()
 
     def setup_actions(self):
-        no_pending_message_actions = NoPendingAction().then(
-            MessageAction().then(
-                GreetAction(),
-                LeaveAction(),
-            )
-        )
-        message_actions = MessageAction().then(
-            TextMessageAction().then(
-                CommandAction("start").then(
-                    AnswerAction("Hello! I am " + self.bot.cache.bot_info.first_name + " and I am here to serve you.\nSorry if I cannot do too much for you now, I am still under construction.")
+        self.bot.set_action(
+            ActionGroup(
+                NoPendingAction().then(
+                    MessageAction().then(
+                        # GreetAction(),
+                        # LeaveAction(),
+                    )
                 ),
-                AdminAction().then(
-                    CommandAction("shutdown").then(
-                        StopAction()
-                    ),
-                    CommandAction("eval").then(
-                        EvalAction()
+
+                MessageAction().then(
+                    TextMessageAction().then(
+                        CommandAction("start").then(
+                            AnswerAction(
+                                "Hello! I am " + self.bot.cache.bot_info.first_name + " and I am here to serve you.\nSorry if I cannot do too much for you now, I am still under construction.")
+                        ),
+                        AdminAction().then(
+                            CommandAction("shutdown").then(
+                                StopAction()
+                            ),
+                            CommandAction("eval").then(
+                                EvalAction()
+                            )
+                        )
                     )
                 )
             )
         )
-        self.bot.add_action(no_pending_message_actions)
-        self.bot.add_action(message_actions)
 
     def run(self):
         self.bot.run()
