@@ -1,8 +1,10 @@
 from bot.action.admin import AdminAction, StopAction, EvalAction
 from bot.action.answer import AnswerAction
+from bot.action.contrib.pole import PoleAction
 from bot.action.core.action import ActionGroup
 from bot.action.core.command import CommandAction
 from bot.action.core.filter import MessageAction, TextMessageAction, NoPendingAction
+from bot.action.perchat import PerChatAction
 from bot.bot import Bot
 
 
@@ -21,17 +23,20 @@ class BotManager:
                 ),
 
                 MessageAction().then(
-                    TextMessageAction().then(
-                        CommandAction("start").then(
-                            AnswerAction(
-                                "Hello! I am " + self.bot.cache.bot_info.first_name + " and I am here to serve you.\nSorry if I cannot do too much for you now, I am still under construction.")
-                        ),
-                        AdminAction().then(
-                            CommandAction("shutdown").then(
-                                StopAction()
+                    PerChatAction().then(
+                        PoleAction(),
+                        TextMessageAction().then(
+                            CommandAction("start").then(
+                                AnswerAction(
+                                    "Hello! I am " + self.bot.cache.bot_info.first_name + " and I am here to serve you.\nSorry if I cannot do too much for you now, I am still under construction.")
                             ),
-                            CommandAction("eval").then(
-                                EvalAction()
+                            AdminAction().then(
+                                CommandAction("shutdown").then(
+                                    StopAction()
+                                ),
+                                CommandAction("eval").then(
+                                    EvalAction()
+                                )
                             )
                         )
                     )
