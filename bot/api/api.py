@@ -15,7 +15,7 @@ class Api:
                                               reply_to_message_id=message.reply_to_message_id)
 
     def get_pending_updates(self):
-        yield from self.get_updates(timeout=0)
+        return self.get_updates(timeout=0)
 
     def get_updates(self, timeout=45):
         updates = self.telegram_api.get_updates(offset=self.__get_updates_offset(), timeout=timeout)
