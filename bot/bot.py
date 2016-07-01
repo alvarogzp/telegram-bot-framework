@@ -17,9 +17,9 @@ class Bot:
         self.config = Config(CONFIG_DIR)
         self.state = State(STATE_DIR)
         self.cache = Cache()
-        telegram_api = TelegramBotApi(self.config.get_auth_token(), self.config.is_debug_enabled())
+        telegram_api = TelegramBotApi(self.config.auth_token, self.config.is_debug_enabled())
         self.api = Api(telegram_api, self.state)
-        self.cache.admin_chat = Chat.create(id=self.config.get_admin_user_id())
+        self.cache.admin_chat = Chat.create(id=self.config.admin_user_id)
         self.cache.bot_info = self.api.get_me()
         self.action = Action()
 

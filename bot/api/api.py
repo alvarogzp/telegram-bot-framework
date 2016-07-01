@@ -24,7 +24,7 @@ class Api:
             yield update
 
     def __get_updates_offset(self):
-        return self.state.get_next_update_id()
+        return self.state.next_update_id
 
     def __set_updates_offset(self, last_update_id):
-        self.state.set_next_update_id(str(last_update_id + 1))
+        self.state.next_update_id = str(last_update_id + 1)
