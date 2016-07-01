@@ -1,6 +1,6 @@
 import traceback
 
-from bot.action.core.action import Update
+from bot.action.core.action import Update, Action
 from bot.api.api import Api
 from bot.api.domain import Chat, Message
 from bot.api.telegram import TelegramBotApi
@@ -21,11 +21,11 @@ class Bot:
         self.api = Api(telegram_api, self.state)
         self.cache.admin_chat = Chat.create(id=self.config.get_admin_user_id())
         self.cache.bot_info = self.api.get_me()
-        self.actions = []
+        self.action = Action()
 
-    def add_action(self, action):
+    def set_action(self, action: Action):
         action.setup(self.api, self.config, self.state, self.cache)
-        self.actions.append(action)
+        self.action = action
 
     def run(self):
         self.send_to_admin("Started")
@@ -47,14 +47,13 @@ class Bot:
                 self.process_update(update)
 
     def process_update(self, update, is_pending=False):
-        for action in self.actions:
-            try:
-                action.process(Update(update, is_pending))
-            except KeyboardInterrupt:
-                raise  # to stop main loop
-            except BaseException as e:
-                self.send_to_admin("Error while processing update. Action " + action.get_name() + " failed with error: " + str(e))
-                traceback.print_exc()
+        try:
+            self.action.process(Update(update, is_pending))
+        except KeyboardInterrupt:
+            raise  # to stop main loop
+        except BaseException as e:
+            self.send_to_admin("Error while processing update. Action " + self.action.get_name() + " failed with error: " + str(e))
+            traceback.print_exc()
 
     def process_message(self, message):
         if message.text is not None:
