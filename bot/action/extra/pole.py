@@ -30,15 +30,17 @@ class PoleAction(Action):
                     current_day_message_count = int(current_day_message_count)
                     if current_day_message_count < 3:
                         current_day_message_count += 1
-                        state.current_day_first_messages += "\n" + self.get_formatted_message_to_store(event.message)
-                        state.current_day_message_count = str(current_day_message_count)
                         if current_day_message_count == 3:
                             chat = event.message.chat
-                            pole_message, subpole_message, subsubpole_message = state.current_day_first_messages.splitlines()
+                            pole_message, subpole_message = state.current_day_first_messages.splitlines()
+                            subsubpole_message = event.message.message_id
                             self.send_message(chat, pole_message, "pole")
                             self.send_message(chat, subpole_message, "subpole")
                             self.send_message(chat, subsubpole_message, "subsubpole")
                             state.current_day_message_count = None
+                        else:
+                            state.current_day_message_count = str(current_day_message_count)
+                            state.current_day_first_messages += "\n" + self.get_formatted_message_to_store(event.message)
 
     def send_message(self, chat, message_id, text):
         self.api.send_message(Message.create(chat, text, reply_to_message_id=message_id))
