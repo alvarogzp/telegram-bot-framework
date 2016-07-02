@@ -7,6 +7,7 @@ from bot.action.core.command import CommandAction
 from bot.action.core.filter import MessageAction, TextMessageAction, NoPendingAction
 from bot.action.gapdetector import GapDetectorAction
 from bot.action.perchat import PerChatAction
+from bot.action.toggle import GetSetFeatureAction
 from bot.bot import Bot
 
 
@@ -46,6 +47,10 @@ class BotManager:
                                 HashtagRecolectorAction(),
                                 CommandAction("hashtags").then(
                                     HashtagListAction()
+                                ),
+
+                                CommandAction("feature").then(
+                                    GetSetFeatureAction()
                                 )
                             )
                         )
