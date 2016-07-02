@@ -22,18 +22,18 @@ class Storage(AttributeObject):
         return self._cache[key]
 
     def _getattr(self, key):
-        return self._get_value(key)
+        return self.get_value(key)
 
     def _setattr(self, key, value):
-        self._set_value(key, value)
+        self.set_value(key, value)
 
-    def _get_value(self, key, default_value=None):
+    def get_value(self, key, default_value=None):
         value_path = self.__get_value_path(key)
         if not os.path.isfile(value_path):
             return default_value
         return open(value_path).read()
 
-    def _set_value(self, key, value, append=False):
+    def set_value(self, key, value, append=False):
         value_path = self.__get_value_path(key)
         mode = "a" if append else "w"
         with open(value_path, mode) as f:
@@ -48,15 +48,15 @@ class Config(Storage):
         super().__init__(config_dir)
 
     def is_debug_enabled(self):
-        return self._get_value("debug").lower() == "true"
+        return self.get_value("debug").lower() == "true"
 
-    def _get_value(self, key, default_value=None):
-        value = super()._get_value(key, default_value)
+    def get_value(self, key, default_value=None):
+        value = super().get_value(key, default_value)
         if value is not None:
             value = value.strip()
         return value
 
-    def _set_value(self, key, value, append=False):
+    def set_value(self, key, value, append=False):
         # do not allow to modify config values
         pass
 

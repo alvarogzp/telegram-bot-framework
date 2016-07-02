@@ -93,4 +93,4 @@ class HashtagStorageHandler:
         return HashtagList.deserialize(hashtags)
 
     def save_new_hashtags(self, hashtags: HashtagList):
-        self.event.state._set_value("hashtags", hashtags.serialize(), append=True)
+        self.event.state.set_value("hashtags", hashtags.serialize(), append=True)
