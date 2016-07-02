@@ -40,8 +40,8 @@ class GetSetFeatureAction(Action):
 
     def send_current_status(self, handler, prepend=""):
         status = handler.get_status_string()
-        response = prepend + "Current status of %s: %s" % (handler.feature, status)
-        self.api.send_message(Message.create_reply(handler.event.message, response))
+        response = prepend + "Current status of *%s*: *%s*" % (handler.feature, status.upper())
+        self.api.send_message(Message.create_reply(handler.event.message, response, parse_mode="Markdown"))
 
     def send_usage(self, event):
         self.api.send_message(Message.create_reply(event.message, "Usage: " + event.command + " <feature> [on|off]"))

@@ -11,8 +11,8 @@ class TelegramBotApi:
     def get_me(self):
         return self.__send_request("getMe")
 
-    def send_message(self, chat_id, text, reply_to_message_id):
-        return self.__send_request("sendMessage", chat_id=chat_id, text=text, reply_to_message_id=reply_to_message_id)
+    def send_message(self, **params):
+        return self.__send_request("sendMessage", **params)
 
     def get_updates(self, offset=None, timeout=None):
         return self.__send_request("getUpdates", offset=offset, timeout=timeout)

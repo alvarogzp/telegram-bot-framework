@@ -12,7 +12,8 @@ class Api:
 
     def send_message(self, message):
         return self.telegram_api.send_message(chat_id=message.chat.id, text=message.text,
-                                              reply_to_message_id=message.reply_to_message_id)
+                                              reply_to_message_id=message.reply_to_message_id,
+                                              parse_mode=message.parse_mode)
 
     def get_pending_updates(self):
         return self.get_updates(timeout=0)
