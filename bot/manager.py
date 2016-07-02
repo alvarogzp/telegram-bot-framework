@@ -1,6 +1,6 @@
 from bot.action.admin import AdminAction, StopAction, EvalAction
 from bot.action.answer import AnswerAction
-from bot.action.contrib.pole import PoleAction
+from bot.action.extra.pole import PoleAction
 from bot.action.core.action import ActionGroup
 from bot.action.core.command import CommandAction
 from bot.action.core.filter import MessageAction, TextMessageAction, NoPendingAction
