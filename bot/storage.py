@@ -33,9 +33,10 @@ class Storage(AttributeObject):
             return default_value
         return open(value_path).read()
 
-    def _set_value(self, key, value):
+    def _set_value(self, key, value, append=False):
         value_path = self.__get_value_path(key)
-        with open(value_path, "w") as f:
+        mode = "a" if append else "w"
+        with open(value_path, mode) as f:
             f.write(value)
 
     def __get_value_path(self, key):
@@ -55,7 +56,7 @@ class Config(Storage):
             value = value.strip()
         return value
 
-    def _set_value(self, key, value):
+    def _set_value(self, key, value, append=False):
         # do not allow to modify config values
         pass
 
