@@ -35,9 +35,13 @@ class Storage(AttributeObject):
 
     def set_value(self, key, value, append=False):
         value_path = self.__get_value_path(key)
-        mode = "a" if append else "w"
-        with open(value_path, mode) as f:
-            f.write(value)
+        if value is None:
+            if os.path.exists(value_path):
+                os.remove(value_path)
+        else:
+            mode = "a" if append else "w"
+            with open(value_path, mode) as f:
+                f.write(value)
 
     def __get_value_path(self, key):
         return os.path.join(self._base_dir, key)
