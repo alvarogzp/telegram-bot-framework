@@ -1,5 +1,6 @@
 from bot.action.admin import AdminAction, StopAction, EvalAction
 from bot.action.answer import AnswerAction
+from bot.action.extra.hashtags import HashtagRecolectorAction, HashtagListAction
 from bot.action.extra.pole import PoleAction
 from bot.action.core.action import ActionGroup
 from bot.action.core.command import CommandAction
@@ -40,6 +41,11 @@ class BotManager:
                                     CommandAction("eval").then(
                                         EvalAction()
                                     )
+                                ),
+
+                                HashtagRecolectorAction(),
+                                CommandAction("hashtags").then(
+                                    HashtagListAction()
                                 )
                             )
                         )
