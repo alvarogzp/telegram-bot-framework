@@ -38,17 +38,26 @@ class Storage(AttributeObject):
     def set_value(self, key, value, append=False):
         value_path = self.__get_value_path(key)
         if value is None:
-            if os.path.exists(value_path):
-                shutil.rmtree(value_path)
+            self.__remove(value_path)
         else:
-            if not os.path.exists(self._base_dir):
-                os.makedirs(self._base_dir)
+            self.__create_dirs_if_needed()
             mode = "a" if append else "w"
             with open(value_path, mode) as f:
                 f.write(value)
 
     def __get_value_path(self, key):
         return os.path.join(self._base_dir, key)
+
+    def __create_dirs_if_needed(self):
+        if not os.path.exists(self._base_dir):
+            os.makedirs(self._base_dir)
+
+    @staticmethod
+    def __remove(value_path):
+        if os.path.isdir(value_path):
+            shutil.rmtree(value_path)
+        elif os.path.isfile(value_path):
+            os.remove(value_path)
 
 
 class Config(Storage):
