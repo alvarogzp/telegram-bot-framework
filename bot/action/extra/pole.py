@@ -7,7 +7,7 @@ OFFSET_FROM_UTC_IN_SECONDS = 2 * 3600
 
 class PoleAction(Action):
     def process(self, event):
-        if event.feature_gap_detected:  # reset everything
+        if event.global_gap_detected:  # reset everything
             event.state.last_message_timestamp = None
             event.state.current_day_message_count = None
             event.state.current_day_first_messages = None
