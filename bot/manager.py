@@ -3,6 +3,7 @@ from bot.action.answer import AnswerAction
 from bot.action.core.action import ActionGroup
 from bot.action.core.command import CommandAction
 from bot.action.core.filter import MessageAction, TextMessageAction, NoPendingAction
+from bot.action.enterexit import GreetAction, LeaveAction
 from bot.action.extra.hashtags import HashtagRecolectorAction, HashtagListAction
 from bot.action.extra.pole import PoleAction
 from bot.action.gapdetector import GlobalGapDetectorAction
@@ -22,8 +23,14 @@ class BotManager:
 
                     NoPendingAction().then(
                         MessageAction().then(
-                            # GreetAction(),
-                            # LeaveAction(),
+                            PerChatAction().then(
+                                ToggleableFeatureAction("greet").then(
+                                    GreetAction()
+                                ),
+                                ToggleableFeatureAction("leave").then(
+                                    LeaveAction()
+                                )
+                            )
                         )
                     ),
 
