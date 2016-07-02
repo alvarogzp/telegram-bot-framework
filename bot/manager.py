@@ -7,7 +7,7 @@ from bot.action.core.command import CommandAction
 from bot.action.core.filter import MessageAction, TextMessageAction, NoPendingAction
 from bot.action.gapdetector import GapDetectorAction
 from bot.action.perchat import PerChatAction
-from bot.action.toggle import GetSetFeatureAction
+from bot.action.toggle import GetSetFeatureAction, ToggleableFeatureAction
 from bot.bot import Bot
 
 
@@ -29,7 +29,10 @@ class BotManager:
 
                     MessageAction().then(
                         PerChatAction().then(
-                            PoleAction(),
+                            ToggleableFeatureAction("pole").then(
+                                PoleAction()
+                            ),
+
                             TextMessageAction().then(
                                 CommandAction("start").then(
                                     AnswerAction(

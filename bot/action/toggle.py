@@ -1,19 +1,23 @@
-from bot.action.core.action import Action
+from bot.action.core.action import Action, IntermediateAction
 from bot.api.domain import Message
 
-CHANGE_STATUS_VALUES = {
-    "on": True,
-    "off": False
+ON_VALUE = "on"
+OFF_VALUE = "off"
+
+STATUS_VALUES = {
+    ON_VALUE: True,
+    OFF_VALUE: False
 }
 
 
 class GetSetFeatureAction(Action):
     def process(self, event):
         feature, new_status = self.parse_args(event.command_args.split())
+        handler = FeatureStatusHandler(event, feature)
         if feature is not None and new_status is not None:
-            self.set_status(event, feature, new_status.lower())
+            self.set_status(handler, new_status.lower())
         elif feature is not None:
-            self.send_current_status(event, feature)
+            self.send_current_status(handler)
         else:
             self.send_usage(event)
 
@@ -27,25 +31,43 @@ class GetSetFeatureAction(Action):
                 new_status = args[1]
         return feature, new_status
 
-    def set_status(self, event, feature, new_status):
-        if new_status in CHANGE_STATUS_VALUES:
-            self.save_status(event, feature, new_status)
-            self.send_current_status(event, feature, "Done!\n")
+    def set_status(self, handler, new_status):
+        if new_status in STATUS_VALUES:
+            handler.set_status(new_status)
+            self.send_current_status(handler, "Done!\n")
         else:
-            self.send_usage(event)
+            self.send_usage(handler.event)
 
-    def send_current_status(self, event, feature, prepend=""):
-        status = self.get_status(event, feature)
-        response = prepend + "Current status of %s: %s" % (feature, status)
-        self.api.send_message(Message.create_reply(event.message, response))
+    def send_current_status(self, handler, prepend=""):
+        status = handler.get_status_string()
+        response = prepend + "Current status of %s: %s" % (handler.feature, status)
+        self.api.send_message(Message.create_reply(handler.event.message, response))
 
     def send_usage(self, event):
         self.api.send_message(Message.create_reply(event.message, "Usage: " + event.command + " <feature> [on|off]"))
 
-    @staticmethod
-    def get_status(event, feature):
-        return event.state.get_for("features").get_value(feature, "off")
 
-    @staticmethod
-    def save_status(event, feature, new_status):
-        event.state.get_for("features").set_value(feature, new_status)
+class ToggleableFeatureAction(IntermediateAction):
+    def __init__(self, feature):
+        super().__init__()
+        self.feature = feature
+
+    def process(self, event):
+        if FeatureStatusHandler(event, self.feature).enabled:
+            self._continue(event)
+
+
+class FeatureStatusHandler:
+    def __init__(self, event, feature):
+        self.event = event
+        self.feature = feature
+
+    @property
+    def enabled(self):
+        return STATUS_VALUES[self.get_status_string()]
+
+    def get_status_string(self):
+        return self.event.state.get_for("features").get_value(self.feature, OFF_VALUE)
+
+    def set_status(self, new_status):
+        self.event.state.get_for("features").set_value(self.feature, new_status)
