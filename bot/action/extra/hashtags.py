@@ -41,7 +41,7 @@ class HashtagListAction(Action):
     @staticmethod
     def get_response_message(hashtags):
         if hashtags.is_empty():
-            return "I have not seen any hashtag in this chat. Write some and try again (hint: #ThisIsAHashTag)."
+            return "I have not seen any hashtag in this chat.\nWrite some and try again (hint: #ThisIsAHashTag)."
         formatted_hashtags = ("%s -> %s" % (count, hashtag) for hashtag, count in hashtags.counted_by_popularity())
         return "\n".join(formatted_hashtags)
 
