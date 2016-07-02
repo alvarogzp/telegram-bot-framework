@@ -71,7 +71,10 @@ class FeatureStatusHandler:
         return self.state_handler.state.get_value("status", OFF_VALUE)
 
     def set_status(self, new_status):
-        self.state_handler.state.status = new_status
+        if new_status == OFF_VALUE:
+            self.state_handler.delete()
+        else:
+            self.state_handler.state.status = new_status
 
 
 class FeatureStateHandler:
@@ -82,3 +85,6 @@ class FeatureStateHandler:
     @property
     def state(self):
         return self.event.state.get_for("features").get_for(self.feature)
+
+    def delete(self):
+        self.event.state.get_for("features").set_value(self.feature, None)

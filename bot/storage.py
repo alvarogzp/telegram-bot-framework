@@ -1,5 +1,7 @@
 import os
 
+import shutil
+
 from bot.api.domain import Chat
 from bot.utils.attributeobject import DictionaryObject, AttributeObject
 
@@ -37,8 +39,10 @@ class Storage(AttributeObject):
         value_path = self.__get_value_path(key)
         if value is None:
             if os.path.exists(value_path):
-                os.remove(value_path)
+                shutil.rmtree(value_path)
         else:
+            if not os.path.exists(self._base_dir):
+                os.makedirs(self._base_dir)
             mode = "a" if append else "w"
             with open(value_path, mode) as f:
                 f.write(value)
@@ -68,8 +72,6 @@ class Config(Storage):
 class State(Storage):
     def __init__(self, state_dir):
         super().__init__(state_dir)
-        if not os.path.exists(self._base_dir):
-            os.makedirs(self._base_dir)
 
 
 class Cache(DictionaryObject):
