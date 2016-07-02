@@ -61,13 +61,24 @@ class FeatureStatusHandler:
     def __init__(self, event, feature):
         self.event = event
         self.feature = feature
+        self.state_handler = FeatureStateHandler(event, feature)
 
     @property
     def enabled(self):
         return STATUS_VALUES[self.get_status_string()]
 
     def get_status_string(self):
-        return self.event.state.get_for("features").get_value(self.feature, OFF_VALUE)
+        return self.state_handler.state.get_value("status", OFF_VALUE)
 
     def set_status(self, new_status):
-        self.event.state.get_for("features").set_value(self.feature, new_status)
+        self.state_handler.state.status = new_status
+
+
+class FeatureStateHandler:
+    def __init__(self, event, feature):
+        self.event = event
+        self.feature = feature
+
+    @property
+    def state(self):
+        return self.event.state.get_for("features").get_for(self.feature)
