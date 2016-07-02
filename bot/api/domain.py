@@ -1,5 +1,3 @@
-
-
 class ApiObject:
     def __init__(self, _type=None, **data):
         self._type = _type
