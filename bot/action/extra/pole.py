@@ -31,15 +31,15 @@ class PoleAction(Action):
                         event.state.current_day_first_messages += "\n" + self.get_formatted_message_to_store(event.message)
                         event.state.current_day_message_count = str(current_day_message_count)
                         if current_day_message_count == 3:
+                            chat = event.message.chat
                             pole_message, subpole_message, subsubpole_message = event.state.current_day_first_messages.splitlines()
-                            self.send_message(pole_message, "pole")
-                            self.send_message(subpole_message, "subpole")
-                            self.send_message(subsubpole_message, "subsubpole")
+                            self.send_message(chat, pole_message, "pole")
+                            self.send_message(chat, subpole_message, "subpole")
+                            self.send_message(chat, subsubpole_message, "subsubpole")
                             event.state.current_day_message_count = None
 
-    def send_message(self, reply_to, text):
-        message_id, chat_id = reply_to.split()
-        self.api.send_message(Message.create(Chat(id=chat_id), text, reply_to_message_id=message_id))
+    def send_message(self, chat, message_id, text):
+        self.api.send_message(Message.create(chat, text, reply_to_message_id=message_id))
 
     @staticmethod
     def get_day_number(timestamp):
@@ -47,4 +47,4 @@ class PoleAction(Action):
 
     @staticmethod
     def get_formatted_message_to_store(message):
-        return str(message.message_id) + " " + str(message.chat.id)
+        return str(message.message_id)
