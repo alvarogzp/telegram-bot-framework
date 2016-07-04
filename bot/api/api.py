@@ -1,3 +1,4 @@
+from bot.api.domain import Message
 from bot.api.telegram import TelegramBotApi
 from bot.storage import State
 
@@ -7,19 +8,16 @@ class Api:
         self.telegram_api = telegram_api
         self.state = state
 
-    def get_me(self):
-        return self.telegram_api.get_me()
-
-    def send_message(self, message):
-        return self.telegram_api.send_message(chat_id=message.chat.id, text=message.text,
-                                              reply_to_message_id=message.reply_to_message_id,
-                                              parse_mode=message.parse_mode)
+    def send_message(self, message: Message, **params):
+        message_params = message.data.copy()
+        message_params.update(params)
+        return self.telegram_api.sendMessage(**message_params)
 
     def get_pending_updates(self):
         return self.get_updates(timeout=0)
 
     def get_updates(self, timeout=45):
-        updates = self.telegram_api.get_updates(offset=self.__get_updates_offset(), timeout=timeout)
+        updates = self.telegram_api.getUpdates(offset=self.__get_updates_offset(), timeout=timeout)
         for update in updates:
             self.__set_updates_offset(update.update_id)
             yield update
@@ -29,3 +27,6 @@ class Api:
 
     def __set_updates_offset(self, last_update_id):
         self.state.next_update_id = str(last_update_id + 1)
+
+    def __getattr__(self, item):
+        return self.telegram_api.__getattr__(item)

@@ -43,7 +43,7 @@ class PoleAction(Action):
                             state.current_day_first_messages += "\n" + self.get_formatted_message_to_store(event.message)
 
     def send_message(self, chat, message_id, text):
-        self.api.send_message(Message.create(chat, text, reply_to_message_id=message_id))
+        self.api.send_message(Message.create(chat.id, text), reply_to_message_id=message_id)
 
     @staticmethod
     def get_day_number(timestamp):

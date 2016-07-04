@@ -38,18 +38,15 @@ class ApiObjectList:
             yield ApiObject.wrap_api_object(data)
 
 
-class Message:
+class Message(ApiObject):
     @staticmethod
-    def create(chat, text, reply_to_message_id=None, parse_mode=None):
-        return ApiObject(_type=Message, chat=chat, text=text, reply_to_message_id=reply_to_message_id,
-                         parse_mode=parse_mode)
+    def create(chat_id, text, reply_to_message_id=None):
+        return ApiObject(_type=Message, chat_id=chat_id, text=text, reply_to_message_id=reply_to_message_id)
 
     @staticmethod
-    def create_reply(message, reply_text, parse_mode=None):
-        return Message.create(message.chat, reply_text, message.message_id, parse_mode)
+    def create_reply(message, reply_text):
+        return Message.create(message.chat.id, reply_text, message.message_id)
 
 
 class Chat(ApiObject):
-    @staticmethod
-    def create(id):
-        return ApiObject(_type=Chat, id=id)
+    pass

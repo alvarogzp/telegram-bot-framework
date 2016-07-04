@@ -8,14 +8,11 @@ class TelegramBotApi:
         self.base_url = "https://api.telegram.org/bot" + auth_token + "/"
         self.debug = debug
 
-    def get_me(self):
-        return self.__send_request("getMe")
+    def __getattr__(self, item):
+        return self.__get_request_from_function_name(item)
 
-    def send_message(self, **params):
-        return self.__send_request("sendMessage", **params)
-
-    def get_updates(self, offset=None, timeout=None):
-        return self.__send_request("getUpdates", offset=offset, timeout=timeout)
+    def __get_request_from_function_name(self, function_name):
+        return lambda **params: self.__send_request(function_name, **params)
 
     def __send_request(self, command, **params):
         request = requests.get(self.base_url + command, params=params, timeout=60)

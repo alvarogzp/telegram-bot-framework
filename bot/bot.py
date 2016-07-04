@@ -2,7 +2,7 @@ import traceback
 
 from bot.action.core.action import Update, Action
 from bot.api.api import Api
-from bot.api.domain import Chat, Message
+from bot.api.domain import Message
 from bot.api.telegram import TelegramBotApi
 from bot.storage import Config, Cache
 from bot.storage import State
@@ -19,8 +19,7 @@ class Bot:
         self.cache = Cache()
         telegram_api = TelegramBotApi(self.config.auth_token, self.config.is_debug_enabled())
         self.api = Api(telegram_api, self.state)
-        self.cache.admin_chat = Chat.create(id=self.config.admin_user_id)
-        self.cache.bot_info = self.api.get_me()
+        self.cache.bot_info = self.api.getMe()
         self.action = Action()
 
     def set_action(self, action: Action):
@@ -65,4 +64,4 @@ class Bot:
 
     def send_to_admin(self, message):
         message_to_admin = "[admin] " + message
-        self.api.send_message(Message.create(chat=self.cache.admin_chat, text=message_to_admin))
+        self.api.send_message(Message.create(chat_id=self.config.admin_user_id, text=message_to_admin))
