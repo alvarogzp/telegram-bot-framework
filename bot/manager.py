@@ -9,6 +9,7 @@ from bot.action.extra.pole import PoleAction
 from bot.action.gapdetector import GlobalGapDetectorAction
 from bot.action.perchat import PerChatAction
 from bot.action.toggle import GetSetFeatureAction, ToggleableFeatureAction
+from bot.action.userinfo import SaveUserAction
 from bot.bot import Bot
 
 
@@ -35,6 +36,8 @@ class BotManager:
                     ),
 
                     MessageAction().then(
+                        SaveUserAction(),
+
                         PerChatAction().then(
                             ToggleableFeatureAction("pole").then(
                                 PoleAction()

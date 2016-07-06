@@ -29,6 +29,10 @@ class Storage(AttributeObject):
     def _setattr(self, key, value):
         self.set_value(key, value)
 
+    def exists_value(self, key):
+        value_path = self.__get_value_path(key)
+        return os.path.exists(value_path)
+
     def get_value(self, key, default_value=None):
         value_path = self.__get_value_path(key)
         if not os.path.isfile(value_path):
