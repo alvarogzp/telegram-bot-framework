@@ -11,6 +11,7 @@ class SaveUserAction(Action):
         self.save_user(message.forward_from)
         self.save_user(message.new_chat_member)
         self.save_user(message.left_chat_member)
+        self.save_user(message.chat)
 
     def save_user(self, user):
         if user is not None:
@@ -41,3 +42,5 @@ class UserStorageHandler:
             user_store.last_name = user.last_name
         if user.username != user_store.username:
             user_store.username = user.username
+        if user.title != user_store.title:
+            user_store.title = user.title
