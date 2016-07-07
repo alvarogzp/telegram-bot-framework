@@ -1,7 +1,7 @@
 import collections
 
 from bot.action.core.action import Action
-from bot.api.domain import Message
+from bot.api.domain import Message, MessageEntityParser
 
 
 class HashtagRecolectorAction(Action):
@@ -17,18 +17,16 @@ class HashtagRecolectorAction(Action):
         return [entity for entity in entities if entity.type == "hashtag"] if entities is not None else []
 
     def get_message_hashtags(self, message, hashtag_entities):
-        message_text_utf16_bytes = message.text.encode("utf-16")
+        entity_parser = MessageEntityParser(message)
         hashtags = HashtagList([])
         for entity in hashtag_entities:
-            hashtag = self.get_hashtag_from_entity(message, entity, message_text_utf16_bytes)
+            hashtag = self.get_hashtag_from_entity(message, entity, entity_parser)
             hashtags.add(hashtag)
         return hashtags
 
     @staticmethod
-    def get_hashtag_from_entity(message, entity, message_text_utf16):
-        start_utf16 = 2 + entity.offset * 2  # BOM + characters * 2 bytes
-        end_utf16 = start_utf16 + entity.length * 2
-        hashtag = message_text_utf16[start_utf16:end_utf16].decode("utf-16")
+    def get_hashtag_from_entity(message, entity, entity_parser):
+        hashtag = entity_parser.get_entity_text(entity)
         user_id = message.from_.id if message.from_ is not None else "-"
         return Hashtag(hashtag, message.date, user_id)
 

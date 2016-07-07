@@ -50,3 +50,13 @@ class Message(ApiObject):
 
 class Chat(ApiObject):
     pass
+
+
+class MessageEntityParser:
+    def __init__(self, message):
+        self.text_as_utf16_bytes = message.text.encode("utf-16")
+
+    def get_entity_text(self, entity):
+        start_byte = 2 + entity.offset * 2  # BOM + characters * 2 bytes
+        end_byte = start_byte + entity.length * 2
+        return self.text_as_utf16_bytes[start_byte:end_byte].decode("utf-16")
