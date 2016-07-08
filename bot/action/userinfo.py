@@ -1,9 +1,10 @@
 from bot.action.core.action import Action
+from bot.utils.attributeobject import DictionaryObject
 
 
 class SaveUserAction(Action):
     def post_setup(self):
-        self.handler = UserStorageHandler(self.state)
+        self.handler = UserStorageHandler.get_instance(self.state)
 
     def process(self, event):
         message = event.message
@@ -19,20 +20,26 @@ class SaveUserAction(Action):
 
 
 class UserStorageHandler:
+    instance = None
+
+    @classmethod
+    def get_instance(cls, state):
+        """:rtype: UserStorageHandler"""
+        if cls.instance is None:
+            cls.instance = UserStorageHandler(state)
+        return cls.instance
+
     def __init__(self, state):
         self.state = state.get_for("user")
 
-    def exists(self, user_id):
-        return self.state.exists_value(str(user_id))
-
     def get(self, user_id):
         user = self.state.get_for(str(user_id))
-        return {
+        return DictionaryObject({
             "id": user_id,
             "first_name": user.first_name,
             "last_name": user.last_name,
             "username": user.username,
-        }
+        })
 
     def save(self, user):
         user_store = self.state.get_for(str(user.id))
