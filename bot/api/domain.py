@@ -39,13 +39,18 @@ class ApiObjectList:
 
 
 class Message(ApiObject):
+    def replying_to(self, message):
+        self.data["chat_id"] = message.chat.id
+        self.data["reply_to_message_id"] = message.message_id
+        return self
+
     @staticmethod
-    def create(chat_id, text, reply_to_message_id=None):
-        return ApiObject(_type=Message, chat_id=chat_id, text=text, reply_to_message_id=reply_to_message_id)
+    def create(text, chat_id=None, **kwargs):
+        return Message(_type=Message, text=text, chat_id=chat_id, **kwargs)
 
     @staticmethod
     def create_reply(message, reply_text):
-        return Message.create(message.chat.id, reply_text, message.message_id)
+        return Message.create(reply_text).replying_to(message)
 
 
 class Chat(ApiObject):

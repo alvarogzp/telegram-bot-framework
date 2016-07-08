@@ -64,4 +64,4 @@ class Bot:
 
     def send_to_admin(self, message):
         message_to_admin = "[admin] " + message
-        self.api.send_message(Message.create(chat_id=self.config.admin_user_id, text=message_to_admin))
+        self.api.send_message(Message.create(text=message_to_admin, chat_id=self.config.admin_user_id))
