@@ -19,9 +19,9 @@ class AttributeObject:
 
 
 class DictionaryObject(AttributeObject):
-    def __init__(self):
+    def __init__(self, initial_items={}):
         super().__init__("_dictionary")
-        self._dictionary = {}
+        self._dictionary = dict(initial_items)
 
     def _getattr(self, item):
         return self._dictionary.get(item)
@@ -30,6 +30,4 @@ class DictionaryObject(AttributeObject):
         self._dictionary[key] = value
 
     def _copy(self):
-        new = DictionaryObject()
-        new._dictionary = self._dictionary.copy()
-        return new
+        return DictionaryObject(self._dictionary)
