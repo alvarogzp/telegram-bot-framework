@@ -1,4 +1,5 @@
 from bot.action.core.action import Action, IntermediateAction
+from bot.action.core.command import CommandUsageMessage
 from bot.api.domain import Message
 
 ON_VALUE = "on"
@@ -44,7 +45,8 @@ class GetSetFeatureAction(Action):
         self.api.send_message(Message.create_reply(handler.event.message, response), parse_mode="Markdown")
 
     def send_usage(self, event):
-        self.api.send_message(Message.create_reply(event.message, "Usage: " + event.command + " <feature> [on|off]"))
+        usage_message = CommandUsageMessage.get_usage_message(event.command, "<feature> [on|off]")
+        self.api.send_message(usage_message.replying_to(event.message))
 
 
 class ToggleableFeatureAction(IntermediateAction):
