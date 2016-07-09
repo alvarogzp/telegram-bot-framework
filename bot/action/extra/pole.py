@@ -16,10 +16,7 @@ class PoleAction(Action):
         previous_message_timestamp = state.last_message_timestamp
         state.last_message_timestamp = str(current_message_timestamp)
         if previous_message_timestamp is not None:
-            current_message_day = self.get_day_number(current_message_timestamp)
-            previous_message_day = self.get_day_number(int(previous_message_timestamp))
-
-            if current_message_day != previous_message_day:  # day change: pole
+            if self.has_changed_day(int(previous_message_timestamp), current_message_timestamp):  # pole
                 self.build_pole_and_add_to(state, "poles", event.message)
                 state.current_day_message_count = str(1)
             else:
@@ -35,6 +32,15 @@ class PoleAction(Action):
                             self.build_pole_and_add_to(state, "subsubpoles", event.message)
                             state.current_day_message_count = None
 
+    def has_changed_day(self, previous_timestamp, current_timestamp):
+        current_day = self.get_day_number(current_timestamp)
+        previous_day = self.get_day_number(previous_timestamp)
+        return current_day != previous_day
+
+    @staticmethod
+    def get_day_number(timestamp):
+        return (timestamp + OFFSET_FROM_UTC_IN_SECONDS) // SECONDS_IN_A_DAY
+
     def build_pole_and_add_to(self, state, key, message):
         pole = self.build_pole_from_message(message)
         self.add_pole_to(state, key, pole)
@@ -47,10 +53,6 @@ class PoleAction(Action):
     def build_pole_from_message(message):
         user_id = message.from_.id if message.from_ is not None else "-"
         return Pole(user_id, message.date, message.message_id)
-
-    @staticmethod
-    def get_day_number(timestamp):
-        return (timestamp + OFFSET_FROM_UTC_IN_SECONDS) // SECONDS_IN_A_DAY
 
 
 class Pole:
