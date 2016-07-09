@@ -8,6 +8,7 @@ class PoleAction(Action):
     def process(self, event):
         state = event.state.get_for("pole")
         if event.global_gap_detected:  # reset everything
+            # FIXME https://github.com/alvarogzp/telegram-bot/issues/23
             state.last_message_timestamp = None
             state.current_day_message_count = None
 
