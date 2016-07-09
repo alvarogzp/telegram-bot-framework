@@ -39,7 +39,9 @@ class BotManager:
                         SaveUserAction(),
 
                         PerChatAction().then(
-                            PoleAction(),
+                            ToggleableFeatureAction("pole").then(
+                                PoleAction()
+                            ),
 
                             TextMessageAction().then(
                                 CommandAction("start").then(
