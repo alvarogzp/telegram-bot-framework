@@ -59,4 +59,4 @@ class Pole:
         self.message_id = message_id
 
     def serialize(self):
-        return "%s %s %s" % (self.user_id, self.date, self.message_id)
+        return "%s %s %s\n" % (self.user_id, self.date, self.message_id)
