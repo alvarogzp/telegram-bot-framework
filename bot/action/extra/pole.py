@@ -4,7 +4,7 @@ SECONDS_IN_A_DAY = 86400
 OFFSET_FROM_UTC_IN_SECONDS = 2 * 3600
 
 
-class PoleAction(Action):
+class SavePoleAction(Action):
     def process(self, event):
         state = event.state.get_for("pole")
         if event.global_gap_detected:  # reset everything
