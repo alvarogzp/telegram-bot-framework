@@ -47,10 +47,11 @@ class BotManager:
 
                         PerChatAction().then(
                             SaveMessageAction(),
-
                             SavePoleAction(),
 
                             TextMessageAction().then(
+                                HashtagRecolectorAction(),
+
                                 CommandAction("start").then(
                                     AnswerAction(
                                         "Hello! I am " + self.bot.cache.bot_info.first_name + " and I am here to serve you.\nSorry if I cannot do too much for you now, I am still under construction.")
@@ -64,17 +65,16 @@ class BotManager:
                                     )
                                 ),
 
-                                CommandAction("poles").then(
-                                    ListPoleAction()
-                                ),
-
-                                HashtagRecolectorAction(),
                                 CommandAction("hashtags").then(
                                     HashtagListAction()
                                 ),
 
                                 CommandAction("feature").then(
                                     GetSetFeatureAction()
+                                ),
+
+                                CommandAction("poles").then(
+                                    ListPoleAction()
                                 )
                             )
                         )
