@@ -4,7 +4,7 @@ from bot.action.core.action import ActionGroup
 from bot.action.core.command import CommandAction
 from bot.action.core.filter import MessageAction, TextMessageAction, NoPendingAction, EditedMessageAction
 from bot.action.enterexit import GreetAction, LeaveAction
-from bot.action.extra.hashtags import HashtagRecolectorAction, HashtagListAction
+from bot.action.extra.hashtags import SaveHashtagsAction, ListHashtagsAction
 from bot.action.extra.messages import SaveMessageAction
 from bot.action.extra.pole import SavePoleAction, ListPoleAction
 from bot.action.gapdetector import GlobalGapDetectorAction
@@ -50,7 +50,7 @@ class BotManager:
                             SavePoleAction(),
 
                             TextMessageAction().then(
-                                HashtagRecolectorAction(),
+                                SaveHashtagsAction(),
 
                                 CommandAction("start").then(
                                     AnswerAction(
@@ -66,7 +66,7 @@ class BotManager:
                                 ),
 
                                 CommandAction("hashtags").then(
-                                    HashtagListAction()
+                                    ListHashtagsAction()
                                 ),
 
                                 CommandAction("feature").then(
