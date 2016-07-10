@@ -106,7 +106,7 @@ class Hashtag:
 
     def printable_version(self, user_storage_handler):
         formatted_date = DateFormatter.format(self.date) if self.date is not None else "???"
-        formatted_user = UserFormatter.format(user_storage_handler.get(self.user_id)) if self.user_id is not None else "???"
+        formatted_user = UserFormatter.retrieve_and_format(self.user_id, user_storage_handler) if self.user_id is not None else "???"
         return "%s  (%s by %s)" % (self.hashtag, formatted_date, formatted_user)
 
     def serialize(self):

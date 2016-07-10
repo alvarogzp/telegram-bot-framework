@@ -1,5 +1,7 @@
 import time
 
+from bot.action.userinfo import UserStorageHandler
+
 
 class DateFormatter:
     @classmethod
@@ -28,3 +30,7 @@ class UserFormatter:
         else:
             formatted_user = str(user.id)
         return formatted_user
+
+    @classmethod
+    def retrieve_and_format(cls, user_id, user_storage_handler: UserStorageHandler):
+        return cls.format(user_storage_handler.get(user_id))
