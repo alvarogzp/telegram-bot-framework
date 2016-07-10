@@ -2,9 +2,10 @@ from bot.action.admin import AdminAction, StopAction, EvalAction
 from bot.action.answer import AnswerAction
 from bot.action.core.action import ActionGroup
 from bot.action.core.command import CommandAction
-from bot.action.core.filter import MessageAction, TextMessageAction, NoPendingAction
+from bot.action.core.filter import MessageAction, TextMessageAction, NoPendingAction, EditedMessageAction
 from bot.action.enterexit import GreetAction, LeaveAction
 from bot.action.extra.hashtags import HashtagRecolectorAction, HashtagListAction
+from bot.action.extra.messages import SaveMessageAction
 from bot.action.extra.pole import SavePoleAction, ListPoleAction
 from bot.action.gapdetector import GlobalGapDetectorAction
 from bot.action.perchat import PerChatAction
@@ -35,10 +36,18 @@ class BotManager:
                         )
                     ),
 
+                    EditedMessageAction().then(
+                        PerChatAction().then(
+                            SaveMessageAction()
+                        )
+                    ),
+
                     MessageAction().then(
                         SaveUserAction(),
 
                         PerChatAction().then(
+                            SaveMessageAction(),
+
                             SavePoleAction(),
 
                             TextMessageAction().then(
