@@ -23,7 +23,7 @@ class SavePoleAction(Action):
         state.last_message_timestamp = str(current_message_timestamp)
         if previous_message_timestamp is not None:
             if self.has_changed_day(int(previous_message_timestamp), current_message_timestamp):  # pole
-                self.build_pole_and_add_to(state, "poles", event.message)
+                self.build_pole_and_save_to(state, "poles", event.message)
                 state.current_day_message_count = str(1)
             else:
                 current_day_message_count = state.current_day_message_count
@@ -32,10 +32,10 @@ class SavePoleAction(Action):
                     if current_day_message_count < 3:
                         current_day_message_count += 1
                         if current_day_message_count == 2:
-                            self.build_pole_and_add_to(state, "subpoles", event.message)
+                            self.build_pole_and_save_to(state, "subpoles", event.message)
                             state.current_day_message_count = str(current_day_message_count)
                         elif current_day_message_count == 3:
-                            self.build_pole_and_add_to(state, "subsubpoles", event.message)
+                            self.build_pole_and_save_to(state, "subsubpoles", event.message)
                             state.current_day_message_count = None
 
     def has_changed_day(self, previous_timestamp, current_timestamp):
@@ -47,18 +47,18 @@ class SavePoleAction(Action):
     def get_day_number(timestamp):
         return (timestamp + OFFSET_FROM_UTC_IN_SECONDS) // SECONDS_IN_A_DAY
 
-    def build_pole_and_add_to(self, state, key, message):
+    def build_pole_and_save_to(self, state, storage, message):
         pole = self.build_pole_from_message(message)
-        self.add_pole_to(state, key, pole)
-
-    @staticmethod
-    def add_pole_to(state, key, pole):
-        state.set_value(key, pole.serialize(), append=True)
+        self.save_pole_to(state, storage, pole)
 
     @staticmethod
     def build_pole_from_message(message):
         user_id = message.from_.id if message.from_ is not None else "-"
         return Pole(user_id, message.date, message.message_id)
+
+    @staticmethod
+    def save_pole_to(state, storage, pole):
+        PoleStorageHandler(state).save_pole_to(storage, pole)
 
 
 class ListPoleAction(Action):
