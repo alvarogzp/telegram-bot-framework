@@ -37,7 +37,8 @@ class Storage(AttributeObject):
         value_path = self.__get_value_path(key)
         if not os.path.isfile(value_path):
             return default_value
-        return open(value_path).read()
+        with open(value_path) as f:
+            return f.read()
 
     def set_value(self, key, value, append=False):
         value_path = self.__get_value_path(key)
