@@ -103,12 +103,12 @@ class ListPoleAction(Action):
 
     @staticmethod
     def get_response_help(event, help_args):
-        args = "[number_of_poles]|[ranking [number_of_users]]|[last [pole_number]]"
-        description = "By default, display recent poles.\n" \
-                      "Use *ranking* to show users with most poles.\n" \
+        args = ["[number_of_poles]", "ranking [number_of_users]", "last [pole_number]"]
+        description = "By default, display recent poles.\n\n" \
+                      "Use *ranking* to show users with most poles.\n\n" \
                       "You can also add a number to the end in both modes to limit the poles or users to display" \
-                      " (default is 10).\n" \
-                      "Use *last* to show last pole, or previous ones adding a number.\n"
+                      " (default is 10).\n\n" \
+                      "Use *last* to show last pole, or previous ones adding a number."
         return CommandUsageMessage.get_usage_message(event.command, args, description)
 
     @staticmethod

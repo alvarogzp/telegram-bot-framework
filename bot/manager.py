@@ -2,9 +2,10 @@ from bot.action.admin import AdminAction, StopAction, EvalAction
 from bot.action.answer import AnswerAction
 from bot.action.core.action import ActionGroup
 from bot.action.core.command import CommandAction
-from bot.action.core.filter import MessageAction, TextMessageAction, NoPendingAction
+from bot.action.core.filter import MessageAction, TextMessageAction, NoPendingAction, EditedMessageAction
 from bot.action.enterexit import GreetAction, LeaveAction
-from bot.action.extra.hashtags import HashtagRecolectorAction, HashtagListAction
+from bot.action.extra.hashtags import SaveHashtagsAction, ListHashtagsAction
+from bot.action.extra.messages import SaveMessageAction, ListMessageAction
 from bot.action.extra.pole import SavePoleAction, ListPoleAction
 from bot.action.gapdetector import GlobalGapDetectorAction
 from bot.action.perchat import PerChatAction
@@ -35,13 +36,22 @@ class BotManager:
                         )
                     ),
 
+                    EditedMessageAction().then(
+                        PerChatAction().then(
+                            SaveMessageAction()
+                        )
+                    ),
+
                     MessageAction().then(
                         SaveUserAction(),
 
                         PerChatAction().then(
+                            SaveMessageAction(),
                             SavePoleAction(),
 
                             TextMessageAction().then(
+                                SaveHashtagsAction(),
+
                                 CommandAction("start").then(
                                     AnswerAction(
                                         "Hello! I am " + self.bot.cache.bot_info.first_name + " and I am here to serve you.\nSorry if I cannot do too much for you now, I am still under construction.")
@@ -55,17 +65,20 @@ class BotManager:
                                     )
                                 ),
 
-                                CommandAction("poles").then(
-                                    ListPoleAction()
-                                ),
-
-                                HashtagRecolectorAction(),
                                 CommandAction("hashtags").then(
-                                    HashtagListAction()
+                                    ListHashtagsAction()
                                 ),
 
                                 CommandAction("feature").then(
                                     GetSetFeatureAction()
+                                ),
+
+                                CommandAction("poles").then(
+                                    ListPoleAction()
+                                ),
+
+                                CommandAction("messages").then(
+                                    ListMessageAction()
                                 )
                             )
                         )

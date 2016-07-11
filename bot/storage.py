@@ -50,6 +50,9 @@ class Storage(AttributeObject):
             with open(value_path, mode) as f:
                 f.write(value)
 
+    def list_keys(self):
+        return os.listdir(self._base_dir)
+
     def __get_value_path(self, key):
         return os.path.join(self._base_dir, key)
 

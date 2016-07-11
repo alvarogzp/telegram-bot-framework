@@ -9,6 +9,10 @@ class DateFormatter:
         return cls._format("%d %b %H:%M", timestamp)
 
     @classmethod
+    def format_full(cls, timestamp):
+        return cls._format("%d %b %Y %H:%M:%S", timestamp)
+
+    @classmethod
     def format_only_date(cls, timestamp):
         return cls._format("%d %b %Y", timestamp)
 
