@@ -9,6 +9,16 @@ class TextMessageAction(IntermediateAction):
             self._continue(event)
 
 
+class EditedMessageAction(IntermediateAction):
+    def process(self, event):
+        edited_message = event.update.edited_message
+        if edited_message is not None:
+            event.message = edited_message
+            event.edited_message = edited_message
+            event.chat = edited_message.chat
+            self._continue(event)
+
+
 class MessageAction(IntermediateAction):
     def process(self, event):
         message = event.update.message

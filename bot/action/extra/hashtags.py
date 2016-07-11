@@ -7,7 +7,7 @@ from bot.action.util.format import DateFormatter, UserFormatter
 from bot.api.domain import Message, MessageEntityParser
 
 
-class HashtagRecolectorAction(Action):
+class SaveHashtagsAction(Action):
     def process(self, event):
         hashtag_entities = self.get_hashtag_entities(event.message.entities)
         if len(hashtag_entities) > 0:
@@ -34,7 +34,7 @@ class HashtagRecolectorAction(Action):
         return Hashtag(hashtag, message.date, user_id)
 
 
-class HashtagListAction(Action):
+class ListHashtagsAction(Action):
     def process(self, event):
         action, number_of_hashtags_to_display, help_args = self.parse_args(event.command_args.split())
         if action in ("recent", "popular"):
@@ -70,9 +70,9 @@ class HashtagListAction(Action):
 
     @staticmethod
     def get_response_help(event, help_args):
-        args = "[number_of_hashtags]|[popular [number_of_hashtags]]"
-        description = "By default, display recent hashtags.\n" \
-                      "Use *popular* to show most popular ones.\n" \
+        args = ["[number_of_hashtags]", "popular [number_of_hashtags]"]
+        description = "By default, display recent hashtags.\n\n" \
+                      "Use *popular* to show most popular ones.\n\n" \
                       "You can also add a number to the end in both modes to limit the hashtags to display" \
                       " (default is 10)."
         return CommandUsageMessage.get_usage_message(event.command, args, description)
