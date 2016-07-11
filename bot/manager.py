@@ -5,7 +5,7 @@ from bot.action.core.command import CommandAction
 from bot.action.core.filter import MessageAction, TextMessageAction, NoPendingAction, EditedMessageAction
 from bot.action.enterexit import GreetAction, LeaveAction
 from bot.action.extra.hashtags import SaveHashtagsAction, ListHashtagsAction
-from bot.action.extra.messages import SaveMessageAction
+from bot.action.extra.messages import SaveMessageAction, ListMessageAction
 from bot.action.extra.pole import SavePoleAction, ListPoleAction
 from bot.action.gapdetector import GlobalGapDetectorAction
 from bot.action.perchat import PerChatAction
@@ -75,6 +75,10 @@ class BotManager:
 
                                 CommandAction("poles").then(
                                     ListPoleAction()
+                                ),
+
+                                CommandAction("messages").then(
+                                    ListMessageAction()
                                 )
                             )
                         )
