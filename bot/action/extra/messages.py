@@ -53,7 +53,7 @@ class ListMessageAction(Action):
 
     @staticmethod
     def get_response_help(event, help_args):
-        args = "[number_of_messages] | show message_id | ranking [number_of_users]"
+        args = ["[number_of_messages]", "show message_id", "ranking [number_of_users]"]
         description = "By default, display a list with information about last messages.\n" \
                       "You can add a number to modify the number of messages to list (default is 10).\n\n" \
                       "Use *show* along with a message\\_id to view that particular message.\n\n" \

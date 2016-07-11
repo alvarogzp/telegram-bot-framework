@@ -103,7 +103,7 @@ class ListPoleAction(Action):
 
     @staticmethod
     def get_response_help(event, help_args):
-        args = "[number_of_poles] | ranking [number_of_users] | last [pole_number]"
+        args = ["[number_of_poles]", "ranking [number_of_users]", "last [pole_number]"]
         description = "By default, display recent poles.\n\n" \
                       "Use *ranking* to show users with most poles.\n\n" \
                       "You can also add a number to the end in both modes to limit the poles or users to display" \
