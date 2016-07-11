@@ -70,9 +70,9 @@ class ListHashtagsAction(Action):
 
     @staticmethod
     def get_response_help(event, help_args):
-        args = "[number_of_hashtags]|[popular [number_of_hashtags]]"
-        description = "By default, display recent hashtags.\n" \
-                      "Use *popular* to show most popular ones.\n" \
+        args = "[number_of_hashtags] | popular [number_of_hashtags]"
+        description = "By default, display recent hashtags.\n\n" \
+                      "Use *popular* to show most popular ones.\n\n" \
                       "You can also add a number to the end in both modes to limit the hashtags to display" \
                       " (default is 10)."
         return CommandUsageMessage.get_usage_message(event.command, args, description)
