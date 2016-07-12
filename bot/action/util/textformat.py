@@ -7,27 +7,27 @@ class FormattedText:
         self.mode = mode
         self.text = ""
 
-    def normal(self, text):
+    def normal(self, text: str):
         self.text += self._escaped(text)
         return self
 
-    def bold(self, text):
+    def bold(self, text: str):
         self.text += self.formatter.bold(self._escaped(text))
         return self
 
-    def italic(self, text):
+    def italic(self, text: str):
         self.text += self.formatter.italic(self._escaped(text))
         return self
 
-    def url(self, text, url):
+    def url(self, text: str, url: str):
         self.text += self.formatter.url(self._escaped(text), self._escaped(url))
         return self
 
-    def code_inline(self, text):
+    def code_inline(self, text: str):
         self.text += self.formatter.code_inline(self._escaped(text))
         return self
 
-    def code_block(self, text):
+    def code_block(self, text: str):
         self.text += self.formatter.code_block(self._escaped(text))
         return self
 
