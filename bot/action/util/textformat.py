@@ -60,9 +60,9 @@ class TextFormatter:
 
 class HtmlTextFormatter(TextFormatter):
     def escape(self, text):
-        return text.replace("<", "&lt;")\
+        return text.replace("&", "&amp;")\
+                   .replace("<", "&lt;")\
                    .replace(">", "&gt;")\
-                   .replace("&", "&amp;")\
                    .replace("\"", "&quot;")
 
     def bold(self, text):
