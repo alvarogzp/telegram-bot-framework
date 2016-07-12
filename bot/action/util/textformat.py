@@ -31,6 +31,19 @@ class FormattedText:
         self.text += self.formatter.code_block(self._escaped(text))
         return self
 
+    def concat(self, formatted_text):
+        """:type formatted_text: FormattedText"""
+        assert self.mode == formatted_text.mode, "Cannot concat text with different modes"
+        self.text += formatted_text.text
+        return self
+
+    def join(self, *formatted_texts):
+        """:type formatted_texts: list[FormattedText]"""
+        for formatted_text in formatted_texts:
+            assert self.mode == formatted_text.mode, "Cannot join text with different modes"
+        self.text = self.text.join((formatted_text.text for formatted_text in formatted_texts))
+        return self
+
     def build_message(self):
         return Message.create(self.text, parse_mode=self.mode)
 
