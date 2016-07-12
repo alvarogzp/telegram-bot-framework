@@ -1,7 +1,7 @@
 from bot.api.domain import Message
 
 
-class FormattedTextBuilder:
+class FormattedText:
     def __init__(self, mode="HTML"):
         self.formatter = TextFormatterFactory.get_for_mode(mode)
         self.mode = mode
