@@ -77,7 +77,7 @@ class ListPoleAction(Action):
         else:
             response = self.get_response_help(event, help_args)
         if response.reply_to_message_id is None:
-            response = response.replying_to(event.message)
+            response = response.to_chat_replying(event.message)
         self.api.send_message(response)
 
     @staticmethod

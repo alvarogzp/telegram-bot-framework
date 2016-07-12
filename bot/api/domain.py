@@ -39,9 +39,23 @@ class ApiObjectList:
 
 
 class Message(ApiObject):
-    def replying_to(self, message):
-        self.data["chat_id"] = message.chat.id
-        self.data["reply_to_message_id"] = message.message_id
+    def to_chat(self, message=None, chat=None, chat_id=None):
+        if message is not None:
+            chat = message.chat
+        if chat is not None:
+            chat_id = chat.id
+        self.data["chat_id"] = chat_id
+        return self
+
+    def reply_to_message(self, message=None, message_id=None):
+        if message is not None:
+            message_id = message.message_id
+        self.data["reply_to_message_id"] = message_id
+        return self
+
+    def to_chat_replying(self, message):
+        self.to_chat(message)
+        self.reply_to_message(message)
         return self
 
     @staticmethod
@@ -50,7 +64,7 @@ class Message(ApiObject):
 
     @staticmethod
     def create_reply(message, reply_text):
-        return Message.create(reply_text).replying_to(message)
+        return Message.create(reply_text).to_chat(message).reply_to_message(message)
 
 
 class Chat(ApiObject):
