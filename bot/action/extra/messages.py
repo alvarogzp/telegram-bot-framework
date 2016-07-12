@@ -107,7 +107,7 @@ class StoredMessage:
         formatted_date = DateFormatter.format(self.message.date)
         edits_info = (" (%s edits)" % len(self.edited_messages)) if len(self.edited_messages) > 0 else ""
         return FormattedText().normal("[").bold(self.message_id).normal("] at ").bold(formatted_date).normal(" by ")\
-            .normal(formatted_user).normal(edits_info)
+            .bold(formatted_user).normal(edits_info)
 
     def printable_full_message(self, user_storage_handler):
         formatted_date = DateFormatter.format_full(self.message.date)
