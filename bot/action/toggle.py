@@ -46,7 +46,7 @@ class GetSetFeatureAction(Action):
 
     def send_usage(self, event):
         usage_message = CommandUsageMessage.get_usage_message(event.command, "<feature> [on|off]")
-        self.api.send_message(usage_message.replying_to(event.message))
+        self.api.send_message(usage_message.to_chat_replying(event.message))
 
 
 class ToggleableFeatureAction(IntermediateAction):

@@ -47,7 +47,7 @@ class ListHashtagsAction(Action):
                 response = self.get_response_popular(event, hashtags, number_of_hashtags_to_display)
         else:
             response = self.get_response_help(event, help_args)
-        self.api.send_message(response.replying_to(event.message))
+        self.api.send_message(response.to_chat_replying(event.message))
 
     @staticmethod
     def parse_args(args):
