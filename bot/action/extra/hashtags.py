@@ -37,17 +37,17 @@ class SaveHashtagsAction(Action):
 
 class ListHashtagsAction(Action):
     def process(self, event):
-        action, number_of_hashtags_to_display, help_args = self.parse_args(event.command_args.split())
+        action, action_param, help_args = self.parse_args(event.command_args.split())
         if action in ("recent", "popular", "ranking"):
             hashtags = HashtagStorageHandler(event).get_stored_hashtags()
             if hashtags.is_empty():
                 response = self.get_response_empty()
             elif action == "recent":
-                response = self.get_response_recent(event, hashtags, number_of_hashtags_to_display)
+                response = self.get_response_recent(event, hashtags, action_param)
             elif action == "popular":
-                response = self.get_response_popular(event, hashtags, number_of_hashtags_to_display)
+                response = self.get_response_popular(event, hashtags, action_param)
             else:
-                response = self.get_response_ranking(event, hashtags, number_of_hashtags_to_display)
+                response = self.get_response_ranking(event, hashtags, action_param)
         else:
             response = self.get_response_help(event, help_args)
         self.api.send_message(response.to_chat_replying(event.message))
@@ -55,21 +55,21 @@ class ListHashtagsAction(Action):
     @staticmethod
     def parse_args(args):
         action = "help"
-        number_of_hashtags_to_display = 10
+        action_param = 10
         help_args = args[1:]
         if len(args) == 0:
             action = "recent"
         elif len(args) == 1:
             if args[0].isnumeric():
                 action = "recent"
-                number_of_hashtags_to_display = int(args[0])
+                action_param = int(args[0])
             else:
                 action = args[0]
         elif len(args) == 2:
             if args[1].isnumeric():
-                number_of_hashtags_to_display = int(args[1])
+                action_param = int(args[1])
                 action = args[0]
-        return action, number_of_hashtags_to_display, help_args
+        return action, action_param, help_args
 
     @staticmethod
     def get_response_help(event, help_args):
