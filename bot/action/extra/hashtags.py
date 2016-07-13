@@ -38,14 +38,16 @@ class SaveHashtagsAction(Action):
 class ListHashtagsAction(Action):
     def process(self, event):
         action, number_of_hashtags_to_display, help_args = self.parse_args(event.command_args.split())
-        if action in ("recent", "popular"):
+        if action in ("recent", "popular", "ranking"):
             hashtags = HashtagStorageHandler(event).get_stored_hashtags()
             if hashtags.is_empty():
                 response = self.get_response_empty()
             elif action == "recent":
                 response = self.get_response_recent(event, hashtags, number_of_hashtags_to_display)
-            else:
+            elif action == "popular":
                 response = self.get_response_popular(event, hashtags, number_of_hashtags_to_display)
+            else:
+                response = self.get_response_ranking(event, hashtags, number_of_hashtags_to_display)
         else:
             response = self.get_response_help(event, help_args)
         self.api.send_message(response.to_chat_replying(event.message))
@@ -71,11 +73,12 @@ class ListHashtagsAction(Action):
 
     @staticmethod
     def get_response_help(event, help_args):
-        args = ["[recent] [number_of_hashtags]", "popular [number_of_hashtags]"]
+        args = ["[recent] [number_of_hashtags]", "popular [number_of_hashtags]", "ranking [number_of_users]"]
         description = "By default, display recent hashtags.\n\n" \
                       "Use *popular* to show most popular ones.\n\n" \
-                      "You can also add a number to the end in both modes to limit the hashtags to display" \
-                      " (default is 10)."
+                      "Use *ranking* to show the users who wrote most hashtags.\n\n" \
+                      "In any mode, you can also add a number to the end to limit the number of hashtags or users" \
+                      " to display (default is 10)."
         return CommandUsageMessage.get_usage_message(event.command, args, description)
 
     @staticmethod
@@ -92,6 +95,11 @@ class ListHashtagsAction(Action):
     def get_response_popular(self, event, hashtags, number_of_hashtags_to_display):
         printable_hashtags = hashtags.grouped_by_popularity(number_of_hashtags_to_display).printable_version()
         return self.__build_success_response_message(event, "Most popular hashtags:", printable_hashtags)
+
+    def get_response_ranking(self, event, hashtags, number_of_users_to_display):
+        user_storage_handler = UserStorageHandler.get_instance(self.state)
+        printable_hashtags = hashtags.grouped_by_user(number_of_users_to_display).printable_version(user_storage_handler)
+        return self.__build_success_response_message(event, "Users who wrote most hashtags:", printable_hashtags)
 
     @staticmethod
     def __build_success_response_message(event, title, printable_hashtags):
@@ -134,6 +142,10 @@ class HashtagList:
         hashtags_names = (hashtag.hashtag for hashtag in self.hashtags)
         return HashtagGroup(collections.Counter(hashtags_names).most_common(max_to_return))
 
+    def grouped_by_user(self, max_to_return):
+        hashtags_users = (hashtag.user_id for hashtag in self.hashtags)
+        return UserGroup(collections.Counter(hashtags_users).most_common(max_to_return))
+
     def sorted_by_recent_use(self, limit):
         if limit <= 0:
             return HashtagList([])
@@ -157,6 +169,15 @@ class HashtagGroup:
 
     def printable_version(self):
         return "\n".join(("%s -> %s" % (count, hashtag) for hashtag, count in self.grouped_hashtags))
+
+
+class UserGroup:
+    def __init__(self, grouped_users):
+        self.grouped_users = grouped_users
+
+    def printable_version(self, user_storage_handler):
+        return "\n".join(("%s -> %s" % (count, UserFormatter.retrieve_and_format(user_id, user_storage_handler))
+                          for user_id, count in self.grouped_users if user_id is not None))
 
 
 class HashtagStorageHandler:
