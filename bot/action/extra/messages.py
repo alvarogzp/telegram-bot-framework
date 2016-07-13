@@ -202,6 +202,7 @@ class MessageStorageHandler:
         data = message.data.copy()
         self.__replace_with_id_if_present(data, "from")
         self.__replace_with_id_if_present(data, "forward_from")
+        self.__replace_with_id_if_present(data, "reply_to_message", "message_id")
         self.__delete_if_present(data, "chat")
         self.__delete_if_present(data, "message_id")
         self.__delete_if_present(data, "entities")
@@ -209,9 +210,9 @@ class MessageStorageHandler:
         self.state.set_value(str(message.message_id), dump + "\n", append=True)
 
     @staticmethod
-    def __replace_with_id_if_present(dict, key):
+    def __replace_with_id_if_present(dict, key, id_key="id"):
         if dict.get(key) is not None:
-            dict[key] = dict[key]["id"]
+            dict[key] = dict[key][id_key]
 
     @staticmethod
     def __delete_if_present(dict, key):
