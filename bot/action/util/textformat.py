@@ -31,6 +31,10 @@ class FormattedText:
         self.text += self.formatter.code_block(self._escaped(text))
         return self
 
+    def newline(self):
+        self.text += "\n"
+        return self
+
     def concat(self, formatted_text):
         """:type formatted_text: FormattedText"""
         assert self.mode == formatted_text.mode, "Cannot concat text with different modes"
