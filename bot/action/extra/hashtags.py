@@ -4,6 +4,7 @@ from bot.action.core.action import Action
 from bot.action.core.command import CommandUsageMessage
 from bot.action.userinfo import UserStorageHandler
 from bot.action.util.format import DateFormatter, UserFormatter
+from bot.action.util.textformat import FormattedText
 from bot.api.domain import Message, MessageEntityParser
 
 
@@ -94,8 +95,10 @@ class ListHashtagsAction(Action):
 
     @staticmethod
     def __build_success_response_message(event, title, printable_hashtags):
-        footer = "\n\nUse *" + event.command + " help* to see more options."
-        return Message.create(title + "\n" + printable_hashtags + footer, parse_mode="Markdown")
+        header = FormattedText().normal(title).newline()
+        footer = FormattedText().newline().newline()\
+            .normal("Use ").bold(event.command + " help").normal(" to see more options.")
+        return FormattedText().concat(header).normal(printable_hashtags).concat(footer).build_message()
 
 
 class Hashtag:
