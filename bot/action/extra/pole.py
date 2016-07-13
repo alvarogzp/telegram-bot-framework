@@ -64,17 +64,17 @@ class SavePoleAction(Action):
 
 class ListPoleAction(Action):
     def process(self, event):
-        action, number_of_poles_to_display, help_args = self.parse_args(event.command_args.split())
+        action, action_param, help_args = self.parse_args(event.command_args.split())
         if action in ("recent", "ranking", "last"):
             poles = PoleStorageHandler(event.state.get_for("pole")).get_stored_poles("poles")
             if poles.is_empty():
                 response = self.get_response_empty()
             elif action == "recent":
-                response = self.get_response_recent(event, poles, number_of_poles_to_display)
+                response = self.get_response_recent(event, poles, action_param)
             elif action == "ranking":
-                response = self.get_response_ranking(event, poles, number_of_poles_to_display)
+                response = self.get_response_ranking(event, poles, action_param)
             else:
-                response = self.get_response_last(event, poles, number_of_poles_to_display)
+                response = self.get_response_last(event, poles, action_param)
         else:
             response = self.get_response_help(event, help_args)
         if response.reply_to_message_id is None:
@@ -84,23 +84,23 @@ class ListPoleAction(Action):
     @staticmethod
     def parse_args(args):
         action = "help"
-        number_of_poles_to_display = 10
+        action_param = 10
         help_args = args[1:]
         if len(args) == 0:
             action = "ranking"
         elif len(args) == 1:
             if args[0].isnumeric():
                 action = "ranking"
-                number_of_poles_to_display = int(args[0])
+                action_param = int(args[0])
             else:
                 action = args[0]
                 if action == "last":
-                    number_of_poles_to_display = 1
+                    action_param = 1
         elif len(args) == 2:
             if args[1].isnumeric():
-                number_of_poles_to_display = int(args[1])
+                action_param = int(args[1])
                 action = args[0]
-        return action, number_of_poles_to_display, help_args
+        return action, action_param, help_args
 
     @staticmethod
     def get_response_help(event, help_args):
@@ -123,9 +123,9 @@ class ListPoleAction(Action):
         printable_poles = sorted_poles.printable_version(user_storage_handler)
         return self.__build_success_response_message(event, "Most recent poles:", printable_poles)
 
-    def get_response_ranking(self, event, poles, number_of_poles_to_display):
+    def get_response_ranking(self, event, poles, number_of_users_to_display):
         user_storage_handler = UserStorageHandler.get_instance(self.state)
-        printable_poles = poles.grouped_by_user(number_of_poles_to_display).printable_version(user_storage_handler)
+        printable_poles = poles.grouped_by_user(number_of_users_to_display).printable_version(user_storage_handler)
         return self.__build_success_response_message(event, "Ranking of poles:", printable_poles)
 
     @staticmethod
