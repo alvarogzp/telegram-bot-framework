@@ -8,10 +8,15 @@ from bot.action.util.format import UserFormatter, DateFormatter
 from bot.action.util.textformat import FormattedText
 from bot.api.domain import Message, ApiObject
 
+MIN_MESSAGES_TO_KEEP = 500
+MAX_MESSAGES_TO_KEEP = 1000
+
 
 class SaveMessageAction(Action):
     def process(self, event):
-        MessageStorageHandler(event).save_message(event.message)
+        storage_handler = MessageStorageHandler(event)
+        storage_handler.save_message(event.message)
+        storage_handler.delete_old_messages()
 
 
 class ListMessageAction(Action):
@@ -162,10 +167,7 @@ class MessageList:
         if limit <= 0:
             ids = []
         else:
-            int_ids = [int(id_) for id_ in self.ids]
-            int_ids.sort(reverse=True)
-            int_ids = int_ids[:limit]
-            ids = [str(id_) for id_ in int_ids]
+            ids = MessageIdSorter.sorted(self.ids, reverse=True, keep_only_first=limit)
         return MessageList(ids, self.storage)
 
     def printable_info(self, user_storage_handler):
@@ -189,6 +191,16 @@ class MessageGroup:
         return FormattedText().normal("\n".join(
             ("%s -> %s" % (count, UserFormatter.retrieve_and_format(user_id, user_storage_handler))
              for user_id, count in self.grouped_messages)))
+
+
+class MessageIdSorter:
+    @staticmethod
+    def sorted(ids, reverse=False, keep_only_first=None):
+        int_ids = [int(id_) for id_ in ids]
+        int_ids.sort(reverse=reverse)
+        if keep_only_first is not None:
+            int_ids = int_ids[:keep_only_first]
+        return [str(id_) for id_ in int_ids]
 
 
 class MessageStorageHandler:
@@ -217,3 +229,14 @@ class MessageStorageHandler:
     @staticmethod
     def __delete_if_present(dict, key):
         dict.pop(key, None)
+
+    def delete_old_messages(self):
+        stored_ids = self.state.list_keys()
+        if len(stored_ids) > MAX_MESSAGES_TO_KEEP:
+            number_of_messages_to_delete = len(stored_ids) - MIN_MESSAGES_TO_KEEP
+            ids_to_delete = MessageIdSorter.sorted(stored_ids, keep_only_first=number_of_messages_to_delete)
+            self.__delete_messages(ids_to_delete)
+
+    def __delete_messages(self, message_ids_to_delete):
+        for message_id in message_ids_to_delete:
+            self.state.set_value(message_id, None)
