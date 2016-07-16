@@ -189,7 +189,7 @@ class MessageGroup:
 
     def printable_info(self, user_storage_handler):
         return FormattedText().normal("\n".join(
-            ("%s -> %s" % (count, UserFormatter.retrieve_and_format(user_id, user_storage_handler))
+            ("%s → %s" % (count, UserFormatter.retrieve_and_format(user_id, user_storage_handler))
              for user_id, count in self.grouped_messages)))
 
 

@@ -153,7 +153,7 @@ class Pole:
     def printable_version(self, user_storage_handler):
         formatted_user = UserFormatter.retrieve_and_format(self.user_id, user_storage_handler)
         formatted_date = DateFormatter.format(self.date)
-        return "%s -> %s" % (formatted_date, formatted_user)
+        return "%s → %s" % (formatted_date, formatted_user)
 
     def serialize(self):
         return "%s %s %s\n" % (self.user_id, self.date, self.message_id)
@@ -199,7 +199,7 @@ class PoleGroup:
         self.grouped_poles = grouped_poles
 
     def printable_version(self, user_storage_handler):
-        return "\n".join(("%s -> %s" % (count, UserFormatter.retrieve_and_format(user_id, user_storage_handler))
+        return "\n".join(("%s → %s" % (count, UserFormatter.retrieve_and_format(user_id, user_storage_handler))
                           for user_id, count in self.grouped_poles))
 
 
