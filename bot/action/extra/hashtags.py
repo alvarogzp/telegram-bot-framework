@@ -168,7 +168,7 @@ class HashtagGroup:
         self.grouped_hashtags = grouped_hashtags
 
     def printable_version(self):
-        return "\n".join(("%s -> %s" % (count, hashtag) for hashtag, count in self.grouped_hashtags))
+        return "\n".join(("%s → %s" % (count, hashtag) for hashtag, count in self.grouped_hashtags))
 
 
 class UserGroup:
@@ -176,7 +176,7 @@ class UserGroup:
         self.grouped_users = grouped_users
 
     def printable_version(self, user_storage_handler):
-        return "\n".join(("%s -> %s" % (count, UserFormatter.retrieve_and_format(user_id, user_storage_handler))
+        return "\n".join(("%s → %s" % (count, UserFormatter.retrieve_and_format(user_id, user_storage_handler))
                           for user_id, count in self.grouped_users if user_id is not None))
 
 
