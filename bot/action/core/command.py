@@ -5,22 +5,22 @@ from bot.api.domain import Message, MessageEntityParser
 
 
 class CommandAction(IntermediateAction):
-    def __init__(self, command):
+    def __init__(self, command, underscores_as_spaces=True):
         super().__init__()
-        self.command = command
+        self.parser = (UnderscoredCommandParser if underscores_as_spaces else CommandParser)(command)
 
     def post_setup(self):
-        self.command_pattern = re.compile("^/" + self.command + "(@" + self.cache.bot_info.username + ")?$",
-                                          re.IGNORECASE)
+        self.parser.build_command_matcher(self.cache.bot_info.username)
 
     def process(self, event):
         for entity in self.get_entities(event):
             if self.is_valid_command(entity):
                 parser = MessageEntityParser(event.message)
                 command_text = parser.get_entity_text(entity)
-                if self.matches_expected_command(command_text):
-                    event.command = command_text
-                    event.command_args = self.get_command_args(parser, entity)
+                if self.parser.matches_command(command_text):
+                    event.command = self.parser.get_command_name(command_text)
+                    additional_text = parser.get_text_after_entity(entity)
+                    event.command_args = self.parser.get_command_args(command_text, additional_text).lstrip()
                     self._continue(event)
 
     @staticmethod
@@ -32,12 +32,48 @@ class CommandAction(IntermediateAction):
     def is_valid_command(entity):
         return entity.type == "bot_command" and entity.offset == 0
 
-    def matches_expected_command(self, command_text):
-        return self.command_pattern.match(command_text) is not None
+    def get_command_args(self, parser, entity, command_text):
+        return parser.get_text_after_entity(entity)
 
-    @staticmethod
-    def get_command_args(parser, entity):
-        return parser.get_text_after_entity(entity)[1:]
+
+class CommandParser:
+    def __init__(self, command):
+        self.command = command
+
+    def build_command_matcher(self, bot_username):
+        self.command_pattern = re.compile("^/" + self.command + "(@" + bot_username + ")?$", re.IGNORECASE)
+
+    def matches_command(self, command):
+        return self.command_pattern.match(command) is not None
+
+    def get_command_name(self, command):
+        return command
+
+    def get_command_args(self, command, additional_text):
+        return additional_text
+
+
+class UnderscoredCommandParser(CommandParser):
+    def __init__(self, command):
+        super().__init__(command + "(_[^@]*)?")
+        self.original_command = command
+
+    def get_command_name(self, command):
+        name = command[:self.__get_command_end_position()]
+        at_start = command.find("@")
+        if at_start != -1:
+            name += command[at_start:]
+        return name
+
+    def get_command_args(self, command, additional_text):
+        in_command_args = command[self.__get_command_end_position()+1:]
+        at_start = in_command_args.find("@")
+        if at_start != -1:
+            in_command_args = in_command_args[:at_start]
+        return in_command_args.replace("_", " ") + additional_text
+
+    def __get_command_end_position(self):
+        return len(self.original_command) + 1
 
 
 class CommandUsageMessage:
