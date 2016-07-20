@@ -95,3 +95,14 @@ class CommandUsageMessage:
             text += " " + args
         text += "`"
         return text
+
+
+class UnderscoredCommandBuilder:
+    @staticmethod
+    def build_command(command, *args):
+        underscored_args = "_" + "_".join(args)
+        at_start = command.find("@")
+        if at_start != -1:
+            return command[:at_start] + underscored_args + command[at_start:]
+        else:
+            return command + underscored_args
