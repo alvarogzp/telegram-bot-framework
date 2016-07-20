@@ -66,7 +66,7 @@ class UnderscoredCommandParser(CommandParser):
         return name
 
     def get_command_args(self, command, additional_text):
-        in_command_args = command[self.__get_command_end_position()+1:]
+        in_command_args = command[self.__get_command_end_position():]
         at_start = in_command_args.find("@")
         if at_start != -1:
             in_command_args = in_command_args[:at_start]
