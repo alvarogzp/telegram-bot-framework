@@ -90,7 +90,7 @@ class ListPoleAction(Action):
             action = "ranking"
         elif len(args) == 1:
             if args[0].isnumeric():
-                action = "ranking"
+                action = "last"
                 action_param = int(args[0])
             else:
                 action = args[0]
@@ -104,7 +104,7 @@ class ListPoleAction(Action):
 
     @staticmethod
     def get_response_help(event, help_args):
-        args = ["[ranking] [number_of_users]", "recent [number_of_poles]", "last [pole_number]"]
+        args = ["[ranking number_of_users]", "recent [number_of_poles]", "[last] pole_number"]
         description = "By default, display users with most poles (the ranking).\n\n" \
                       "Use *recent* to show recent poles.\n\n" \
                       "You can also add a number to the end in both modes to limit the users or poles to display" \
