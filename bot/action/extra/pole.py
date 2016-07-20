@@ -139,11 +139,11 @@ class ListPoleAction(Action):
         return Message.create(text, chat_id=event.message.chat.id, reply_to_message_id=pole.message_id)
 
     @staticmethod
-    def __build_success_response_message(event, title, printable_poles, additional_footer_text=None):
+    def __build_success_response_message(event, title, printable_poles, footer_text=None):
         header = FormattedText().normal(title).newline()
         footer = FormattedText().newline().newline()
-        if additional_footer_text is not None:
-            footer.concat(additional_footer_text)
+        if footer_text is not None:
+            footer.concat(footer_text)
         else:
             footer.normal("Write ").bold(event.command + " help").normal(" to see more options.")
         return FormattedText().concat(header).normal(printable_poles).concat(footer).build_message()
