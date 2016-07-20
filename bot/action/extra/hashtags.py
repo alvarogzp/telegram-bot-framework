@@ -105,7 +105,7 @@ class ListHashtagsAction(Action):
     def __build_success_response_message(event, title, printable_hashtags):
         header = FormattedText().normal(title).newline()
         footer = FormattedText().newline().newline()\
-            .normal("Use ").bold(event.command + " help").normal(" to see more options.")
+            .normal("Write ").bold(event.command + " help").normal(" to see more options.")
         return FormattedText().concat(header).normal(printable_hashtags).concat(footer).build_message()
 
 

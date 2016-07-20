@@ -94,7 +94,7 @@ class ListMessageAction(Action):
 
     @staticmethod
     def __build_success_response_message(event, title, printable_messages):
-        footer = FormattedText().normal("\n\nUse ").bold(event.command + " help").normal(" to see more options.")
+        footer = FormattedText().normal("\n\nWrite ").bold(event.command + " help").normal(" to see more options.")
         return FormattedText().normal(title + "\n").concat(printable_messages).concat(footer).build_message()
 
 
