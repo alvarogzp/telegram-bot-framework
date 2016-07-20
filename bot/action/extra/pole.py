@@ -1,7 +1,7 @@
 import collections
 
 from bot.action.core.action import Action
-from bot.action.core.command import CommandUsageMessage
+from bot.action.core.command import CommandUsageMessage, UnderscoredCommandBuilder
 from bot.action.userinfo import UserStorageHandler
 from bot.action.util.format import DateFormatter, UserFormatter
 from bot.action.util.textformat import FormattedText
@@ -90,7 +90,7 @@ class ListPoleAction(Action):
             action = "ranking"
         elif len(args) == 1:
             if args[0].isnumeric():
-                action = "ranking"
+                action = "last"
                 action_param = int(args[0])
             else:
                 action = args[0]
@@ -104,7 +104,7 @@ class ListPoleAction(Action):
 
     @staticmethod
     def get_response_help(event, help_args):
-        args = ["[ranking] [number_of_users]", "recent [number_of_poles]", "last [pole_number]"]
+        args = ["[ranking number_of_users]", "recent [number_of_poles]", "[last] pole_number"]
         description = "By default, display users with most poles (the ranking).\n\n" \
                       "Use *recent* to show recent poles.\n\n" \
                       "You can also add a number to the end in both modes to limit the users or poles to display" \
@@ -120,13 +120,15 @@ class ListPoleAction(Action):
     def get_response_recent(self, event, poles, number_of_poles_to_display):
         user_storage_handler = UserStorageHandler.get_instance(self.state)
         sorted_poles = poles.most_recent(number_of_poles_to_display)
-        printable_poles = sorted_poles.printable_version(user_storage_handler)
+        printable_poles = sorted_poles.printable_version(event, user_storage_handler)
         return self.__build_success_response_message(event, "Most recent poles:", printable_poles)
 
     def get_response_ranking(self, event, poles, number_of_users_to_display):
         user_storage_handler = UserStorageHandler.get_instance(self.state)
         printable_poles = poles.grouped_by_user(number_of_users_to_display).printable_version(user_storage_handler)
-        return self.__build_success_response_message(event, "Ranking of poles:", printable_poles)
+        recent_poles_command = UnderscoredCommandBuilder.build_command(event.command, "recent")
+        recent_poles_text = FormattedText().normal("Write ").normal(recent_poles_command).normal(" to see recent poles.")
+        return self.__build_success_response_message(event, "Ranking of poles:", printable_poles, recent_poles_text)
 
     @staticmethod
     def get_response_last(event, poles, number_of_pole_to_display):
@@ -137,10 +139,13 @@ class ListPoleAction(Action):
         return Message.create(text, chat_id=event.message.chat.id, reply_to_message_id=pole.message_id)
 
     @staticmethod
-    def __build_success_response_message(event, title, printable_poles):
+    def __build_success_response_message(event, title, printable_poles, footer_text=None):
         header = FormattedText().normal(title).newline()
-        footer = FormattedText().newline().newline()\
-            .normal("Use ").bold(event.command + " help").normal(" to see more options.")
+        footer = FormattedText().newline().newline()
+        if footer_text is not None:
+            footer.concat(footer_text)
+        else:
+            footer.normal("Write ").bold(event.command + " help").normal(" to see more options.")
         return FormattedText().concat(header).normal(printable_poles).concat(footer).build_message()
 
 
@@ -150,10 +155,11 @@ class Pole:
         self.date = date
         self.message_id = message_id
 
-    def printable_version(self, user_storage_handler):
+    def printable_version(self, event, user_storage_handler, index):
         formatted_user = UserFormatter.retrieve_and_format(self.user_id, user_storage_handler)
         formatted_date = DateFormatter.format(self.date)
-        return "%s → %s" % (formatted_date, formatted_user)
+        view_pole_command = UnderscoredCommandBuilder.build_command(event.command, str(index+1))
+        return "%s → %s → %s" % (formatted_date, formatted_user, view_pole_command)
 
     def serialize(self):
         return "%s %s %s\n" % (self.user_id, self.date, self.message_id)
@@ -186,8 +192,9 @@ class PoleList:
         # for now, assume they are already sorted by date
         return PoleList(reversed(self.poles[-limit:]))
 
-    def printable_version(self, user_storage_handler):
-        return "\n".join((pole.printable_version(user_storage_handler) for pole in self.poles))
+    def printable_version(self, event, user_storage_handler):
+        return "\n".join((pole.printable_version(event, user_storage_handler, index)
+                          for index, pole in enumerate(self.poles)))
 
     @staticmethod
     def deserialize(poles_data):
