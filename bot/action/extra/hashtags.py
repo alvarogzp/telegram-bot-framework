@@ -1,7 +1,7 @@
 import collections
 
 from bot.action.core.action import Action
-from bot.action.core.command import CommandUsageMessage
+from bot.action.core.command import CommandUsageMessage, UnderscoredCommandBuilder
 from bot.action.userinfo import UserStorageHandler
 from bot.action.util.format import DateFormatter, UserFormatter
 from bot.action.util.textformat import FormattedText
@@ -90,22 +90,29 @@ class ListHashtagsAction(Action):
         user_storage_handler = UserStorageHandler.get_instance(self.state)
         sorted_hashtags = hashtags.sorted_by_recent_use(number_of_hashtags_to_display)
         printable_hashtags = sorted_hashtags.printable_version(user_storage_handler)
-        return self.__build_success_response_message(event, "Most recent hashtags:", printable_hashtags)
+        popular_hashtags_command = UnderscoredCommandBuilder.build_command(event.command, "popular")
+        popular_hashtags_text = FormattedText().normal("Write ").normal(popular_hashtags_command).normal(" to see popular hashtags.")
+        return self.__build_success_response_message(event, "Most recent hashtags:", printable_hashtags, popular_hashtags_text)
 
     def get_response_popular(self, event, hashtags, number_of_hashtags_to_display):
         printable_hashtags = hashtags.grouped_by_popularity(number_of_hashtags_to_display).printable_version()
-        return self.__build_success_response_message(event, "Most popular hashtags:", printable_hashtags)
+        ranking_hashtags_command = UnderscoredCommandBuilder.build_command(event.command, "ranking")
+        ranking_hashtags_text = FormattedText().normal("Write ").normal(ranking_hashtags_command).normal(" to see which users write most hashtags.")
+        return self.__build_success_response_message(event, "Most popular hashtags:", printable_hashtags, ranking_hashtags_text)
 
     def get_response_ranking(self, event, hashtags, number_of_users_to_display):
         user_storage_handler = UserStorageHandler.get_instance(self.state)
         printable_hashtags = hashtags.grouped_by_user(number_of_users_to_display).printable_version(user_storage_handler)
-        return self.__build_success_response_message(event, "Users who wrote most hashtags:", printable_hashtags)
+        return self.__build_success_response_message(event, "Users who write most hashtags:", printable_hashtags)
 
     @staticmethod
-    def __build_success_response_message(event, title, printable_hashtags):
+    def __build_success_response_message(event, title, printable_hashtags, footer_text=None):
         header = FormattedText().normal(title).newline()
-        footer = FormattedText().newline().newline()\
-            .normal("Write ").bold(event.command + " help").normal(" to see more options.")
+        footer = FormattedText().newline().newline()
+        if footer_text is not None:
+            footer.concat(footer_text)
+        else:
+            footer.normal("Write ").bold(event.command + " help").normal(" to see more options.")
         return FormattedText().concat(header).normal(printable_hashtags).concat(footer).build_message()
 
 
