@@ -47,7 +47,7 @@ class ListMessageAction(Action):
             action = "recent"
         elif len(args) == 1:
             if args[0].isnumeric():
-                action = "recent"
+                action = "show"
                 action_param = int(args[0])
             elif args[0] != "show":
                 action = args[0]
@@ -59,9 +59,10 @@ class ListMessageAction(Action):
 
     @staticmethod
     def get_response_help(event, help_args):
-        args = ["[recent] [number_of_messages]", "show message_id", "ranking [number_of_users]"]
+        args = ["[recent number_of_messages]", "[show] message_id", "ranking [number_of_users]"]
         description = "By default, display a list with information about last messages.\n" \
-                      "You can add a number to modify the number of messages to list (default is 10).\n\n" \
+                      "You can use *recent* with a number to modify the number of messages to list" \
+                      " (default is 10).\n\n" \
                       "Use *show* along with a message\\_id to view that particular message.\n\n" \
                       "Use *ranking* to display a ranking of the users who wrote most recent messages" \
                       " (approximately last 1000 messages are counted).\n" \
