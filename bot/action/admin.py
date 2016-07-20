@@ -20,3 +20,13 @@ class AdminAction(IntermediateAction):
         from_ = event.message.from_
         if from_ is not None and str(from_.id) == self.config.admin_user_id:
             self._continue(event)
+
+
+class AdminActionWithErrorMessage(IntermediateAction):
+    def process(self, event):
+        from_ = event.message.from_
+        if from_ is not None and str(from_.id) == self.config.admin_user_id:
+            self._continue(event)
+        else:
+            error_response = "You are not allowed to perform this action (admins only)."
+            self.api.send_message(Message.create_reply(event.message, error_response))

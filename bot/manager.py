@@ -1,4 +1,4 @@
-from bot.action.admin import AdminAction, StopAction, EvalAction
+from bot.action.admin import StopAction, EvalAction, AdminActionWithErrorMessage
 from bot.action.answer import AnswerAction
 from bot.action.core.action import ActionGroup
 from bot.action.core.command import CommandAction
@@ -61,11 +61,14 @@ class BotManager:
                                     AnswerAction(
                                         "Hello! I am " + self.bot.cache.bot_info.first_name + " and I am here to serve you.\nSorry if I cannot do too much for you now, I am still under construction.")
                                 ),
-                                AdminAction().then(
-                                    CommandAction("shutdown").then(
+
+                                CommandAction("shutdown").then(
+                                    AdminActionWithErrorMessage().then(
                                         StopAction()
-                                    ),
-                                    CommandAction("eval").then(
+                                    )
+                                ),
+                                CommandAction("eval").then(
+                                    AdminActionWithErrorMessage().then(
                                         EvalAction()
                                     )
                                 ),
