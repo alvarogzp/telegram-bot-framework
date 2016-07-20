@@ -127,7 +127,7 @@ class ListPoleAction(Action):
         user_storage_handler = UserStorageHandler.get_instance(self.state)
         printable_poles = poles.grouped_by_user(number_of_users_to_display).printable_version(user_storage_handler)
         recent_poles_command = UnderscoredCommandBuilder.build_command(event.command, "recent")
-        recent_poles_text = FormattedText().normal("Write ").normal(recent_poles_command).normal(" to view recent poles.")
+        recent_poles_text = FormattedText().normal("Write ").normal(recent_poles_command).normal(" to see recent poles.")
         return self.__build_success_response_message(event, "Ranking of poles:", printable_poles, recent_poles_text)
 
     @staticmethod
