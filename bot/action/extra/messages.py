@@ -2,7 +2,7 @@ import collections
 import json
 
 from bot.action.core.action import Action
-from bot.action.core.command import CommandUsageMessage
+from bot.action.core.command import CommandUsageMessage, UnderscoredCommandBuilder
 from bot.action.userinfo import UserStorageHandler
 from bot.action.util.format import UserFormatter, DateFormatter
 from bot.action.util.textformat import FormattedText
@@ -47,7 +47,7 @@ class ListMessageAction(Action):
             action = "recent"
         elif len(args) == 1:
             if args[0].isnumeric():
-                action = "recent"
+                action = "show"
                 action_param = int(args[0])
             elif args[0] != "show":
                 action = args[0]
@@ -59,9 +59,10 @@ class ListMessageAction(Action):
 
     @staticmethod
     def get_response_help(event, help_args):
-        args = ["[recent] [number_of_messages]", "show message_id", "ranking [number_of_users]"]
+        args = ["[recent number_of_messages]", "[show] message_id", "ranking [number_of_users]"]
         description = "By default, display a list with information about last messages.\n" \
-                      "You can add a number to modify the number of messages to list (default is 10).\n\n" \
+                      "You can use *recent* with a number to modify the number of messages to list" \
+                      " (default is 10).\n\n" \
                       "Use *show* along with a message\\_id to view that particular message.\n\n" \
                       "Use *ranking* to display a ranking of the users who wrote most recent messages" \
                       " (approximately last 1000 messages are counted).\n" \
@@ -76,7 +77,7 @@ class ListMessageAction(Action):
     def get_response_recent(self, event, messages, number_of_messages_to_display):
         user_storage_handler = UserStorageHandler.get_instance(self.state)
         sorted_messages = messages.most_recent(number_of_messages_to_display)
-        printable_messages = sorted_messages.printable_info(user_storage_handler)
+        printable_messages = sorted_messages.printable_info(event, user_storage_handler)
         return self.__build_success_response_message(event, "Most recent messages:", printable_messages)
 
     def get_response_show(self, event, messages, message_id):
@@ -93,7 +94,7 @@ class ListMessageAction(Action):
 
     @staticmethod
     def __build_success_response_message(event, title, printable_messages):
-        footer = FormattedText().normal("\n\nUse ").bold(event.command + " help").normal(" to see more options.")
+        footer = FormattedText().normal("\n\nWrite ").bold(event.command + " help").normal(" to see more options.")
         return FormattedText().normal(title + "\n").concat(printable_messages).concat(footer).build_message()
 
 
@@ -107,11 +108,12 @@ class StoredMessage:
     def user_id(self):
         return self.message.from_
 
-    def printable_info(self, user_storage_handler):
+    def printable_info(self, event, user_storage_handler):
+        show_command = UnderscoredCommandBuilder.build_command(event.command, self.message_id)
         formatted_user = UserFormatter.retrieve_and_format(self.message.from_, user_storage_handler)
         formatted_date = DateFormatter.format(self.message.date)
         edits_info = (" (%s edits)" % len(self.edited_messages)) if len(self.edited_messages) > 0 else ""
-        return FormattedText().normal("[").bold(self.message_id).normal("] at ").bold(formatted_date).normal(" by ")\
+        return FormattedText().normal(show_command).normal(" at ").bold(formatted_date).normal(" by ")\
             .bold(formatted_user).normal(edits_info)
 
     def printable_full_message(self, user_storage_handler):
@@ -170,9 +172,9 @@ class MessageList:
             ids = MessageIdSorter.sorted(self.ids, reverse=True, keep_only_first=limit)
         return MessageList(ids, self.storage)
 
-    def printable_info(self, user_storage_handler):
+    def printable_info(self, event, user_storage_handler):
         return FormattedText().normal("\n")\
-            .join(*(message.printable_info(user_storage_handler) for message in self.__get_messages()))
+            .join(*(message.printable_info(event, user_storage_handler) for message in self.__get_messages()))
 
     def __get_messages(self):
         if self.cached_messages is None:
