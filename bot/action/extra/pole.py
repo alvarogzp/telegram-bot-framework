@@ -1,7 +1,7 @@
 import collections
 
 from bot.action.core.action import Action
-from bot.action.core.command import CommandUsageMessage
+from bot.action.core.command import CommandUsageMessage, UnderscoredCommandBuilder
 from bot.action.userinfo import UserStorageHandler
 from bot.action.util.format import DateFormatter, UserFormatter
 from bot.action.util.textformat import FormattedText
@@ -120,7 +120,7 @@ class ListPoleAction(Action):
     def get_response_recent(self, event, poles, number_of_poles_to_display):
         user_storage_handler = UserStorageHandler.get_instance(self.state)
         sorted_poles = poles.most_recent(number_of_poles_to_display)
-        printable_poles = sorted_poles.printable_version(user_storage_handler)
+        printable_poles = sorted_poles.printable_version(event, user_storage_handler)
         return self.__build_success_response_message(event, "Most recent poles:", printable_poles)
 
     def get_response_ranking(self, event, poles, number_of_users_to_display):
@@ -150,10 +150,11 @@ class Pole:
         self.date = date
         self.message_id = message_id
 
-    def printable_version(self, user_storage_handler):
+    def printable_version(self, event, user_storage_handler, index):
         formatted_user = UserFormatter.retrieve_and_format(self.user_id, user_storage_handler)
         formatted_date = DateFormatter.format(self.date)
-        return "%s → %s" % (formatted_date, formatted_user)
+        view_pole_command = UnderscoredCommandBuilder.build_command(event.command, str(index+1))
+        return "%s → %s → %s" % (formatted_date, formatted_user, view_pole_command)
 
     def serialize(self):
         return "%s %s %s\n" % (self.user_id, self.date, self.message_id)
@@ -186,8 +187,9 @@ class PoleList:
         # for now, assume they are already sorted by date
         return PoleList(reversed(self.poles[-limit:]))
 
-    def printable_version(self, user_storage_handler):
-        return "\n".join((pole.printable_version(user_storage_handler) for pole in self.poles))
+    def printable_version(self, event, user_storage_handler):
+        return "\n".join((pole.printable_version(event, user_storage_handler, index)
+                          for index, pole in enumerate(self.poles)))
 
     @staticmethod
     def deserialize(poles_data):
