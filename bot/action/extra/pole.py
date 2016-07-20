@@ -126,7 +126,9 @@ class ListPoleAction(Action):
     def get_response_ranking(self, event, poles, number_of_users_to_display):
         user_storage_handler = UserStorageHandler.get_instance(self.state)
         printable_poles = poles.grouped_by_user(number_of_users_to_display).printable_version(user_storage_handler)
-        return self.__build_success_response_message(event, "Ranking of poles:", printable_poles)
+        recent_poles_command = UnderscoredCommandBuilder.build_command(event.command, "recent")
+        recent_poles_text = FormattedText().normal("Write ").normal(recent_poles_command).normal(" to view recent poles.")
+        return self.__build_success_response_message(event, "Ranking of poles:", printable_poles, recent_poles_text)
 
     @staticmethod
     def get_response_last(event, poles, number_of_pole_to_display):
@@ -137,10 +139,13 @@ class ListPoleAction(Action):
         return Message.create(text, chat_id=event.message.chat.id, reply_to_message_id=pole.message_id)
 
     @staticmethod
-    def __build_success_response_message(event, title, printable_poles):
+    def __build_success_response_message(event, title, printable_poles, additional_footer_text=None):
         header = FormattedText().normal(title).newline()
-        footer = FormattedText().newline().newline()\
-            .normal("Use ").bold(event.command + " help").normal(" to see more options.")
+        footer = FormattedText().newline().newline()
+        if additional_footer_text is not None:
+            footer.concat(additional_footer_text)
+        else:
+            footer.normal("Write ").bold(event.command + " help").normal(" to see more options.")
         return FormattedText().concat(header).normal(printable_poles).concat(footer).build_message()
 
 
