@@ -6,19 +6,30 @@ DEBUG_ENABLED=true
 EXIT_STATUS_TO_HALT=55
 
 
+is_first_execution()
+{
+    [ "$RE_RUNNING" != "true" ]
+}
+
+perform_first_execution_tasks()
+{
+    cd_to_current_script_location
+}
+
 cd_to_current_script_location()
 {
     current_script_location="$(dirname "$0")"
     cd "$current_script_location"
 }
 
-main_loop()
+perform_main_tasks()
 {
     run_bot
     check_halt_received $?
     sleep ${SLEEP_TIME_SECONDS}
     update_code
     sleep ${SLEEP_TIME_SECONDS}
+    rerun_current_script
 }
 
 run_bot()
@@ -52,6 +63,13 @@ update_code()
     git pull
 }
 
+rerun_current_script()
+{
+    current_script_name="$(basename "$0")"
+    RE_RUNNING=true
+    . "./$current_script_name"
+}
+
 debug()
 {
     if [ "$DEBUG_ENABLED" = "true" ]
@@ -61,13 +79,9 @@ debug()
 }
 
 
-debug "Starting"
+if is_first_execution
+then
+    perform_first_execution_tasks
+fi
 
-cd_to_current_script_location
-
-while true
-do
-    main_loop
-done
-
-debug "End"
+perform_main_tasks
