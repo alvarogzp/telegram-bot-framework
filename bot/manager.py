@@ -1,8 +1,8 @@
-from bot.action.admin import StopAction, EvalAction, AdminActionWithErrorMessage
+from bot.action.admin import RestartAction, EvalAction, AdminActionWithErrorMessage, AdminAction, HaltAction
 from bot.action.answer import AnswerAction
 from bot.action.core.action import ActionGroup
 from bot.action.core.command import CommandAction
-from bot.action.core.filter import MessageAction, TextMessageAction, NoPendingAction, EditedMessageAction
+from bot.action.core.filter import MessageAction, TextMessageAction, NoPendingAction, EditedMessageAction, PendingAction
 from bot.action.enterexit import GreetAction, LeaveAction
 from bot.action.extra.hashtags import SaveHashtagsAction, ListHashtagsAction
 from bot.action.extra.legacypole import LegacyPoleAction
@@ -27,11 +27,70 @@ class BotManager:
                     NoPendingAction().then(
                         MessageAction().then(
                             PerChatAction().then(
+
                                 ToggleableFeatureAction("greet").then(
                                     GreetAction()
                                 ),
                                 ToggleableFeatureAction("leave").then(
                                     LeaveAction()
+                                ),
+
+                                TextMessageAction().then(
+
+                                    CommandAction("start").then(
+                                        AnswerAction(
+                                            "Hello! I am " + self.bot.cache.bot_info.first_name + " and I am here to serve you.\nSorry if I cannot do too much for you now, I am still under construction.")
+                                    ),
+
+                                    CommandAction("restart").then(
+                                        AdminActionWithErrorMessage().then(
+                                            RestartAction()
+                                        )
+                                    ),
+                                    CommandAction("halt").then(
+                                        AdminActionWithErrorMessage().then(
+                                            HaltAction()
+                                        )
+                                    ),
+                                    CommandAction("eval").then(
+                                        AdminActionWithErrorMessage().then(
+                                            EvalAction()
+                                        )
+                                    ),
+
+                                    CommandAction("hashtags").then(
+                                        ListHashtagsAction()
+                                    ),
+
+                                    CommandAction("feature").then(
+                                        GetSetFeatureAction()
+                                    ),
+
+                                    CommandAction("poles").then(
+                                        ListPoleAction()
+                                    ),
+
+                                    CommandAction("messages").then(
+                                        ListMessageAction()
+                                    )
+
+                                )
+                            )
+                        )
+                    ),
+
+                    PendingAction().then(
+                        MessageAction().then(
+                            PerChatAction().then(
+                                TextMessageAction().then(
+                                    AdminAction().then(
+                                        CommandAction("restart").then(
+                                            RestartAction()
+                                        ),
+                                        CommandAction("halt").then(
+                                            HaltAction()
+                                        )
+                                    )
                                 )
                             )
                         )
@@ -55,39 +114,7 @@ class BotManager:
                             ),
 
                             TextMessageAction().then(
-                                SaveHashtagsAction(),
-
-                                CommandAction("start").then(
-                                    AnswerAction(
-                                        "Hello! I am " + self.bot.cache.bot_info.first_name + " and I am here to serve you.\nSorry if I cannot do too much for you now, I am still under construction.")
-                                ),
-
-                                CommandAction("shutdown").then(
-                                    AdminActionWithErrorMessage().then(
-                                        StopAction()
-                                    )
-                                ),
-                                CommandAction("eval").then(
-                                    AdminActionWithErrorMessage().then(
-                                        EvalAction()
-                                    )
-                                ),
-
-                                CommandAction("hashtags").then(
-                                    ListHashtagsAction()
-                                ),
-
-                                CommandAction("feature").then(
-                                    GetSetFeatureAction()
-                                ),
-
-                                CommandAction("poles").then(
-                                    ListPoleAction()
-                                ),
-
-                                CommandAction("messages").then(
-                                    ListMessageAction()
-                                )
+                                SaveHashtagsAction()
                             )
                         )
                     )
