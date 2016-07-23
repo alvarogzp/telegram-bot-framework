@@ -4,6 +4,7 @@ SLEEP_TIME_SECONDS=30
 DEBUG_ENABLED=true
 
 EXIT_STATUS_TO_HALT_BOT=55
+RUN_BOT_COMMAND="./main.py"
 
 
 is_first_execution()
@@ -35,7 +36,7 @@ perform_main_tasks()
 run_bot()
 {
     debug "Starting bot instance"
-    ./main.py
+    "$RUN_BOT_COMMAND"
     exit_status=$?
     debug "Bot instance finished"
     return ${exit_status}
