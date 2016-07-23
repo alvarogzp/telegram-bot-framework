@@ -1,8 +1,8 @@
-from bot.action.admin import StopAction, EvalAction, AdminActionWithErrorMessage
+from bot.action.admin import StopAction, EvalAction, AdminActionWithErrorMessage, AdminAction
 from bot.action.answer import AnswerAction
 from bot.action.core.action import ActionGroup
 from bot.action.core.command import CommandAction
-from bot.action.core.filter import MessageAction, TextMessageAction, NoPendingAction, EditedMessageAction
+from bot.action.core.filter import MessageAction, TextMessageAction, NoPendingAction, EditedMessageAction, PendingAction
 from bot.action.enterexit import GreetAction, LeaveAction
 from bot.action.extra.hashtags import SaveHashtagsAction, ListHashtagsAction
 from bot.action.extra.legacypole import LegacyPoleAction
@@ -73,6 +73,20 @@ class BotManager:
                                         ListMessageAction()
                                     )
 
+                                )
+                            )
+                        )
+                    ),
+
+                    PendingAction().then(
+                        MessageAction().then(
+                            PerChatAction().then(
+                                TextMessageAction().then(
+                                    AdminAction().then(
+                                        CommandAction("shutdown").then(
+                                            StopAction()
+                                        )
+                                    )
                                 )
                             )
                         )

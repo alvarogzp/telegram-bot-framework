@@ -32,3 +32,9 @@ class NoPendingAction(IntermediateAction):
     def process(self, event):
         if not event.is_pending:
             self._continue(event)
+
+
+class PendingAction(IntermediateAction):
+    def process(self, event):
+        if event.is_pending:
+            self._continue(event)
