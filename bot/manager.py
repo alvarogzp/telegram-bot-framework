@@ -27,11 +27,52 @@ class BotManager:
                     NoPendingAction().then(
                         MessageAction().then(
                             PerChatAction().then(
+
                                 ToggleableFeatureAction("greet").then(
                                     GreetAction()
                                 ),
                                 ToggleableFeatureAction("leave").then(
                                     LeaveAction()
+                                ),
+
+                                ToggleableFeatureAction("pole").then(
+                                    LegacyPoleAction()
+                                ),
+
+                                TextMessageAction().then(
+
+                                    CommandAction("start").then(
+                                        AnswerAction(
+                                            "Hello! I am " + self.bot.cache.bot_info.first_name + " and I am here to serve you.\nSorry if I cannot do too much for you now, I am still under construction.")
+                                    ),
+
+                                    CommandAction("shutdown").then(
+                                        AdminActionWithErrorMessage().then(
+                                            StopAction()
+                                        )
+                                    ),
+                                    CommandAction("eval").then(
+                                        AdminActionWithErrorMessage().then(
+                                            EvalAction()
+                                        )
+                                    ),
+
+                                    CommandAction("hashtags").then(
+                                        ListHashtagsAction()
+                                    ),
+
+                                    CommandAction("feature").then(
+                                        GetSetFeatureAction()
+                                    ),
+
+                                    CommandAction("poles").then(
+                                        ListPoleAction()
+                                    ),
+
+                                    CommandAction("messages").then(
+                                        ListMessageAction()
+                                    )
+
                                 )
                             )
                         )
@@ -50,44 +91,8 @@ class BotManager:
                             SaveMessageAction(),
                             SavePoleAction(),
 
-                            ToggleableFeatureAction("pole").then(
-                                LegacyPoleAction()
-                            ),
-
                             TextMessageAction().then(
-                                SaveHashtagsAction(),
-
-                                CommandAction("start").then(
-                                    AnswerAction(
-                                        "Hello! I am " + self.bot.cache.bot_info.first_name + " and I am here to serve you.\nSorry if I cannot do too much for you now, I am still under construction.")
-                                ),
-
-                                CommandAction("shutdown").then(
-                                    AdminActionWithErrorMessage().then(
-                                        StopAction()
-                                    )
-                                ),
-                                CommandAction("eval").then(
-                                    AdminActionWithErrorMessage().then(
-                                        EvalAction()
-                                    )
-                                ),
-
-                                CommandAction("hashtags").then(
-                                    ListHashtagsAction()
-                                ),
-
-                                CommandAction("feature").then(
-                                    GetSetFeatureAction()
-                                ),
-
-                                CommandAction("poles").then(
-                                    ListPoleAction()
-                                ),
-
-                                CommandAction("messages").then(
-                                    ListMessageAction()
-                                )
+                                SaveHashtagsAction()
                             )
                         )
                     )
