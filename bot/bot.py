@@ -32,6 +32,9 @@ class Bot:
             self.main_loop()
         except KeyboardInterrupt:
             self.send_to_admin("KeyboardInterrupt")
+        except SystemExit as e:
+            self.send_to_admin("SystemExit: " + str(e))
+            raise e
         except BaseException as e:
             self.send_to_admin("Fatal error: " + str(e))
             raise e
@@ -48,9 +51,7 @@ class Bot:
     def process_update(self, update, is_pending=False):
         try:
             self.action.process(Update(update, is_pending))
-        except KeyboardInterrupt:
-            raise  # to stop main loop
-        except BaseException as e:
+        except Exception as e:
             self.send_to_admin("Error while processing update. Action " + self.action.get_name() + " failed with error: " + str(e))
             traceback.print_exc()
 
