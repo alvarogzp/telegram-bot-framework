@@ -35,10 +35,6 @@ class BotManager:
                                     LeaveAction()
                                 ),
 
-                                ToggleableFeatureAction("pole").then(
-                                    LegacyPoleAction()
-                                ),
-
                                 TextMessageAction().then(
 
                                     CommandAction("start").then(
@@ -104,6 +100,10 @@ class BotManager:
                         PerChatAction().then(
                             SaveMessageAction(),
                             SavePoleAction(),
+
+                            ToggleableFeatureAction("pole").then(
+                                LegacyPoleAction()
+                            ),
 
                             TextMessageAction().then(
                                 SaveHashtagsAction()
