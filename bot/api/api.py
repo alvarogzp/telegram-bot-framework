@@ -14,7 +14,12 @@ class Api:
         return self.telegram_api.sendMessage(**message_params)
 
     def get_pending_updates(self):
-        return self.get_updates(timeout=0)
+        there_are_pending_updates = True
+        while there_are_pending_updates:
+            there_are_pending_updates = False
+            for update in self.get_updates(timeout=0):
+                there_are_pending_updates = True
+                yield update
 
     def get_updates(self, timeout=45):
         updates = self.telegram_api.getUpdates(offset=self.__get_updates_offset(), timeout=timeout)
