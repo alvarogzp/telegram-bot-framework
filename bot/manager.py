@@ -1,4 +1,4 @@
-from bot.action.admin import StopAction, EvalAction, AdminActionWithErrorMessage, AdminAction
+from bot.action.admin import RestartAction, EvalAction, AdminActionWithErrorMessage, AdminAction
 from bot.action.answer import AnswerAction
 from bot.action.core.action import ActionGroup
 from bot.action.core.command import CommandAction
@@ -42,9 +42,9 @@ class BotManager:
                                             "Hello! I am " + self.bot.cache.bot_info.first_name + " and I am here to serve you.\nSorry if I cannot do too much for you now, I am still under construction.")
                                     ),
 
-                                    CommandAction("shutdown").then(
+                                    CommandAction("restart").then(
                                         AdminActionWithErrorMessage().then(
-                                            StopAction()
+                                            RestartAction()
                                         )
                                     ),
                                     CommandAction("eval").then(
@@ -79,8 +79,8 @@ class BotManager:
                             PerChatAction().then(
                                 TextMessageAction().then(
                                     AdminAction().then(
-                                        CommandAction("shutdown").then(
-                                            StopAction()
+                                        CommandAction("restart").then(
+                                            RestartAction()
                                         )
                                     )
                                 )

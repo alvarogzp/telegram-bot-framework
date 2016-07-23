@@ -2,7 +2,7 @@ from bot.action.core.action import Action, IntermediateAction
 from bot.api.domain import Message
 
 
-class StopAction(Action):
+class RestartAction(Action):
     def process(self, event):
         raise KeyboardInterrupt()
 
