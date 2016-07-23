@@ -1,9 +1,15 @@
+import sys
+
 from bot.action.core.action import Action, IntermediateAction
 from bot.api.domain import Message
+
+EXIT_STATUS_TO_HALT_BOT = 55
 
 
 class RestartAction(Action):
     def process(self, event):
+        response_text = "Restarting bot...\nCommands might not work while restarting."
+        self.api.send_message(Message.create_reply(event.message, response_text))
         raise KeyboardInterrupt()
 
 
@@ -13,6 +19,13 @@ class EvalAction(Action):
         result = eval(code)
         response_message = "Evaluated. Result: %s" % result
         self.api.send_message(Message.create_reply(event.message, response_message))
+
+
+class HaltAction(Action):
+    def process(self, event):
+        response_text = "Bot stopped.\nYou need to launch it manually for it to work again."
+        self.api.send_message(Message.create_reply(event.message, response_text))
+        sys.exit(EXIT_STATUS_TO_HALT_BOT)
 
 
 class AdminAction(IntermediateAction):

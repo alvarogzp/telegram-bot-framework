@@ -1,4 +1,4 @@
-from bot.action.admin import RestartAction, EvalAction, AdminActionWithErrorMessage, AdminAction
+from bot.action.admin import RestartAction, EvalAction, AdminActionWithErrorMessage, AdminAction, HaltAction
 from bot.action.answer import AnswerAction
 from bot.action.core.action import ActionGroup
 from bot.action.core.command import CommandAction
@@ -47,6 +47,11 @@ class BotManager:
                                             RestartAction()
                                         )
                                     ),
+                                    CommandAction("halt").then(
+                                        AdminActionWithErrorMessage().then(
+                                            HaltAction()
+                                        )
+                                    ),
                                     CommandAction("eval").then(
                                         AdminActionWithErrorMessage().then(
                                             EvalAction()
@@ -81,6 +86,9 @@ class BotManager:
                                     AdminAction().then(
                                         CommandAction("restart").then(
                                             RestartAction()
+                                        ),
+                                        CommandAction("halt").then(
+                                            HaltAction()
                                         )
                                     )
                                 )

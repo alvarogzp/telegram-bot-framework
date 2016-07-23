@@ -3,7 +3,7 @@
 SLEEP_TIME_SECONDS=30
 DEBUG_ENABLED=true
 
-EXIT_STATUS_TO_HALT=55
+EXIT_STATUS_TO_HALT_BOT=55
 
 
 is_first_execution()
@@ -54,7 +54,7 @@ check_halt_received()
 should_stop_execution()
 {
     exit_status="$1"
-    [ "$exit_status" -eq "$EXIT_STATUS_TO_HALT" ]
+    [ "$exit_status" -eq "$EXIT_STATUS_TO_HALT_BOT" ]
 }
 
 update_code()
