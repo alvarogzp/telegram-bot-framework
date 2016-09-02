@@ -96,41 +96,50 @@ class ListVoiceAction(Action):
 
     def get_response_length(self, event, voices, number_of_users_to_display):
         user_storage_handler = UserStorageHandler.get_instance(self.state)
-        printable_voices = voices.grouped_by_length(number_of_users_to_display).printable_version(user_storage_handler)
+        formatter = TimeFormatter.format
+        printable_voices = voices.grouped_by_length(number_of_users_to_display)\
+            .printable_version(user_storage_handler, formatter)
         return self.__build_success_response_message(event, "Sum of audios length per user:", printable_voices)
 
     def get_response_longest(self, event, voices, number_of_voices_to_display):
         user_storage_handler = UserStorageHandler.get_instance(self.state)
-        filtered_voices = voices.longest().limit(number_of_voices_to_display)
-        printable_voices = filtered_voices.printable_version(event, user_storage_handler)
+        format_string = "{formatted_duration} → {formatted_user} → {formatted_command}"
+        printable_voices = voices.longest().limit(number_of_voices_to_display)\
+            .printable_version(event, user_storage_handler, format_string)
         return self.__build_success_response_message(event, "Longest audios:", printable_voices)
 
     def get_response_number(self, event, voices, number_of_users_to_display):
         user_storage_handler = UserStorageHandler.get_instance(self.state)
-        printable_voices = voices.grouped_by_user(number_of_users_to_display).printable_version(user_storage_handler)
+        printable_voices = voices.grouped_by_user(number_of_users_to_display)\
+            .printable_version(user_storage_handler)
         return self.__build_success_response_message(event, "Number of audios sent per user:", printable_voices)
 
     def get_response_size(self, event, voices, number_of_users_to_display):
         user_storage_handler = UserStorageHandler.get_instance(self.state)
-        printable_voices = voices.grouped_by_size(number_of_users_to_display).printable_version(user_storage_handler)
+        formatter = SizeFormatter.format
+        printable_voices = voices.grouped_by_size(number_of_users_to_display)\
+            .printable_version(user_storage_handler, formatter)
         return self.__build_success_response_message(event, "Sum of audios size per user:", printable_voices)
 
     def get_response_biggest(self, event, voices, number_of_voices_to_display):
         user_storage_handler = UserStorageHandler.get_instance(self.state)
-        filtered_voices = voices.biggest().limit(number_of_voices_to_display)
-        printable_voices = filtered_voices.printable_version(event, user_storage_handler)
+        format_string = "{formatted_size} → {formatted_user} → {formatted_command}"
+        printable_voices = voices.biggest().limit(number_of_voices_to_display)\
+            .printable_version(event, user_storage_handler, format_string)
         return self.__build_success_response_message(event, "Biggest audios:", printable_voices)
 
     def get_response_smallest(self, event, voices, number_of_voices_to_display):
         user_storage_handler = UserStorageHandler.get_instance(self.state)
-        filtered_voices = voices.smallest().limit(number_of_voices_to_display)
-        printable_voices = filtered_voices.printable_version(event, user_storage_handler)
+        format_string = "{formatted_size} → {formatted_user} → {formatted_command}"
+        printable_voices = voices.smallest().limit(number_of_voices_to_display)\
+            .printable_version(event, user_storage_handler, format_string)
         return self.__build_success_response_message(event, "Smallest audios:", printable_voices)
 
     def get_response_recent(self, event, voices, number_of_voices_to_display):
         user_storage_handler = UserStorageHandler.get_instance(self.state)
-        filtered_voices = voices.most_recent().limit(number_of_voices_to_display)
-        printable_voices = filtered_voices.printable_version(event, user_storage_handler)
+        format_string = "{formatted_date} → {formatted_user} → {formatted_command}"
+        printable_voices = voices.most_recent().limit(number_of_voices_to_display)\
+            .printable_version(event, user_storage_handler, format_string)
         return self.__build_success_response_message(event, "Most recent audios:", printable_voices)
 
     def get_response_show(self, event, voices, message_id):
@@ -159,11 +168,15 @@ class Voice:
         self.duration = int(duration)
         self.file_size = int(file_size)  # may be None
 
-    def printable_version(self, event, user_storage_handler):
-        formatted_user = UserFormatter.retrieve_and_format(self.user_id, user_storage_handler)
-        formatted_date = DateFormatter.format(self.date)
-        view_voice_command = UnderscoredCommandBuilder.build_command(event.command, self.message_id)
-        return "{} → {} → {}".format(formatted_user, formatted_date, view_voice_command)
+    def printable_version(self, event, user_storage_handler, format_string):
+        format_dict = {
+            "formatted_user": UserFormatter.retrieve_and_format(self.user_id, user_storage_handler),
+            "formatted_date": DateFormatter.format(self.date),
+            "formatted_duration": TimeFormatter.format(self.duration),
+            "formatted_size": SizeFormatter.format(self.file_size),
+            "formatted_command": UnderscoredCommandBuilder.build_command(event.command, self.message_id),
+        }
+        return format_string.format(**format_dict)
 
     def full_printable_version(self, user_storage_handler):
         formatted_user = UserFormatter.retrieve_and_format(self.user_id, user_storage_handler)
@@ -235,8 +248,8 @@ class VoiceList:
     def __get_voices_sorted_by(self, key):
         return sorted(self.voices, key=key)
 
-    def printable_version(self, event, user_storage_handler):
-        return "\n".join((voice.printable_version(event, user_storage_handler) for voice in self.voices))
+    def printable_version(self, event, user_storage_handler, format_string):
+        return "\n".join((voice.printable_version(event, user_storage_handler, format_string) for voice in self.voices))
 
     @staticmethod
     def deserialize(voices_data):
@@ -247,8 +260,8 @@ class VoiceGroup:
     def __init__(self, grouped_voices):
         self.grouped_voices = grouped_voices
 
-    def printable_version(self, user_storage_handler):
-        return "\n".join(("{} → {}".format(count, UserFormatter.retrieve_and_format(user_id, user_storage_handler))
+    def printable_version(self, user_storage_handler, formatter=lambda x: x):
+        return "\n".join(("{} → {}".format(formatter(count), UserFormatter.retrieve_and_format(user_id, user_storage_handler))
                           for user_id, count in self.grouped_voices))
 
 
