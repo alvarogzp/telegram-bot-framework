@@ -9,6 +9,21 @@ class TextMessageAction(IntermediateAction):
             self._continue(event)
 
 
+class VoiceMessageAction(IntermediateAction):
+    def process(self, event):
+        voice = event.message.voice
+        if voice is not None:
+            event.voice = voice
+            self._continue(event)
+
+
+class NoForwardedMessage(IntermediateAction):
+    def process(self, event):
+        forwarded = event.message.forward_date
+        if forwarded is None:
+            self._continue(event)
+
+
 class EditedMessageAction(IntermediateAction):
     def process(self, event):
         edited_message = event.update.edited_message
