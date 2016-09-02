@@ -30,7 +30,7 @@ class SaveVoiceAction(Action):
 class ListVoiceAction(Action):
     def process(self, event):
         action, action_param, help_args = self.parse_args(event.command_args.split())
-        if action in ("length", "longest", "number", "size", "biggest", "smallest", "recent", "show"):
+        if action in ("length", "longest", "shortest", "number", "size", "biggest", "smallest", "recent", "show"):
             voices = VoiceStorageHandler(event).get_voices()
             if voices.is_empty():
                 response = self.get_response_empty()
@@ -69,6 +69,7 @@ class ListVoiceAction(Action):
         args = [
             "[length [number_of_users]]",
             "longest [number_of_audios]",
+            "shortest [number_of_audios]",
             "number [number_of_users]",
             "size [number_of_users]",
             "biggest [number_of_audios]",
@@ -78,6 +79,7 @@ class ListVoiceAction(Action):
         ]
         description = "By default, display a ranking with the sum of audios length per user.\n\n" \
                       "Use *longest* for a list of the longest audios sent.\n\n" \
+                      "Use *shortest* for a list of the shortest audios sent.\n\n" \
                       "Use *number* for a ranking with the number of audios per user.\n\n" \
                       "Use *size* for a ranking with the sum of audios size per user.\n\n" \
                       "Use *biggest* for a list of the audios with most size.\n\n" \
@@ -107,6 +109,13 @@ class ListVoiceAction(Action):
         printable_voices = voices.longest().limit(number_of_voices_to_display)\
             .printable_version(event, user_storage_handler, format_string)
         return self.__build_success_response_message(event, "Longest audios:", printable_voices)
+
+    def get_response_shortest(self, event, voices, number_of_voices_to_display):
+        user_storage_handler = UserStorageHandler.get_instance(self.state)
+        format_string = "{formatted_duration} → {formatted_user} → {formatted_command}"
+        printable_voices = voices.shortest().limit(number_of_voices_to_display)\
+            .printable_version(event, user_storage_handler, format_string)
+        return self.__build_success_response_message(event, "Shortest audios:", printable_voices)
 
     def get_response_number(self, event, voices, number_of_users_to_display):
         user_storage_handler = UserStorageHandler.get_instance(self.state)
@@ -234,13 +243,19 @@ class VoiceList:
         return VoiceList(list(reversed(self.voices)))
 
     def longest(self):
-        return VoiceList(list(reversed(self.__get_voices_sorted_by(lambda x: x.duration))))
+        return VoiceList(list(reversed(self.__get_voices_sorted_by_duration())))
+
+    def shortest(self):
+        return VoiceList(self.__get_voices_sorted_by_duration())
 
     def biggest(self):
         return VoiceList(list(reversed(self.__get_voices_sorted_by_file_size())))
 
     def smallest(self):
         return VoiceList(self.__get_voices_sorted_by_file_size())
+
+    def __get_voices_sorted_by_duration(self):
+        return self.__get_voices_sorted_by(lambda x: x.duration)
 
     def __get_voices_sorted_by_file_size(self):
         return self.__get_voices_sorted_by(lambda x: x.file_size)
