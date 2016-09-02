@@ -1,5 +1,7 @@
 import time
 
+import datetime
+
 from bot.action.userinfo import UserStorageHandler
 
 
@@ -38,3 +40,23 @@ class UserFormatter:
     @classmethod
     def retrieve_and_format(cls, user_id, user_storage_handler: UserStorageHandler):
         return cls.format(user_storage_handler.get(user_id))
+
+
+class TimeFormatter:
+    @staticmethod
+    def format(seconds):
+        return str(datetime.timedelta(seconds=seconds))
+
+
+class SizeFormatter:
+    MULTIPLIER_FACTOR = 1024
+
+    @classmethod
+    def format(cls, number, suffix='B'):
+        if abs(number) < cls.MULTIPLIER_FACTOR:
+            return "{} {}".format(number, suffix)
+        for unit in ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi', 'Yi']:
+            if abs(number) < cls.MULTIPLIER_FACTOR:
+                break
+            number /= cls.MULTIPLIER_FACTOR
+        return "{:.2f} {}{}".format(number, unit, suffix)

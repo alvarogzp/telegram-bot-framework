@@ -4,7 +4,7 @@ from bot.action import util
 from bot.action.core.action import Action
 from bot.action.core.command import UnderscoredCommandBuilder, CommandUsageMessage
 from bot.action.userinfo import UserStorageHandler
-from bot.action.util.format import UserFormatter, DateFormatter
+from bot.action.util.format import UserFormatter, DateFormatter, TimeFormatter, SizeFormatter
 from bot.action.util.textformat import FormattedText
 from bot.api.domain import Message
 
@@ -168,10 +168,12 @@ class Voice:
     def full_printable_version(self, user_storage_handler):
         formatted_user = UserFormatter.retrieve_and_format(self.user_id, user_storage_handler)
         formatted_date = DateFormatter.format_full(self.date)
+        formatted_duration = TimeFormatter.format(self.duration)
+        formatted_size = SizeFormatter.format(self.file_size)
         text = "Author: {}\n".format(formatted_user)
         text += "Date: {}\n".format(formatted_date)
-        text += "Duration: {} seconds\n".format(self.duration)  # TODO pretty print
-        text += "Size: {} bytes".format(self.file_size)  # TODO pretty print
+        text += "Duration: {}\n".format(formatted_duration)
+        text += "Size: {}".format(formatted_size)
         return Message.create(text).reply_to_message(message_id=self.message_id)
 
     def serialize(self):
