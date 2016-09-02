@@ -2,7 +2,7 @@ from bot.action import util
 from bot.action.core.action import Action
 
 
-class SaveAudioAction(Action):
+class SaveVoiceAction(Action):
     def process(self, event):
         storage_handler = VoiceStorageHandler(event)
         voice = self.build_voice_from_event(event)
