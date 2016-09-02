@@ -39,8 +39,10 @@ class ListVoiceAction(Action):
                 response = func(event, voices, action_param)
         else:
             response = self.get_response_help(event, help_args)
+        if response.chat_id is None:
+            response.to_chat(message=event.message)
         if response.reply_to_message_id is None:
-            response = response.to_chat_replying(event.message)
+            response = response.reply_to_message(message=event.message)
         self.api.send_message(response)
 
     @staticmethod
@@ -83,7 +85,7 @@ class ListVoiceAction(Action):
                       "Use *recent* for a list of the most recent audios sent.\n\n" \
                       "In all of the previous modes you can add a number to the end of the command to limit " \
                       "the number of audios or users to display (default is 10).\n\n" \
-                      "You can also call the command with an audio _message_id_ to see some info about it " \
+                      "You can also call the command with an audio message\\_id to see some info about it " \
                       "with a reply to the requested audio, so you can listen it again."
         return CommandUsageMessage.get_usage_message(event.command, args, description)
 
@@ -94,7 +96,7 @@ class ListVoiceAction(Action):
 
     def get_response_length(self, event, voices, number_of_users_to_display):
         user_storage_handler = UserStorageHandler.get_instance(self.state)
-        printable_voices = voices.grouped_by_length(number_of_users_to_display).printable_info(user_storage_handler)
+        printable_voices = voices.grouped_by_length(number_of_users_to_display).printable_version(user_storage_handler)
         return self.__build_success_response_message(event, "Sum of audios length per user:", printable_voices)
 
     def get_response_longest(self, event, voices, number_of_voices_to_display):
@@ -105,12 +107,12 @@ class ListVoiceAction(Action):
 
     def get_response_number(self, event, voices, number_of_users_to_display):
         user_storage_handler = UserStorageHandler.get_instance(self.state)
-        printable_voices = voices.grouped_by_user(number_of_users_to_display).printable_info(user_storage_handler)
+        printable_voices = voices.grouped_by_user(number_of_users_to_display).printable_version(user_storage_handler)
         return self.__build_success_response_message(event, "Number of audios sent per user:", printable_voices)
 
     def get_response_size(self, event, voices, number_of_users_to_display):
         user_storage_handler = UserStorageHandler.get_instance(self.state)
-        printable_voices = voices.grouped_by_size(number_of_users_to_display).printable_info(user_storage_handler)
+        printable_voices = voices.grouped_by_size(number_of_users_to_display).printable_version(user_storage_handler)
         return self.__build_success_response_message(event, "Sum of audios size per user:", printable_voices)
 
     def get_response_biggest(self, event, voices, number_of_voices_to_display):
@@ -154,8 +156,8 @@ class Voice:
         self.date = date
         self.message_id = message_id
         self.user_id = user_id
-        self.duration = duration
-        self.file_size = file_size  # may be None
+        self.duration = int(duration)
+        self.file_size = int(file_size)  # may be None
 
     def printable_version(self, event, user_storage_handler):
         formatted_user = UserFormatter.retrieve_and_format(self.user_id, user_storage_handler)
@@ -170,7 +172,7 @@ class Voice:
         text += "Date: {}\n".format(formatted_date)
         text += "Duration: {} seconds\n".format(self.duration)  # TODO pretty print
         text += "Size: {} bytes".format(self.file_size)  # TODO pretty print
-        return Message.create(text)
+        return Message.create(text).reply_to_message(message_id=self.message_id)
 
     def serialize(self):
         return "{} {} {} {} {}\n".format(self.date, self.message_id, self.user_id, self.duration, self.file_size)
@@ -214,22 +216,22 @@ class VoiceList:
 
     def most_recent(self):
         # for now, assume they are already sorted by date, in descending order
-        return VoiceList(reversed(self.voices))
+        return VoiceList(list(reversed(self.voices)))
 
     def longest(self):
-        return reversed(self.__get_voices_sorted_by(lambda x: x.duration))
+        return VoiceList(list(reversed(self.__get_voices_sorted_by(lambda x: x.duration))))
 
     def biggest(self):
-        return reversed(self.__get_voices_sorted_by_file_size())
+        return VoiceList(list(reversed(self.__get_voices_sorted_by_file_size())))
 
     def smallest(self):
-        return self.__get_voices_sorted_by_file_size()
+        return VoiceList(self.__get_voices_sorted_by_file_size())
 
     def __get_voices_sorted_by_file_size(self):
         return self.__get_voices_sorted_by(lambda x: x.file_size)
 
     def __get_voices_sorted_by(self, key):
-        return VoiceList(sorted(self.voices, key=key))
+        return sorted(self.voices, key=key)
 
     def printable_version(self, event, user_storage_handler):
         return "\n".join((voice.printable_version(event, user_storage_handler) for voice in self.voices))
