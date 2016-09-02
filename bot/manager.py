@@ -5,7 +5,7 @@ from bot.action.core.command import CommandAction
 from bot.action.core.filter import MessageAction, TextMessageAction, NoPendingAction, EditedMessageAction, PendingAction, \
     NoForwardedMessage, VoiceMessageAction
 from bot.action.enterexit import GreetAction, LeaveAction
-from bot.action.extra.audios import SaveVoiceAction
+from bot.action.extra.audios import SaveVoiceAction, ListVoiceAction
 from bot.action.extra.hashtags import SaveHashtagsAction, ListHashtagsAction
 from bot.action.extra.legacypole import LegacyPoleAction
 from bot.action.extra.messages import SaveMessageAction, ListMessageAction
@@ -74,6 +74,10 @@ class BotManager:
 
                                     CommandAction("messages").then(
                                         ListMessageAction()
+                                    ),
+
+                                    CommandAction("audios").then(
+                                        ListVoiceAction()
                                     )
 
                                 )
