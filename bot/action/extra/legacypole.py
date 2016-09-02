@@ -40,6 +40,7 @@ class LegacyPoleAction(Action):
                             state.current_day_first_messages += "\n" + self.get_formatted_message_to_store(event.message)
 
     def has_changed_day(self, previous_timestamp, current_timestamp):
+        # TODO remove this and use Pole one, and find a way to use offset
         current_day = self.get_day_number(current_timestamp)
         previous_day = self.get_day_number(previous_timestamp)
         return current_day != previous_day
