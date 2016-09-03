@@ -30,15 +30,16 @@ class SaveVoiceAction(Action):
 class ListVoiceAction(Action):
     def process(self, event):
         action, action_param, help_args = self.parse_args(event.command_args.split())
-        if action in ("length", "longest", "shortest", "number", "size", "biggest", "smallest", "recent", "show"):
+        function_name = "get_response_" + action
+        func = getattr(self, function_name, None)
+        if callable(func):
             voices = VoiceStorageHandler(event).get_voices()
             if voices.is_empty():
-                response = self.get_response_empty()
+                response = self._get_response_empty()
             else:
-                func = getattr(self, "get_response_" + action)
                 response = func(event, voices, action_param)
         else:
-            response = self.get_response_help(event, help_args)
+            response = self._get_response_help(event, help_args)
         if response.chat_id is None:
             response.to_chat(message=event.message)
         if response.reply_to_message_id is None:
@@ -65,7 +66,7 @@ class ListVoiceAction(Action):
         return action, action_param, help_args
 
     @staticmethod
-    def get_response_help(event, help_args):
+    def _get_response_help(event, help_args):
         args = [
             "[length [number_of_users]]",
             "longest [number_of_audios]",
@@ -74,6 +75,7 @@ class ListVoiceAction(Action):
             "size [number_of_users]",
             "biggest [number_of_audios]",
             "smallest [number_of_audios]",
+            "mean [number_of_users]",
             "recent [number_of_audios]",
             "[show] message_id"
         ]
@@ -84,6 +86,7 @@ class ListVoiceAction(Action):
                       "Use *size* for a ranking with the sum of audios size per user.\n\n" \
                       "Use *biggest* for a list of the audios with most size.\n\n" \
                       "Use *smallest* for a list of the audios with less size.\n\n" \
+                      "Use *mean* for a ranking with the mean audio length per user.\n\n" \
                       "Use *recent* for a list of the most recent audios sent.\n\n" \
                       "In all of the previous modes you can add a number to the end of the command to limit " \
                       "the number of audios or users to display (default is 10).\n\n" \
@@ -92,7 +95,7 @@ class ListVoiceAction(Action):
         return CommandUsageMessage.get_usage_message(event.command, args, description)
 
     @staticmethod
-    def get_response_empty():
+    def _get_response_empty():
         return Message.create("I have not seen any audios here.\n"
                               "Send some of them and try again.")
 
@@ -127,8 +130,8 @@ class ListVoiceAction(Action):
         user_storage_handler = UserStorageHandler.get_instance(self.state)
         printable_voices = voices.grouped_by_user(number_of_users_to_display)\
             .printable_version(user_storage_handler)
-        suggested_command = UnderscoredCommandBuilder.build_command(event.command, "size")
-        footer_text = FormattedText().normal("Write ").normal(suggested_command).normal(" to see sum of audios size per user.")
+        suggested_command = UnderscoredCommandBuilder.build_command(event.command, "mean")
+        footer_text = FormattedText().normal("Write ").normal(suggested_command).normal(" to see mean audio length per user.")
         return self.__build_success_response_message(event, "Number of audios sent per user:", printable_voices, footer_text)
 
     def get_response_size(self, event, voices, number_of_users_to_display):
@@ -157,6 +160,15 @@ class ListVoiceAction(Action):
         suggested_command = UnderscoredCommandBuilder.build_command(event.command, "shortest")
         footer_text = FormattedText().normal("Write ").normal(suggested_command).normal(" to see shortest audios.")
         return self.__build_success_response_message(event, "Smallest audios:", printable_voices, footer_text)
+
+    def get_response_mean(self, event, voices, number_of_users_to_display):
+        user_storage_handler = UserStorageHandler.get_instance(self.state)
+        formatter = TimeFormatter.format
+        printable_voices = voices.grouped_by_mean(number_of_users_to_display)\
+            .printable_version(user_storage_handler, formatter)
+        suggested_command = UnderscoredCommandBuilder.build_command(event.command, "size")
+        footer_text = FormattedText().normal("Write ").normal(suggested_command).normal(" to see sum of audios size per user.")
+        return self.__build_success_response_message(event, "Mean audio length per user:", printable_voices, footer_text)
 
     def get_response_recent(self, event, voices, number_of_voices_to_display):
         user_storage_handler = UserStorageHandler.get_instance(self.state)
@@ -235,20 +247,38 @@ class VoiceList:
                 return voice
 
     def grouped_by_user(self, max_to_return):
-        voice_users = (voice.user_id for voice in self.voices)
-        return VoiceGroup(collections.Counter(voice_users).most_common(max_to_return))
+        return VoiceGroup(self.__get_counter_for_number_of_audios().most_common(max_to_return))
 
     def grouped_by_length(self, max_to_return):
-        counter = collections.Counter()
-        for voice in self.voices:
-            counter.update({voice.user_id: voice.duration})
-        return VoiceGroup(counter.most_common(max_to_return))
+        return VoiceGroup(self.__get_counter_for_lengths().most_common(max_to_return))
 
     def grouped_by_size(self, max_to_return):
+        return VoiceGroup(self.__get_counter_for_sizes().most_common(max_to_return))
+
+    def grouped_by_mean(self, max_to_return):
+        number_counter = self.__get_counter_for_number_of_audios()
+        duration_counter = self.__get_counter_for_lengths()
+        means = []
+        for user_id, number_of_voices in number_counter.items():
+            total_length = duration_counter[user_id]
+            means.append((user_id, total_length / number_of_voices))
+        means.sort(reverse=True)
+        return VoiceGroup(means[:max_to_return])
+
+    def __get_counter_for_number_of_audios(self):
+        return self.__get_counter_for(lambda x: 1)
+
+    def __get_counter_for_lengths(self):
+        return self.__get_counter_for(lambda x: x.duration)
+
+    def __get_counter_for_sizes(self):
+        return self.__get_counter_for(lambda x: x.file_size)
+
+    def __get_counter_for(self, key):
         counter = collections.Counter()
         for voice in self.voices:
-            counter.update({voice.user_id: voice.file_size})
-        return VoiceGroup(counter.most_common(max_to_return))
+            counter[voice.user_id] += key(voice)
+        return counter
 
     def limit(self, limit):
         return VoiceList(self.voices[:limit])
