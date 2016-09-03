@@ -247,22 +247,32 @@ class VoiceList:
                 return voice
 
     def grouped_by_user(self, max_to_return):
-        return VoiceGroup(self.__get_counter_for_number_of_audios().most_common(max_to_return))
+        counter, total = self.__get_counter_for_number_of_audios()
+        users = counter.most_common(max_to_return)
+        users.append(("[TOTAL]", total))
+        return VoiceGroup(users)
 
     def grouped_by_length(self, max_to_return):
-        return VoiceGroup(self.__get_counter_for_lengths().most_common(max_to_return))
+        counter, total = self.__get_counter_for_lengths()
+        lengths = counter.most_common(max_to_return)
+        lengths.append(("[TOTAL]", total))
+        return VoiceGroup(lengths)
 
     def grouped_by_size(self, max_to_return):
-        return VoiceGroup(self.__get_counter_for_sizes().most_common(max_to_return))
+        counter, total = self.__get_counter_for_sizes()
+        sizes = counter.most_common(max_to_return)
+        sizes.append(("[TOTAL]", total))
+        return VoiceGroup(sizes)
 
     def grouped_by_mean(self, max_to_return):
-        number_counter = self.__get_counter_for_number_of_audios()
-        duration_counter = self.__get_counter_for_lengths()
+        number_counter, number_total = self.__get_counter_for_number_of_audios()
+        length_counter, length_total = self.__get_counter_for_lengths()
         means = []
         for user_id, number_of_voices in number_counter.items():
-            total_length = duration_counter[user_id]
+            total_length = length_counter[user_id]
             means.append((user_id, total_length / number_of_voices))
-        means.sort(reverse=True)
+        means.sort(key=lambda x: x[1], reverse=True)
+        means.append(("[TOTAL]", length_total / number_total))
         return VoiceGroup(means[:max_to_return])
 
     def __get_counter_for_number_of_audios(self):
@@ -276,9 +286,12 @@ class VoiceList:
 
     def __get_counter_for(self, key):
         counter = collections.Counter()
+        total = 0
         for voice in self.voices:
-            counter[voice.user_id] += key(voice)
-        return counter
+            value = key(voice)
+            counter[voice.user_id] += value
+            total += value
+        return counter, total
 
     def limit(self, limit):
         return VoiceList(self.voices[:limit])
