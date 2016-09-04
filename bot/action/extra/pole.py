@@ -1,5 +1,8 @@
 import collections
 
+import datetime
+import pytz
+
 from bot.action.core.action import Action
 from bot.action.core.command import CommandUsageMessage, UnderscoredCommandBuilder
 from bot.action.userinfo import UserStorageHandler
@@ -7,8 +10,7 @@ from bot.action.util.format import DateFormatter, UserFormatter
 from bot.action.util.textformat import FormattedText
 from bot.api.domain import Message
 
-SECONDS_IN_A_DAY = 86400
-OFFSET_FROM_UTC_IN_SECONDS = 2 * 3600
+DEFAULT_TIMEZONE = "CET"
 
 
 class SavePoleAction(Action):
@@ -23,7 +25,7 @@ class SavePoleAction(Action):
         previous_message_timestamp = state.last_message_timestamp
         state.last_message_timestamp = str(current_message_timestamp)
         if previous_message_timestamp is not None:
-            if self.has_changed_day(int(previous_message_timestamp), current_message_timestamp):  # pole
+            if self.has_changed_day(event.state, state, int(previous_message_timestamp), current_message_timestamp):  # pole
                 self.build_pole_and_save_to(state, "poles", event.message)
                 state.current_day_message_count = str(1)
             else:
@@ -39,14 +41,20 @@ class SavePoleAction(Action):
                             self.build_pole_and_save_to(state, "subsubpoles", event.message)
                             state.current_day_message_count = None
 
-    def has_changed_day(self, previous_timestamp, current_timestamp):
-        current_day = self.get_day_number(current_timestamp)
-        previous_day = self.get_day_number(previous_timestamp)
+    @classmethod
+    def has_changed_day(cls, chat_state, feature_state, previous_timestamp, current_timestamp):
+        current_day = cls.get_day_number(chat_state, feature_state, current_timestamp)
+        previous_day = cls.get_day_number(chat_state, feature_state, previous_timestamp)
         return current_day != previous_day
 
     @staticmethod
-    def get_day_number(timestamp):
-        return (timestamp + OFFSET_FROM_UTC_IN_SECONDS) // SECONDS_IN_A_DAY
+    def get_day_number(chat_state, feature_state, timestamp):
+        offset_seconds = feature_state.get_value("offset_seconds", 0)  # TODO check number on set
+        if offset_seconds:
+            timestamp += int(offset_seconds)
+        timezone_name = chat_state.get_value("timezone", DEFAULT_TIMEZONE)
+        timezone = pytz.timezone(timezone_name)  # TODO catch exceptions on set
+        return datetime.datetime.fromtimestamp(timestamp, tz=timezone).date().toordinal()
 
     def build_pole_and_save_to(self, state, storage, message):
         pole = self.build_pole_from_message(message)

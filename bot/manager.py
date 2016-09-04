@@ -1,5 +1,6 @@
 from bot.action.admin import RestartAction, EvalAction, AdminActionWithErrorMessage, AdminAction, HaltAction
 from bot.action.answer import AnswerAction
+from bot.action.config import ConfigAction
 from bot.action.core.action import ActionGroup
 from bot.action.core.command import CommandAction
 from bot.action.core.filter import MessageAction, TextMessageAction, NoPendingAction, EditedMessageAction, PendingAction, \
@@ -57,6 +58,11 @@ class BotManager:
                                     CommandAction("eval").then(
                                         AdminActionWithErrorMessage().then(
                                             EvalAction()
+                                        )
+                                    ),
+                                    CommandAction("config").then(
+                                        AdminActionWithErrorMessage().then(
+                                            ConfigAction()
                                         )
                                     ),
 
