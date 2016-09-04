@@ -74,6 +74,10 @@ class BotManager:
                                             "Hello! I am " + self.bot.cache.bot_info.first_name + " and I am here to serve you.\nSorry if I cannot do too much for you now, I am still under construction.")
                                     ),
 
+                                    CommandAction("ping").then(
+                                        AnswerAction("Up and running, sir!")
+                                    ),
+
                                     CommandAction("restart").then(
                                         AdminActionWithErrorMessage().then(
                                             RestartAction()
@@ -124,6 +128,11 @@ class BotManager:
                         MessageAction().then(
                             PerChatAction().then(
                                 TextMessageAction().then(
+
+                                    CommandAction("ping").then(
+                                        AnswerAction("I'm back! Sorry for the delay...")
+                                    ),
+
                                     AdminAction().then(
                                         CommandAction("restart").then(
                                             RestartAction()
@@ -132,6 +141,7 @@ class BotManager:
                                             HaltAction()
                                         )
                                     )
+
                                 )
                             )
                         )
