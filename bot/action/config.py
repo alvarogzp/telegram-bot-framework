@@ -42,21 +42,33 @@ class ConfigAction(Action):
             state = event.state
         return key, state
 
-    @staticmethod
-    def get_current_value(state, key, key_to_display):
-        current_value = state.get_value(key)
+    def get_current_value(self, state, key, key_to_display):
+        value = self.__get_current_value(state, key)
         return FormattedText().bold("Key").normal(":").newline().code_block(key_to_display).newline().newline()\
-            .bold("Value").normal(":").newline().code_block(str(current_value)).build_message()
+            .bold("Value").normal(":").newline().concat(value).build_message()
 
-    @staticmethod
-    def set_new_value(state, key, new_value, key_to_display):
-        previous_value = state.get_value(key)
+    def set_new_value(self, state, key, new_value, key_to_display):
+        previous_value = self.__get_current_value(state, key)
         state.set_value(key, new_value)
-        current_value = state.get_value(key)
+        current_value = self.__get_current_value(state, key)
         return FormattedText().bold("Config updated!").newline().newline()\
             .bold("Key").normal(":").newline().code_block(key_to_display).newline().newline()\
-            .bold("Previous value").normal(":").newline().code_block(str(previous_value)).newline().newline()\
-            .bold("Current value").normal(":").newline().code_block(str(current_value)).build_message()
+            .bold("Previous value").normal(":").newline().concat(previous_value).newline().newline()\
+            .bold("Current value").normal(":").newline().concat(current_value).build_message()
+
+    @staticmethod
+    def __get_current_value(state, key):
+        text = FormattedText()
+        current_value = state.get_value(key)
+        if current_value is not None:
+            text.code_block(str(current_value))
+        elif state.exists_value(key):
+            keys = state.get_for(key).list_keys()
+            formatted_keys = "\n".join(sorted(keys))
+            text.italic("Key is a node.").newline().italic("Child keys:").newline().code_block(formatted_keys)
+        else:
+            text.italic("Key does not exists")
+        return text
 
     @staticmethod
     def get_usage(event):
