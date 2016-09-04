@@ -41,9 +41,10 @@ class SavePoleAction(Action):
                             self.build_pole_and_save_to(state, "subsubpoles", event.message)
                             state.current_day_message_count = None
 
-    def has_changed_day(self, chat_state, feature_state, previous_timestamp, current_timestamp):
-        current_day = self.get_day_number(chat_state, feature_state, current_timestamp)
-        previous_day = self.get_day_number(chat_state, feature_state, previous_timestamp)
+    @classmethod
+    def has_changed_day(cls, chat_state, feature_state, previous_timestamp, current_timestamp):
+        current_day = cls.get_day_number(chat_state, feature_state, current_timestamp)
+        previous_day = cls.get_day_number(chat_state, feature_state, previous_timestamp)
         return current_day != previous_day
 
     @staticmethod
