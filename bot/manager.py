@@ -27,6 +27,35 @@ class BotManager:
             ActionGroup(
                 GlobalGapDetectorAction().then(
 
+                    MessageAction().then(
+                        SaveUserAction(),
+
+                        PerChatAction().then(
+                            NoForwardedMessage().then(
+                                VoiceMessageAction().then(
+                                    SaveVoiceAction()
+                                )
+                            ),
+
+                            SaveMessageAction(),
+                            SavePoleAction(),
+
+                            ToggleableFeatureAction("pole").then(
+                                LegacyPoleAction()
+                            ),
+
+                            TextMessageAction().then(
+                                SaveHashtagsAction()
+                            )
+                        )
+                    ),
+
+                    EditedMessageAction().then(
+                        PerChatAction().then(
+                            SaveMessageAction()
+                        )
+                    ),
+
                     NoPendingAction().then(
                         MessageAction().then(
                             PerChatAction().then(
@@ -104,35 +133,6 @@ class BotManager:
                                         )
                                     )
                                 )
-                            )
-                        )
-                    ),
-
-                    EditedMessageAction().then(
-                        PerChatAction().then(
-                            SaveMessageAction()
-                        )
-                    ),
-
-                    MessageAction().then(
-                        SaveUserAction(),
-
-                        PerChatAction().then(
-                            NoForwardedMessage().then(
-                                VoiceMessageAction().then(
-                                    SaveVoiceAction()
-                                )
-                            ),
-
-                            SaveMessageAction(),
-                            SavePoleAction(),
-
-                            ToggleableFeatureAction("pole").then(
-                                LegacyPoleAction()
-                            ),
-
-                            TextMessageAction().then(
-                                SaveHashtagsAction()
                             )
                         )
                     )
