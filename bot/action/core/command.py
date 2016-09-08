@@ -20,7 +20,7 @@ class CommandAction(IntermediateAction):
                 if self.parser.matches_command(command_text):
                     event.command = self.parser.get_command_name(command_text)
                     additional_text = parser.get_text_after_entity(entity)
-                    event.command_args = self.parser.get_command_args(command_text, additional_text).lstrip()
+                    event.command_args = self.parser.get_command_args(command_text, additional_text).lstrip(" ")
                     self._continue(event)
 
     @staticmethod

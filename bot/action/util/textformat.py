@@ -52,6 +52,8 @@ class FormattedText:
         return Message.create(self.text, parse_mode=self.mode)
 
     def _escaped(self, text):
+        if type(text) is not str:
+            text = str(text)
         return self.formatter.escape(text)
 
 

@@ -11,6 +11,7 @@ from bot.action.extra.hashtags import SaveHashtagsAction, ListHashtagsAction
 from bot.action.extra.legacypole import LegacyPoleAction
 from bot.action.extra.messages import SaveMessageAction, ListMessageAction
 from bot.action.extra.pole import SavePoleAction, ListPoleAction
+from bot.action.extra.random import RandomChoiceAction
 from bot.action.gapdetector import GlobalGapDetectorAction
 from bot.action.perchat import PerChatAction
 from bot.action.toggle import GetSetFeatureAction, ToggleableFeatureAction
@@ -125,6 +126,10 @@ class BotManager:
 
                                     CommandAction("audios").then(
                                         ListVoiceAction()
+                                    ),
+
+                                    CommandAction("random").then(
+                                        RandomChoiceAction()
                                     )
 
                                 )
