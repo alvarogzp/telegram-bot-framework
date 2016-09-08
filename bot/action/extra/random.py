@@ -27,7 +27,7 @@ class RandomChoiceAction(Action):
     @staticmethod
     def try_get_range(arg):
         split = arg.split(" ")
-        if len(split) == 2 and all((e.isnumeric() for e in split)):
+        if len(split) == 2 and all((e.isnumeric() or (len(e) > 1 and e[0] == "-" and e[1:].isnumeric()) for e in split)):
             return int(split[0]), int(split[1])
         return None, None
 
@@ -36,14 +36,13 @@ class RandomChoiceAction(Action):
         args = [
             "",
             "start end",
-            "option1 {line-break} option2 ..."
+            "option1 {line-break} option2 [{line-break} option 3 ...]"
         ]
         description = (
             "Without arguments, display a random float number in the range \[0, 1).\n\n"
             "Add two integers separated by a space to get a random number in that range,"
             " including both endpoints: \[start, end].\n\n"
-            "Put various options, each one in a different line to get one chosen randomly.\n\n"
-            "Implementation details: The `random` Python module is used for all modes."
+            "Put various options, each one in a different line to get one chosen randomly."
         )
         return CommandUsageMessage.get_usage_message(event.command, args, description)
 
@@ -56,6 +55,9 @@ class RandomChoiceAction(Action):
 
     @staticmethod
     def get_random_in_range(start, end):
+        if start > end:
+            return FormattedText().bold("Sorry").normal(", for this to work the first number must be ").bold("lower")\
+                .normal(" than the second number.").build_message()
         chosen = random.randint(start, end)
         return FormattedText().normal("Choosing a random number between ").bold(start).normal(" and ").bold(end).normal(" (both included).").newline().newline()\
             .normal("Chosen number: ").bold(chosen)\
