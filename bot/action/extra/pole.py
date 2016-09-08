@@ -71,10 +71,15 @@ class SavePoleAction(Action):
 
 
 class ListPoleAction(Action):
+    def __init__(self, kind="poles"):
+        super().__init__()
+        self.kind = kind
+        self.format_dict = {"poles": self.kind, "pole": self.kind[:-1]}
+
     def process(self, event):
         action, action_param, help_args = self.parse_args(event.command_args.split())
         if action in ("recent", "ranking", "last"):
-            poles = PoleStorageHandler(event.state.get_for("pole")).get_stored_poles("poles")
+            poles = PoleStorageHandler(event.state.get_for("pole")).get_stored_poles(self.kind)
             if poles.is_empty():
                 response = self.get_response_empty()
             elif action == "recent":
@@ -110,40 +115,39 @@ class ListPoleAction(Action):
                 action = args[0]
         return action, action_param, help_args
 
-    @staticmethod
-    def get_response_help(event, help_args):
-        args = ["[ranking number_of_users]", "recent [number_of_poles]", "[last] pole_number"]
-        description = "By default, display users with most poles (the ranking).\n\n" \
-                      "Use *recent* to show recent poles.\n\n" \
-                      "You can also add a number to the end in both modes to limit the users or poles to display" \
-                      " (default is 10).\n\n" \
-                      "Use *last* to show last pole, or previous ones adding a number (starting with 1)."
+    def get_response_help(self, event, help_args):
+        args = self.__formatted("[ranking number_of_users]", "recent [number_of_{poles}]", "[last] {pole}_number")
+        description = self.__formatted(
+            "By default, display users with most {poles} (the ranking).\n\n"
+            "Use *recent* to show recent {poles}.\n\n"
+            "You can also add a number to the end in both modes to limit the users or {poles} to display"
+            " (default is 10).\n\n"
+            "Use *last* to show last {pole}, or previous ones adding a number (starting with 1)."
+        )
         return CommandUsageMessage.get_usage_message(event.command, args, description)
 
-    @staticmethod
-    def get_response_empty():
-        return Message.create("I have not seen any poles here.\n"
-                              "Wait until next day start, make a pole and try again.")
+    def get_response_empty(self):
+        return Message.create(self.__formatted("I have not seen any {poles} here.\n"
+                                               "Wait until next day start, make a {pole} and try again."))
 
     def get_response_recent(self, event, poles, number_of_poles_to_display):
         user_storage_handler = UserStorageHandler.get_instance(self.state)
         sorted_poles = poles.most_recent(number_of_poles_to_display)
         printable_poles = sorted_poles.printable_version(event, user_storage_handler)
-        return self.__build_success_response_message(event, "Most recent poles:", printable_poles)
+        return self.__build_success_response_message(event, self.__formatted("Most recent {poles}:"), printable_poles)
 
     def get_response_ranking(self, event, poles, number_of_users_to_display):
         user_storage_handler = UserStorageHandler.get_instance(self.state)
         printable_poles = poles.grouped_by_user(number_of_users_to_display).printable_version(user_storage_handler)
         recent_poles_command = UnderscoredCommandBuilder.build_command(event.command, "recent")
-        recent_poles_text = FormattedText().normal("Write ").normal(recent_poles_command).normal(" to see recent poles.")
-        return self.__build_success_response_message(event, "Ranking of poles:", printable_poles, recent_poles_text)
+        recent_poles_text = FormattedText().normal("Write ").normal(recent_poles_command).normal(self.__formatted(" to see recent {poles}."))
+        return self.__build_success_response_message(event, self.__formatted("Ranking of {poles}:"), printable_poles, recent_poles_text)
 
-    @staticmethod
-    def get_response_last(event, poles, number_of_pole_to_display):
+    def get_response_last(self, event, poles, number_of_pole_to_display):
         pole = poles.get(-number_of_pole_to_display)
         if pole is None:
-            return Message.create("Invalid number. Range [1,total_poles]")
-        text = "\U0001f446 Here is the " + str(number_of_pole_to_display) + " last pole"
+            return Message.create(self.__formatted("Invalid number. Range [1,total_{poles}]"))
+        text = "\U0001f446 Here is the " + str(number_of_pole_to_display) + self.__formatted(" last {pole}")
         return Message.create(text, chat_id=event.message.chat.id, reply_to_message_id=pole.message_id)
 
     @staticmethod
@@ -155,6 +159,11 @@ class ListPoleAction(Action):
         else:
             footer.normal("Write ").bold(event.command + " help").normal(" to see more options.")
         return FormattedText().concat(header).normal(printable_poles).concat(footer).build_message()
+
+    def __formatted(self, *text):
+        if len(text) == 1:
+            return text[0].format(**self.format_dict)
+        return [t.format(**self.format_dict) for t in text]
 
 
 class Pole:
