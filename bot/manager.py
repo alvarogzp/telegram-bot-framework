@@ -108,7 +108,15 @@ class BotManager:
                                     ),
 
                                     CommandAction("poles").then(
-                                        ListPoleAction()
+                                        ListPoleAction("poles")
+                                    ),
+
+                                    CommandAction("subpoles").then(
+                                        ListPoleAction("subpoles")
+                                    ),
+
+                                    CommandAction("subsubpoles").then(
+                                        ListPoleAction("subsubpoles")
                                     ),
 
                                     CommandAction("messages").then(
