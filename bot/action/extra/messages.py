@@ -16,7 +16,7 @@ class SaveMessageAction(Action):
     def process(self, event):
         storage_handler = MessageStorageHandler(event)
         storage_handler.save_message(event.message)
-        storage_handler.delete_old_messages()
+        #storage_handler.delete_old_messages()
 
 
 class ListMessageAction(Action):
