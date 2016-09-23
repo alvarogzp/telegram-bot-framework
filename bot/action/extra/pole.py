@@ -106,7 +106,7 @@ class ManagePoleTimezonesAction(Action):
             action = "list"
         elif len(args) == 2 and args[0] == "info":
             action = args[0]
-        elif 3 <= len(args) <= 4 and args[0] in ("add", "mod"):
+        elif 2 <= len(args) <= 4 and args[0] in ("add", "mod"):
             action = args[0]
         return action, action_params
 
@@ -116,7 +116,7 @@ class ManagePoleTimezonesAction(Action):
             "[list]",
             "info timezone_alias",
             "add timezone_alias timezone_name [offset_in_seconds]",
-            "mod timezone_alias timezone_name [offset_in_seconds]"
+            "mod timezone_alias [timezone_name] [offset_in_seconds]"
         ]
         description = (
             "By default, list current pole timezones.\n"
@@ -173,8 +173,16 @@ class ManagePoleTimezonesAction(Action):
 
     def get_response_add(self, event, action_params, handler):
         timezone_alias = action_params[0]
+        if timezone_alias in handler.get_timezones():
+            return FormattedText().bold("ERROR").normal(", a timezone called ").bold(timezone_alias)\
+                .normal(" already exists. Modify it instead of trying to add it again.")\
+                .build_message()
+        success = self.set_timezone_data(action_params, handler)
+        if not success:
+            return FormattedText().bold("ERROR while adding timezone").normal(", check name and offset are valid.")\
+                .normal(" See help for more info")\
+                .build_message()
         handler.add_timezone(timezone_alias)
-        self.set_timezone_data(action_params, handler)
         return FormattedText().bold("New timezone added!").newline().newline()\
             .normal("Alias: ").bold(timezone_alias).newline()\
             .concat(self.get_timezone_info_text(handler.get_timezone_state(timezone_alias)))\
@@ -182,20 +190,48 @@ class ManagePoleTimezonesAction(Action):
 
     def get_response_mod(self, event, action_params, handler):
         alias = action_params[0]
-        self.set_timezone_data(action_params, handler)
+        success = self.set_timezone_data(action_params, handler)
+        if not success:
+            return FormattedText().bold("ERROR while modifying timezone").normal(", check name and offset are valid.")\
+                .normal(" See help for more info")\
+                .build_message()
         return FormattedText().normal("Timezone ").bold(alias).normal(" updated!").newline().newline()\
             .concat(self.get_timezone_info_text(handler.get_timezone_state(alias)))\
             .build_message()
 
-    @staticmethod
-    def set_timezone_data(action_params, handler):
+    @classmethod
+    def set_timezone_data(cls, action_params, handler):
         timezone_alias = action_params[0]
-        timezone_name = action_params[1]
-        state = handler.get_timezone_state(timezone_alias)
-        state.timezone = timezone_name
-        if len(action_params) > 2:
-            offset_seconds = action_params[2]
+        timezone_name = action_params[1] if len(action_params) > 1 else None
+        offset_seconds = action_params[2] if len(action_params) > 2 else None
+        if cls.is_valid_timezone_name(timezone_name) and cls.is_valid_offset_seconds(offset_seconds):
+            state = handler.get_timezone_state(timezone_alias)
+            state.timezone = timezone_name
             state.offset_seconds = offset_seconds
+            return True
+        return False
+
+    @staticmethod
+    def is_valid_timezone_name(name):
+        if name is None:
+            return True
+        try:
+            pytz.timezone(name)
+        except:
+            return False
+        else:
+            return True
+
+    @staticmethod
+    def is_valid_offset_seconds(offset_seconds):
+        if offset_seconds is None:
+            return True
+        try:
+            int(offset_seconds)
+        except:
+            return False
+        else:
+            return True
 
 
 class ListPoleAction(Action):
