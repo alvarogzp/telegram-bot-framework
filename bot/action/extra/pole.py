@@ -82,6 +82,122 @@ class SavePoleAction(Action):
         PoleStorageHandler(state).save_pole_to(storage, pole)
 
 
+class ManagePoleTimezonesAction(Action):
+    def process(self, event):
+        action, action_params = self.parse_args(event.command_args.split())
+        function_name = "get_response_" + action
+        func = getattr(self, function_name, None)
+        if callable(func):
+            handler = TimezoneStorageHandler(event.state.get_for("pole"))
+            response = func(event, action_params, handler)
+        else:
+            response = self._get_response_help(event, action_params)
+        if response.chat_id is None:
+            response.to_chat(message=event.message)
+        if response.reply_to_message_id is None:
+            response = response.reply_to_message(message=event.message)
+        self.api.send_message(response)
+
+    @staticmethod
+    def parse_args(args):
+        action = "help"
+        action_params = args[1:]
+        if len(args) == 0 or (len(args) == 1 and args[0] == "list"):
+            action = "list"
+        elif len(args) == 1 and args[0] == "info":
+            action = args[0]
+        elif 3 <= len(args) <= 4 and args[0] in ("add", "mod"):
+            action = args[0]
+        return action, action_params
+
+    @staticmethod
+    def _get_response_help(event, help_args):
+        args = [
+            "[list]",
+            "info timezone_alias",
+            "add timezone_alias timezone_name [offset_in_seconds]",
+            "mod timezone_alias timezone_name [offset_in_seconds]"
+        ]
+        description = (
+            "By default, list current pole timezones.\n"
+            "\n"
+            "Use *info* with a timezone alias to view the info of that alias.\n"
+            "\n"
+            "Use *add* to add a new timezone.\n"
+            "Give it:\n"
+            "· an `alias` to refer to it,\n"
+            "· the `timezone_name` for this pole using the non daylight-saving abbreviation"
+            " (you can use this URL to find yours:"
+            " https://en.wikipedia.org/wiki/List_of_time_zone_abbreviations),\n"
+            "· an optional `offset_in_seconds` to add (if positive) or subtract (if negative) to the moment"
+            " when the day changes in that timezone.\n"
+            "\n"
+            "Use *mod* to modify an already added timezone.\n"
+            "You can change both the `timezone_name` and the `offset_in_seconds`.\n"
+            "\n"
+            "Currently, I cannot remove an already-added timezone.\n"
+            "Contact the bot admin if you need to do it.\n\n"
+            "Only group admins can use this command."
+        )
+        return CommandUsageMessage.get_usage_message(event.command, args, description)
+
+    @staticmethod
+    def get_response_list(event, action_params, handler):
+        text = FormattedText().normal("List of pole timezones:").newline()
+        for alias in handler.get_timezones():
+            state = handler.get_timezone_state(alias)
+            name = state.timezone
+            text.bold(alias).normal(" → ").bold(name)
+            offset_seconds = state.offset_seconds
+            if offset_seconds is not None:
+                text.normal(" (with ").bold(offset_seconds).normal(" seconds offset)")
+            text.newline()
+        return text.build_message()
+
+    def get_response_info(self, event, action_params, handler):
+        alias = action_params[0]
+        return FormattedText().normal("Information for ").bold(alias).normal(" timezone:").newline()\
+            .concat(self.get_timezone_info_text(handler.get_timezone_state(alias)))\
+            .build_message()
+
+    @staticmethod
+    def get_timezone_info_text(state):
+        name = state.timezone
+        offset_seconds = state.offset_seconds
+        text = FormattedText().normal("Timezone abbreviation: ").bold(name).newline()
+        if offset_seconds is None:
+            text.bold("No").normal(" offset set.")
+        else:
+            text.bold(offset_seconds).normal(" seconds of offset.")
+        return text
+
+    def get_response_add(self, event, action_params, handler):
+        timezone_alias = action_params[0]
+        handler.add_timezone(timezone_alias)
+        self.set_timezone_data(action_params, handler)
+        return FormattedText().bold("New timezone added!").newline().newline()\
+            .normal("Alias: ").bold(timezone_alias).newline()\
+            .concat(self.get_timezone_info_text(handler.get_timezone_state(timezone_alias)))\
+            .build_message()
+
+    def get_response_mod(self, event, action_params, handler):
+        alias = action_params[0]
+        self.set_timezone_data(action_params, handler)
+        return FormattedText().normal("Timezone ").bold(alias).normal(" updated!").newline().newline()\
+            .concat(self.get_timezone_info_text(handler.get_timezone_state(alias)))\
+            .build_message()
+
+    @staticmethod
+    def set_timezone_data(action_params, handler):
+        timezone_alias = action_params[0]
+        timezone_name = action_params[1]
+        state = handler.get_timezone_state(timezone_alias)
+        state.timezone = timezone_name
+        if len(action_params) > 2:
+            offset_seconds = action_params[2]
+            state.offset_seconds = offset_seconds
+
+
 class ListPoleAction(Action):
     def __init__(self, kind="poles"):
         super().__init__()
@@ -272,3 +388,6 @@ class TimezoneStorageHandler:
             return self.state
         else:
             return self.state.get_for(timezone_name)
+
+    def add_timezone(self, name):
+        self.state.set_value("timezones", name + "\n", append=True)
