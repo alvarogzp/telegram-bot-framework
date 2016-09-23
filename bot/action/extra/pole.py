@@ -63,7 +63,7 @@ class SavePoleAction(Action):
     def get_day_number(state, timestamp):
         offset_seconds = state.get_value("offset_seconds", 0)  # TODO check number on set
         if offset_seconds:
-            timestamp += int(offset_seconds)
+            timestamp -= int(offset_seconds)
         timezone_name = state.get_value("timezone", DEFAULT_TIMEZONE)
         timezone = pytz.timezone(timezone_name)  # TODO catch exceptions on set
         return datetime.datetime.fromtimestamp(timestamp, tz=timezone).date().toordinal()
