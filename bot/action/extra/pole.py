@@ -128,7 +128,7 @@ class ManagePoleTimezonesAction(Action):
             "· an `alias` to refer to it,\n"
             "· the `timezone_name` for this pole using the non daylight-saving abbreviation"
             " (you can use this URL to find yours:"
-            " https://en.wikipedia.org/wiki/List_of_time_zone_abbreviations),\n"
+            " [https://en.wikipedia.org/wiki/List_of_time_zone_abbreviations]),\n"
             "· an optional `offset_in_seconds` to add (if positive) or subtract (if negative) to the moment"
             " when the day changes in that timezone.\n"
             "\n"
