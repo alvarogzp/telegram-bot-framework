@@ -1,4 +1,5 @@
-from bot.action.admin import RestartAction, EvalAction, AdminActionWithErrorMessage, AdminAction, HaltAction
+from bot.action.admin import RestartAction, EvalAction, AdminActionWithErrorMessage, AdminAction, HaltAction, \
+    GroupAdminAction
 from bot.action.answer import AnswerAction
 from bot.action.config import ConfigAction
 from bot.action.core.action import ActionGroup
@@ -109,7 +110,9 @@ class BotManager:
                                     ),
 
                                     CommandAction("polestzman").then(
-                                        ManagePoleTimezonesAction()
+                                        GroupAdminAction().then(
+                                            ManagePoleTimezonesAction()
+                                        )
                                     ),
 
                                     CommandAction("poles").then(
