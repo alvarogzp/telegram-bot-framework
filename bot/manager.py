@@ -1,4 +1,5 @@
-from bot.action.admin import RestartAction, EvalAction, AdminActionWithErrorMessage, AdminAction, HaltAction
+from bot.action.admin import RestartAction, EvalAction, AdminActionWithErrorMessage, AdminAction, HaltAction, \
+    GroupAdminAction
 from bot.action.answer import AnswerAction
 from bot.action.config import ConfigAction
 from bot.action.core.action import ActionGroup
@@ -10,7 +11,7 @@ from bot.action.extra.audios import SaveVoiceAction, ListVoiceAction
 from bot.action.extra.hashtags import SaveHashtagsAction, ListHashtagsAction
 from bot.action.extra.legacypole import LegacyPoleAction
 from bot.action.extra.messages import SaveMessageAction, ListMessageAction
-from bot.action.extra.pole import SavePoleAction, ListPoleAction
+from bot.action.extra.pole import SavePoleAction, ListPoleAction, ManagePoleTimezonesAction
 from bot.action.extra.random import RandomChoiceAction
 from bot.action.gapdetector import GlobalGapDetectorAction
 from bot.action.perchat import PerChatAction
@@ -106,6 +107,12 @@ class BotManager:
 
                                     CommandAction("feature").then(
                                         GetSetFeatureAction()
+                                    ),
+
+                                    CommandAction("polestzman").then(
+                                        GroupAdminAction().then(
+                                            ManagePoleTimezonesAction()
+                                        )
                                     ),
 
                                     CommandAction("poles").then(
