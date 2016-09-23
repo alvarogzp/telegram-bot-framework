@@ -25,34 +25,46 @@ class SavePoleAction(Action):
         previous_message_timestamp = state.last_message_timestamp
         state.last_message_timestamp = str(current_message_timestamp)
         if previous_message_timestamp is not None:
-            if self.has_changed_day(event.state, state, int(previous_message_timestamp), current_message_timestamp):  # pole
-                self.build_pole_and_save_to(state, "poles", event.message)
-                state.current_day_message_count = str(1)
-            else:
-                current_day_message_count = state.current_day_message_count
-                if current_day_message_count is not None:
-                    current_day_message_count = int(current_day_message_count)
-                    if current_day_message_count < 3:
-                        current_day_message_count += 1
-                        if current_day_message_count == 2:
-                            self.build_pole_and_save_to(state, "subpoles", event.message)
-                            state.current_day_message_count = str(current_day_message_count)
-                        elif current_day_message_count == 3:
-                            self.build_pole_and_save_to(state, "subsubpoles", event.message)
-                            state.current_day_message_count = None
+            previous_message_timestamp = int(previous_message_timestamp)
+            timezone_states = self.get_timezone_states(state)
+            for timezone_state in timezone_states:
+                self.handle_pole_for_timezone(event, timezone_state, previous_message_timestamp, current_message_timestamp)
+
+    @staticmethod
+    def get_timezone_states(state):
+        handler = TimezoneStorageHandler(state)
+        timezones = handler.get_timezones()
+        return (handler.get_timezone_state(timezone) for timezone in timezones)
+
+    def handle_pole_for_timezone(self, event, state, previous_timestamp, current_timestamp):
+        if self.has_changed_day(state, previous_timestamp, current_timestamp):  # pole
+            self.build_pole_and_save_to(state, "poles", event.message)
+            state.current_day_message_count = str(1)
+        else:
+            current_day_message_count = state.current_day_message_count
+            if current_day_message_count is not None:
+                current_day_message_count = int(current_day_message_count)
+                if current_day_message_count < 3:
+                    current_day_message_count += 1
+                    if current_day_message_count == 2:
+                        self.build_pole_and_save_to(state, "subpoles", event.message)
+                        state.current_day_message_count = str(current_day_message_count)
+                    elif current_day_message_count == 3:
+                        self.build_pole_and_save_to(state, "subsubpoles", event.message)
+                        state.current_day_message_count = None
 
     @classmethod
-    def has_changed_day(cls, chat_state, feature_state, previous_timestamp, current_timestamp):
-        current_day = cls.get_day_number(chat_state, feature_state, current_timestamp)
-        previous_day = cls.get_day_number(chat_state, feature_state, previous_timestamp)
+    def has_changed_day(cls, state, previous_timestamp, current_timestamp):
+        current_day = cls.get_day_number(state, current_timestamp)
+        previous_day = cls.get_day_number(state, previous_timestamp)
         return current_day != previous_day
 
     @staticmethod
-    def get_day_number(chat_state, feature_state, timestamp):
-        offset_seconds = feature_state.get_value("offset_seconds", 0)  # TODO check number on set
+    def get_day_number(state, timestamp):
+        offset_seconds = state.get_value("offset_seconds", 0)  # TODO check number on set
         if offset_seconds:
             timestamp += int(offset_seconds)
-        timezone_name = chat_state.get_value("timezone", DEFAULT_TIMEZONE)
+        timezone_name = state.get_value("timezone", DEFAULT_TIMEZONE)
         timezone = pytz.timezone(timezone_name)  # TODO catch exceptions on set
         return datetime.datetime.fromtimestamp(timestamp, tz=timezone).date().toordinal()
 
@@ -239,3 +251,24 @@ class PoleStorageHandler:
 
     def save_pole_to(self, storage_name, pole: Pole):
         self.state.set_value(storage_name, pole.serialize(), append=True)
+
+
+class TimezoneStorageHandler:
+    def __init__(self, state):
+        self.state = state
+
+    def get_timezones(self):
+        timezones_raw_data = self.state.timezones
+        if timezones_raw_data is None:
+            timezones_raw_data = ""
+        timezones = timezones_raw_data.splitlines()
+        if "main" not in timezones:
+            timezones.insert(0, "main")
+        return timezones
+
+    def get_timezone_state(self, timezone_name):
+        if timezone_name == "main" and self.state.exists_value("poles"):
+            # backward compatibility with existing poles
+            return self.state
+        else:
+            return self.state.get_for(timezone_name)
