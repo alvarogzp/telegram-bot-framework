@@ -104,7 +104,7 @@ class ManagePoleTimezonesAction(Action):
         action_params = args[1:]
         if len(args) == 0 or (len(args) == 1 and args[0] == "list"):
             action = "list"
-        elif len(args) == 1 and args[0] == "info":
+        elif len(args) == 2 and args[0] == "info":
             action = args[0]
         elif 3 <= len(args) <= 4 and args[0] in ("add", "mod"):
             action = args[0]
@@ -146,7 +146,7 @@ class ManagePoleTimezonesAction(Action):
         text = FormattedText().normal("List of pole timezones:").newline()
         for alias in handler.get_timezones():
             state = handler.get_timezone_state(alias)
-            name = state.timezone
+            name = state.get_value("timezone", DEFAULT_TIMEZONE)
             text.bold(alias).normal(" → ").bold(name)
             offset_seconds = state.offset_seconds
             if offset_seconds is not None:
@@ -162,7 +162,7 @@ class ManagePoleTimezonesAction(Action):
 
     @staticmethod
     def get_timezone_info_text(state):
-        name = state.timezone
+        name = state.get_value("timezone", DEFAULT_TIMEZONE)
         offset_seconds = state.offset_seconds
         text = FormattedText().normal("Timezone abbreviation: ").bold(name).newline()
         if offset_seconds is None:
