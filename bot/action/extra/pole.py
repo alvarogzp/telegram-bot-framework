@@ -205,9 +205,10 @@ class ListPoleAction(Action):
         self.format_dict = {"poles": self.kind, "pole": self.kind[:-1]}
 
     def process(self, event):
-        action, action_param, help_args = self.parse_args(event.command_args.split())
+        action, action_param, help_args, timezone = self.parse_args(event.command_args.split())
         if action in ("recent", "ranking", "last"):
-            poles = PoleStorageHandler(event.state.get_for("pole")).get_stored_poles(self.kind)
+            state = TimezoneStorageHandler(event.state.get_for("pole")).get_timezone_state(timezone)
+            poles = PoleStorageHandler(state).get_stored_poles(self.kind)
             if poles.is_empty():
                 response = self.get_response_empty()
             elif action == "recent":
@@ -224,6 +225,10 @@ class ListPoleAction(Action):
 
     @staticmethod
     def parse_args(args):
+        timezone = "main"
+        if len(args) > 1 and args[0] == "tz":
+            timezone = args[1]
+            args = args[2:]
         action = "help"
         action_param = 10
         help_args = args[1:]
@@ -241,7 +246,7 @@ class ListPoleAction(Action):
             if args[1].isnumeric():
                 action_param = int(args[1])
                 action = args[0]
-        return action, action_param, help_args
+        return action, action_param, help_args, timezone
 
     def get_response_help(self, event, help_args):
         args = self.__formatted("[ranking number_of_users]", "recent [number_of_{poles}]", "[last] {pole}_number")
@@ -250,7 +255,9 @@ class ListPoleAction(Action):
             "Use *recent* to show recent {poles}.\n\n"
             "You can also add a number to the end in both modes to limit the users or {poles} to display"
             " (default is 10).\n\n"
-            "Use *last* to show last {pole}, or previous ones adding a number (starting with 1)."
+            "Use *last* to show last {pole}, or previous ones adding a number (starting with 1).\n\n"
+            "Use: `/poles tz timezone_name` to view rankings of poles in another timezone"
+            " (they can be managed with `/polestzman`)"
         )
         return CommandUsageMessage.get_usage_message(event.command, args, description)
 
