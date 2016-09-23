@@ -1,5 +1,5 @@
 from bot.action.core.action import Action
-from bot.action.extra.pole import SavePoleAction
+from bot.action.extra.pole import SavePoleAction, TimezoneStorageHandler
 from bot.action.toggle import FeatureStateHandler
 from bot.api.domain import Message
 
@@ -19,7 +19,7 @@ class LegacyPoleAction(Action):
         previous_message_timestamp = state.last_message_timestamp
         state.last_message_timestamp = str(current_message_timestamp)
         if previous_message_timestamp is not None:
-            if self.has_changed_day(event.state, event.state.get_for("pole"), int(previous_message_timestamp), current_message_timestamp):  # pole
+            if self.has_changed_day(event, int(previous_message_timestamp), current_message_timestamp):  # pole
                 state.current_day_message_count = str(1)
                 state.current_day_first_messages = self.get_formatted_message_to_store(event.message)
             else:
@@ -41,8 +41,9 @@ class LegacyPoleAction(Action):
                             state.current_day_first_messages += "\n" + self.get_formatted_message_to_store(event.message)
 
     @staticmethod
-    def has_changed_day(chat_state, feature_state, previous_timestamp, current_timestamp):
-        return SavePoleAction.has_changed_day(chat_state, feature_state, previous_timestamp, current_timestamp)
+    def has_changed_day(event, previous_timestamp, current_timestamp):
+        state = TimezoneStorageHandler(event.state.get_for("pole")).get_timezone_state("main")
+        return SavePoleAction.has_changed_day(state, previous_timestamp, current_timestamp)
 
     @staticmethod
     def get_formatted_message_to_store(message):
