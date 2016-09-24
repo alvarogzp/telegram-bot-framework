@@ -104,7 +104,7 @@ class ManagePoleTimezonesAction(Action):
         action_params = args[1:]
         if len(args) == 0 or (len(args) == 1 and args[0] == "list"):
             action = "list"
-        elif len(args) == 2 and args[0] == "info":
+        elif len(args) == 2 and (args[0] == "info" or args[0] == "del"):
             action = args[0]
         elif 2 <= len(args) <= 4 and args[0] in ("add", "mod"):
             action = args[0]
@@ -116,7 +116,8 @@ class ManagePoleTimezonesAction(Action):
             "[list]",
             "info timezone_alias",
             "add timezone_alias timezone_name [offset_in_seconds]",
-            "mod timezone_alias [timezone_name] [offset_in_seconds]"
+            "mod timezone_alias [timezone_name] [offset_in_seconds]",
+            "del timezone_alias"
         ]
         description = (
             "By default, list current pole timezones.\n"
@@ -135,8 +136,8 @@ class ManagePoleTimezonesAction(Action):
             "Use *mod* to modify an already added timezone.\n"
             "You can change both the `timezone_name` and the `offset_in_seconds`.\n"
             "\n"
-            "Currently, I cannot remove an already-added timezone.\n"
-            "Contact the bot admin if you need to do it.\n\n"
+            "Use *del* to remove a previously added timezone by indicating its alias.\n"
+            "Poles in that timezone remain in case you later re-enable it (you must use the same alias).\n\n"
             "Only group admins can use this command."
         )
         return CommandUsageMessage.get_usage_message(event.command, args, description)
@@ -199,6 +200,23 @@ class ManagePoleTimezonesAction(Action):
             .concat(self.get_timezone_info_text(handler.get_timezone_state(alias)))\
             .build_message()
 
+    @staticmethod
+    def get_response_del(event, action_params, handler):
+        alias = action_params[0]
+        if alias not in handler.get_timezones():
+            return FormattedText().bold("ERROR").normal(", no ").bold(alias).normal(" timezone found.")\
+                .build_message()
+        if alias == "main":
+            return FormattedText().normal("Sorry, main timezone cannot be removed")\
+                .build_message()
+        handler.del_timezone(alias)
+        return FormattedText().normal("Timezone ").bold(alias).normal(" removed.").newline().newline()\
+            .normal("Ranking in that timezone is still accessible, but no new poles will be added.").newline()\
+            .normal("If you add a timezone with the same alias in the future,"
+                    " new poles will be added to the ranking again.").newline()\
+            .normal("Contact the bot admin if you want the ranking to be wiped.")\
+            .build_message()
+
     @classmethod
     def set_timezone_data(cls, action_params, handler):
         timezone_alias = action_params[0]
@@ -242,6 +260,9 @@ class ListPoleAction(Action):
 
     def process(self, event):
         action, action_param, help_args, timezone = self.parse_args(event.command_args.split())
+        original_command = event.command
+        if timezone != "main":
+            event.command = original_command + "_tz_" + timezone
         if action in ("recent", "ranking", "last"):
             state = TimezoneStorageHandler(event.state.get_for("pole")).get_timezone_state(timezone)
             poles = PoleStorageHandler(state).get_stored_poles(self.kind)
@@ -258,6 +279,7 @@ class ListPoleAction(Action):
         if response.reply_to_message_id is None:
             response = response.to_chat_replying(event.message)
         self.api.send_message(response)
+        event.command = original_command
 
     @staticmethod
     def parse_args(args):
@@ -434,3 +456,11 @@ class TimezoneStorageHandler:
 
     def add_timezone(self, name):
         self.state.set_value("timezones", name + "\n", append=True)
+
+    def del_timezone(self, name):
+        timezones = self.state.timezones.splitlines()
+        timezones.remove(name)
+        if len(timezones) == 0:
+            self.state.timezones = None
+        else:
+            self.state.timezones = "\n".join(timezones) + "\n"
