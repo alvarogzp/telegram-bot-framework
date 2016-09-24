@@ -242,6 +242,9 @@ class ListPoleAction(Action):
 
     def process(self, event):
         action, action_param, help_args, timezone = self.parse_args(event.command_args.split())
+        original_command = event.command
+        if timezone != "main":
+            event.command = original_command + "_tz_" + timezone
         if action in ("recent", "ranking", "last"):
             state = TimezoneStorageHandler(event.state.get_for("pole")).get_timezone_state(timezone)
             poles = PoleStorageHandler(state).get_stored_poles(self.kind)
@@ -258,6 +261,7 @@ class ListPoleAction(Action):
         if response.reply_to_message_id is None:
             response = response.to_chat_replying(event.message)
         self.api.send_message(response)
+        event.command = original_command
 
     @staticmethod
     def parse_args(args):
