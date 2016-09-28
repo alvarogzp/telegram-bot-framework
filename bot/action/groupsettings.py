@@ -8,7 +8,9 @@ class GroupSettingsAction(Action):
         action, key, new_value = self.parse_args(event.command_args.split(" "))
         if key is not None and self.is_valid_key(key):
             state = event.state.get_for("settings")
-            if action == "get":
+            if action == "list":
+                response = self.list_settings(state)
+            elif action == "get":
                 response = self.get_current_value(state, key)
             elif action == "set":
                 response = self.set_new_value(state, key, new_value)
@@ -28,6 +30,8 @@ class GroupSettingsAction(Action):
         new_value = None
         if len(args) == 1 and args[0] != "":
             key = args[0]
+            if key == "list":
+                action = key
         elif len(args) > 1:
             action = args[0]
             key = args[1]
@@ -36,11 +40,19 @@ class GroupSettingsAction(Action):
 
     @staticmethod
     def is_valid_key(key):
-        return "/" not in key and not key.startswith(".")
+        return key.replace("_", "").isalpha()
+
+    @staticmethod
+    def list_settings(state):
+        keys = state.list_keys()
+        if len(keys) == 0:
+            return FormattedText().normal("No setting has been modified on this chat.").build_message()
+        formatted_keys = "\n".join(sorted(keys))
+        return FormattedText().normal("List of modified settings on this chat:").newline()\
+            .code_block(formatted_keys)\
+            .build_message()
 
     def get_current_value(self, state, key):
-        if key == "all":
-            return self.__get_settings_list(state)
         value = self.__get_current_value(state, key)
         return FormattedText().bold("Setting").normal(":").newline().code_block(key).newline().newline()\
             .bold("Value").normal(":").newline().concat(value)\
@@ -67,11 +79,5 @@ class GroupSettingsAction(Action):
         return text
 
     @staticmethod
-    def __get_settings_list(state):
-        keys = state.list_keys()
-        formatted_keys = "\n".join(sorted(keys))
-        return FormattedText().italic("Settings:").newline().code_block(formatted_keys).build_message()
-
-    @staticmethod
     def get_usage(event):
-        return CommandUsageMessage.get_usage_message(event.command, ["[get] <key>", "set <key> <value>", "del <key>"])
+        return CommandUsageMessage.get_usage_message(event.command, ["list", "[get] <key>", "set <key> <value>", "del <key>"])
