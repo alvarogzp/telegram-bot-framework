@@ -14,6 +14,7 @@ from bot.action.extra.messages import SaveMessageAction, ListMessageAction
 from bot.action.extra.pole import SavePoleAction, ListPoleAction, ManagePoleTimezonesAction
 from bot.action.extra.random import RandomChoiceAction
 from bot.action.gapdetector import GlobalGapDetectorAction
+from bot.action.groupsettings import GroupSettingsAction
 from bot.action.perchat import PerChatAction
 from bot.action.toggle import GetSetFeatureAction, ToggleableFeatureAction
 from bot.action.userinfo import SaveUserAction
@@ -98,6 +99,12 @@ class BotManager:
                                     CommandAction("config").then(
                                         AdminActionWithErrorMessage().then(
                                             ConfigAction()
+                                        )
+                                    ),
+
+                                    CommandAction("settings").then(
+                                        GroupAdminAction().then(
+                                            GroupSettingsAction()
                                         )
                                     ),
 
