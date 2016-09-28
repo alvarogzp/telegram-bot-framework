@@ -262,7 +262,7 @@ class ListPoleAction(Action):
         action, action_param, help_args, timezone = self.parse_args(event.command_args.split())
         original_command = event.command
         if timezone != "main":
-            event.command = original_command + "_tz_" + timezone
+            event.command = UnderscoredCommandBuilder.build_command(original_command, "tz", timezone)
         if action in ("recent", "ranking", "last"):
             state = TimezoneStorageHandler(event.state.get_for("pole")).get_timezone_state(timezone)
             poles = PoleStorageHandler(state).get_stored_poles(self.kind)
