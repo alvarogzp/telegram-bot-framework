@@ -41,7 +41,7 @@ msgstr ""
 "Utiliza *last* para mostrar la última {pole}, o la anterior añadiendo un número "
 "empezando por 1).\n"
 "\n"
-"Utiliza: `/poles tz nombre_de_la_zona` para ver la clasificaicón de las poles
+"Utiliza: `/poles tz nombre_de_la_zona` para ver la clasificaicón de las poles"
 "en otra zona horaria (también se puede a administrar con `/polestzman`)"
 
 
