@@ -71,9 +71,12 @@ msgstr "✍🏻 Escribe {0} para ver las {poles} recientes. ✍🏻"
 msgid "Ranking of {poles}:"
 msgstr ""
 "\n"
-"🕕🏎 Clasificación de {poles} 🏎🕕"
+"🏎  Clasificación de {poles}  🏆"
 "\n"
-"⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋"
+"————————————————"
+
+
+
 
 
 #: bot/action/extra/pole.py:343
