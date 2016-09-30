@@ -15,6 +15,7 @@ from bot.action.extra.pole import SavePoleAction, ListPoleAction, ManagePoleTime
 from bot.action.extra.random import RandomChoiceAction
 from bot.action.gapdetector import GlobalGapDetectorAction
 from bot.action.groupsettings import GroupSettingsAction
+from bot.action.internationalization import InternationalizationAction
 from bot.action.perchat import PerChatAction
 from bot.action.toggle import GetSetFeatureAction, ToggleableFeatureAction
 from bot.action.userinfo import SaveUserAction
@@ -62,88 +63,91 @@ class BotManager:
                     NoPendingAction().then(
                         MessageAction().then(
                             PerChatAction().then(
+                                InternationalizationAction().then(
 
-                                ToggleableFeatureAction("greet").then(
-                                    GreetAction()
-                                ),
-                                ToggleableFeatureAction("leave").then(
-                                    LeaveAction()
-                                ),
-
-                                TextMessageAction().then(
-
-                                    CommandAction("start").then(
-                                        AnswerAction(
-                                            "Hello! I am " + self.bot.cache.bot_info.first_name + " and I am here to serve you.\nSorry if I cannot do too much for you now, I am still under construction.")
+                                    ToggleableFeatureAction("greet").then(
+                                        GreetAction()
+                                    ),
+                                    ToggleableFeatureAction("leave").then(
+                                        LeaveAction()
                                     ),
 
-                                    CommandAction("ping").then(
-                                        AnswerAction("Up and running, sir!")
-                                    ),
+                                    TextMessageAction().then(
 
-                                    CommandAction("restart").then(
-                                        AdminActionWithErrorMessage().then(
-                                            RestartAction()
+                                        CommandAction("start").then(
+                                            AnswerAction(
+                                                "Hello! I am " + self.bot.cache.bot_info.first_name + " and I am here to serve you.\nSorry if I cannot do too much for you now, I am still under construction.")
+                                        ),
+
+                                        CommandAction("ping").then(
+                                            AnswerAction("Up and running, sir!")
+                                        ),
+
+                                        CommandAction("restart").then(
+                                            AdminActionWithErrorMessage().then(
+                                                RestartAction()
+                                            )
+                                        ),
+                                        CommandAction("halt").then(
+                                            AdminActionWithErrorMessage().then(
+                                                HaltAction()
+                                            )
+                                        ),
+                                        CommandAction("eval").then(
+                                            AdminActionWithErrorMessage().then(
+                                                EvalAction()
+                                            )
+                                        ),
+                                        CommandAction("config").then(
+                                            AdminActionWithErrorMessage().then(
+                                                ConfigAction()
+                                            )
+                                        ),
+
+                                        CommandAction("settings").then(
+                                            GroupAdminAction().then(
+                                                GroupSettingsAction()
+                                            )
+                                        ),
+
+                                        CommandAction("hashtags").then(
+                                            ListHashtagsAction()
+                                        ),
+
+                                        CommandAction("feature").then(
+                                            GetSetFeatureAction()
+                                        ),
+
+                                        CommandAction("polestzman").then(
+                                            GroupAdminAction().then(
+                                                ManagePoleTimezonesAction()
+                                            )
+                                        ),
+
+                                        CommandAction("poles").then(
+                                            ListPoleAction("poles")
+                                        ),
+
+                                        CommandAction("subpoles").then(
+                                            ListPoleAction("subpoles")
+                                        ),
+
+                                        CommandAction("subsubpoles").then(
+                                            ListPoleAction("subsubpoles")
+                                        ),
+
+                                        CommandAction("messages").then(
+                                            ListMessageAction()
+                                        ),
+
+                                        CommandAction("audios").then(
+                                            ListVoiceAction()
+                                        ),
+
+                                        CommandAction("random").then(
+                                            RandomChoiceAction()
                                         )
-                                    ),
-                                    CommandAction("halt").then(
-                                        AdminActionWithErrorMessage().then(
-                                            HaltAction()
-                                        )
-                                    ),
-                                    CommandAction("eval").then(
-                                        AdminActionWithErrorMessage().then(
-                                            EvalAction()
-                                        )
-                                    ),
-                                    CommandAction("config").then(
-                                        AdminActionWithErrorMessage().then(
-                                            ConfigAction()
-                                        )
-                                    ),
 
-                                    CommandAction("settings").then(
-                                        GroupAdminAction().then(
-                                            GroupSettingsAction()
-                                        )
-                                    ),
-
-                                    CommandAction("hashtags").then(
-                                        ListHashtagsAction()
-                                    ),
-
-                                    CommandAction("feature").then(
-                                        GetSetFeatureAction()
-                                    ),
-
-                                    CommandAction("polestzman").then(
-                                        GroupAdminAction().then(
-                                            ManagePoleTimezonesAction()
-                                        )
-                                    ),
-
-                                    CommandAction("poles").then(
-                                        ListPoleAction("poles")
-                                    ),
-
-                                    CommandAction("subpoles").then(
-                                        ListPoleAction("subpoles")
-                                    ),
-
-                                    CommandAction("subsubpoles").then(
-                                        ListPoleAction("subsubpoles")
-                                    ),
-
-                                    CommandAction("messages").then(
-                                        ListMessageAction()
-                                    ),
-
-                                    CommandAction("audios").then(
-                                        ListVoiceAction()
-                                    ),
-
-                                    CommandAction("random").then(
-                                        RandomChoiceAction()
                                     )
 
                                 )
