@@ -51,8 +51,8 @@ msgid ""
 "I have not seen any {poles} here.\n"
 "Wait until next day start, make a {pole} and try again."
 msgstr ""
-"🙊 No veo ninguna {pole} aquí.\n"
-"Espera hasta el día siguiente, haz una {pole} y prueba de nuevo. 🙊"
+"🙊 No veo ninguna {pole} aquí 🙊.\n"
+"Espera hasta el día siguiente, haz una {pole} y prueba de nuevo. "
 
 #: bot/action/extra/pole.py:330
 #, python-brace-format
@@ -62,7 +62,7 @@ msgstr "🏆 {poles} recientes:"
 #: bot/action/extra/pole.py:336
 #, python-brace-format
 msgid "Write {0} to see recent {poles}."
-msgstr "✍🏻Escribe {0} para ver las {poles} recientes.✍"
+msgstr "✍🏻 Escribe {0} para ver las {poles} recientes. ✍🏻"
 
 #: bot/action/extra/pole.py:338
 #, python-brace-format
@@ -70,7 +70,7 @@ msgid "Ranking of {poles}:"
 msgstr ""
 "🕕🏎 Clasificación de {poles} 🏎🕕"
 "\n"
-"⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋"
+"⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋"
 
 
 #: bot/action/extra/pole.py:343
