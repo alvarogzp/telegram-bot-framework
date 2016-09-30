@@ -256,7 +256,7 @@ class ListPoleAction(Action):
     def __init__(self, kind="poles"):
         super().__init__()
         self.kind = kind
-        self.format_dict = {"poles": self.kind, "pole": self.kind[:-1]}
+        self.pole_format_dict = {"poles": self.kind, "pole": self.kind[:-1]}
 
     def process(self, event):
         action, action_param, help_args, timezone = self.parse_args(event.command_args.split())
@@ -308,7 +308,7 @@ class ListPoleAction(Action):
 
     def get_response_help(self, event, help_args):
         args = self.__formatted("[ranking number_of_users]", "recent [number_of_{poles}]", "[last] {pole}_number")
-        description = self.__formatted(
+        description = self.__formatted(_(
             "By default, display users with most {poles} (the ranking).\n\n"
             "Use *recent* to show recent {poles}.\n\n"
             "You can also add a number to the end in both modes to limit the users or {poles} to display"
@@ -316,31 +316,32 @@ class ListPoleAction(Action):
             "Use *last* to show last {pole}, or previous ones adding a number (starting with 1).\n\n"
             "Use: `/poles tz timezone_name` to view rankings of poles in another timezone"
             " (they can be managed with `/polestzman`)"
-        )
+        ))
         return CommandUsageMessage.get_usage_message(event.command, args, description)
 
     def get_response_empty(self):
-        return Message.create(self.__formatted("I have not seen any {poles} here.\n"
-                                               "Wait until next day start, make a {pole} and try again."))
+        return Message.create(self.__formatted(_("I have not seen any {poles} here.\n"
+                                                 "Wait until next day start, make a {pole} and try again.")))
 
     def get_response_recent(self, event, poles, number_of_poles_to_display):
         user_storage_handler = UserStorageHandler.get_instance(self.state)
         sorted_poles = poles.most_recent(number_of_poles_to_display)
         printable_poles = sorted_poles.printable_version(event, user_storage_handler)
-        return self.__build_success_response_message(event, self.__formatted("Most recent {poles}:"), printable_poles)
+        return self.__build_success_response_message(event, self.__formatted(_("Most recent {poles}:")), printable_poles)
 
     def get_response_ranking(self, event, poles, number_of_users_to_display):
         user_storage_handler = UserStorageHandler.get_instance(self.state)
         printable_poles = poles.grouped_by_user(number_of_users_to_display).printable_version(user_storage_handler)
         recent_poles_command = UnderscoredCommandBuilder.build_command(event.command, "recent")
-        recent_poles_text = FormattedText().normal("Write ").normal(recent_poles_command).normal(self.__formatted(" to see recent {poles}."))
-        return self.__build_success_response_message(event, self.__formatted("Ranking of {poles}:"), printable_poles, recent_poles_text)
+        recent_poles_text = FormattedText().normal(_("Write {0} to see recent {poles}."))\
+            .start_format().normal(recent_poles_command).normal(**self.pole_format_dict).end_format()
+        return self.__build_success_response_message(event, self.__formatted(_("Ranking of {poles}:")), printable_poles, recent_poles_text)
 
     def get_response_last(self, event, poles, number_of_pole_to_display):
         pole = poles.get(-number_of_pole_to_display)
         if pole is None:
-            return Message.create(self.__formatted("Invalid number. Range [1,total_{poles}]"))
-        text = "\U0001f446 Here is the " + str(number_of_pole_to_display) + self.__formatted(" last {pole}")
+            return Message.create(self.__formatted(_("Invalid {pole} number. Range [1,total_{poles}]")))
+        text = _("This is the {0} last {pole}").format(number_of_pole_to_display, **self.pole_format_dict)
         return Message.create(text, chat_id=event.message.chat.id, reply_to_message_id=pole.message_id)
 
     @staticmethod
@@ -350,13 +351,14 @@ class ListPoleAction(Action):
         if footer_text is not None:
             footer.concat(footer_text)
         else:
-            footer.normal("Write ").bold(event.command + " help").normal(" to see more options.")
+            footer.normal(_("Write {0} to see more options."))\
+                .start_format().bold(event.command + " help").end_format()
         return FormattedText().concat(header).normal(printable_poles).concat(footer).build_message()
 
     def __formatted(self, *text):
         if len(text) == 1:
-            return text[0].format(**self.format_dict)
-        return [t.format(**self.format_dict) for t in text]
+            return text[0].format(**self.pole_format_dict)
+        return [t.format(**self.pole_format_dict) for t in text]
 
 
 class Pole:
@@ -369,7 +371,8 @@ class Pole:
         formatted_user = UserFormatter.retrieve_and_format(self.user_id, user_storage_handler)
         formatted_date = DateFormatter.format(self.date)
         view_pole_command = UnderscoredCommandBuilder.build_command(event.command, str(index+1))
-        return "%s → %s → %s" % (formatted_date, formatted_user, view_pole_command)
+        return _("{date} → {user} → {view_pole_command}")\
+            .format(date=formatted_date, user=formatted_user, view_pole_command=view_pole_command)
 
     def serialize(self):
         return "%s %s %s\n" % (self.user_id, self.date, self.message_id)
@@ -416,7 +419,8 @@ class PoleGroup:
         self.grouped_poles = grouped_poles
 
     def printable_version(self, user_storage_handler):
-        return "\n".join(("%s → %s" % (count, UserFormatter.retrieve_and_format(user_id, user_storage_handler))
+        return "\n".join((_("{pole_count} → {user}")
+                          .format(pole_count=count, user=UserFormatter.retrieve_and_format(user_id, user_storage_handler))
                           for user_id, count in self.grouped_poles))
 
 
