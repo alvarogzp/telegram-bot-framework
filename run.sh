@@ -15,6 +15,8 @@ is_first_execution()
 perform_first_execution_tasks()
 {
     cd_to_current_script_location
+    update_code
+    rerun_current_script
 }
 
 cd_to_current_script_location()
