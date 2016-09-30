@@ -15,6 +15,8 @@ is_first_execution()
 perform_first_execution_tasks()
 {
     cd_to_current_script_location
+    update_code
+    rerun_current_script
 }
 
 cd_to_current_script_location()
@@ -25,12 +27,24 @@ cd_to_current_script_location()
 
 perform_main_tasks()
 {
+    build_bot
     run_bot
     check_halt_received $?
     sleep ${SLEEP_TIME_SECONDS}
     update_code
     sleep ${SLEEP_TIME_SECONDS}
     rerun_current_script
+}
+
+build_bot()
+{
+    generate_locales
+}
+
+generate_locales()
+{
+    debug "Generating locale .mo files"
+    locales/generate_mo.sh
 }
 
 run_bot()
