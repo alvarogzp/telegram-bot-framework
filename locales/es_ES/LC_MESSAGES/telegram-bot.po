@@ -76,8 +76,8 @@ msgstr "Número de {pole} no válido. Rango [1, total_{poles}]"
 
 #: bot/action/extra/pole.py:344
 #, python-brace-format
-msgid "\\U0001f446 This is the {0} last {pole}"
-msgstr "\\U0001f446 Esta es la {0} última {pole}"
+msgid "This is the {0} last {pole}"
+msgstr "☝️ Esta es la {0} última {pole}"
 
 #: bot/action/extra/pole.py:354
 #, python-brace-format

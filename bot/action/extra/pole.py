@@ -341,7 +341,7 @@ class ListPoleAction(Action):
         pole = poles.get(-number_of_pole_to_display)
         if pole is None:
             return Message.create(self.__formatted(_("Invalid {pole} number. Range [1,total_{poles}]")))
-        text = _("\U0001f446 This is the {0} last {pole}").format(number_of_pole_to_display, **self.pole_format_dict)
+        text = _("This is the {0} last {pole}").format(number_of_pole_to_display, **self.pole_format_dict)
         return Message.create(text, chat_id=event.message.chat.id, reply_to_message_id=pole.message_id)
 
     @staticmethod
