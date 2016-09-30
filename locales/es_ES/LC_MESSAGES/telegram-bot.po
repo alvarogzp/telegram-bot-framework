@@ -51,7 +51,7 @@ msgid ""
 "I have not seen any {poles} here.\n"
 "Wait until next day start, make a {pole} and try again."
 msgstr ""
-"🙊 No veo ninguna {pole} aquí 🙊.\n"
+"🙊 No veo ninguna {pole} aquí. 🙊\n"
 "Espera hasta el día siguiente, haz una {pole} y prueba de nuevo. "
 
 #: bot/action/extra/pole.py:330
