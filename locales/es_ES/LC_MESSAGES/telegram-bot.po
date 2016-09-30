@@ -57,7 +57,9 @@ msgstr ""
 #: bot/action/extra/pole.py:330
 #, python-brace-format
 msgid "Most recent {poles}:"
-msgstr "🏆 {poles} recientes:"
+msgstr ""
+"🏆 Las {poles} más recientes:"
+"\n"
 
 #: bot/action/extra/pole.py:336
 #, python-brace-format
@@ -92,7 +94,7 @@ msgstr "✍🏻 Escribe {0} para ver más opciones. ✍🏻"
 #: bot/action/extra/pole.py:374
 #, python-brace-format
 msgid "{date} → {user} → {view_pole_command}"
-msgstr "{date} → {user} → {view_pole_command}"
+msgstr "{date} : {user} → {view_pole_command}"
 
 #: bot/action/extra/pole.py:422
 #, python-brace-format
