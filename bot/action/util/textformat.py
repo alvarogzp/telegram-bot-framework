@@ -56,6 +56,9 @@ class FormattedText:
             text = str(text)
         return self.formatter.escape(text)
 
+    def start_format(self):
+        return FormattedTextStringFormat(self)
+
 
 class TextFormatter:
     def escape(self, text):
@@ -158,3 +161,51 @@ class TextFormatterFactory:
     @classmethod
     def get_html_formatter(cls):
         return cls.html
+
+
+class FormattedTextStringFormat:
+    def __init__(self, formatted_text):
+        self.formatted_text = formatted_text
+        self.formatter = formatted_text.formatter
+        self.format_args = []
+        self.format_kwargs = {}
+
+    def normal(self, *args, **kwargs):
+        self._add(lambda x: x, args, kwargs)
+        return self
+
+    def bold(self, *args, **kwargs):
+        self._add(self.formatter.bold, args, kwargs)
+        return self
+
+    def italic(self, *args, **kwargs):
+        self._add(self.formatter.italic, args, kwargs)
+        return self
+
+    def url(self, text: str, url: str, name=None):
+        text = self.formatter.url(self._escaped(text), self._escaped(url))
+        if name is None:
+            self.format_args.append(text)
+        else:
+            self.format_kwargs[name] = text
+        return self
+
+    def code_inline(self, *args, **kwargs):
+        self._add(self.formatter.code_inline, args, kwargs)
+        return self
+
+    def code_block(self, *args, **kwargs):
+        self._add(self.formatter.code_block, args, kwargs)
+        return self
+
+    def _add(self, func_to_apply, args, kwargs):
+        self.format_args.extend((func_to_apply(self._escaped(arg)) for arg in args))
+        for kwarg in kwargs:
+            self.format_kwargs[kwarg] = func_to_apply(self._escaped(kwargs[kwarg]))
+
+    def _escaped(self, text):
+        return self.formatted_text._escaped(text)
+
+    def end_format(self):
+        self.formatted_text.text = self.formatted_text.text.format(*self.format_args, **self.format_kwargs)
+        return self.formatted_text
