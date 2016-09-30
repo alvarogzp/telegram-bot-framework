@@ -41,8 +41,8 @@ msgstr ""
 "Utiliza *last* para mostrar la última {pole}, o la anterior añadiendo un número "
 "empezando por 1).\n"
 "\n"
-"Utiliza: `/poles tz nombre_de_la_zona` para ver la clasificaicón de las poles"
-"en otra zona horaria (también se puede a administrar con `/polestzman`)"
+"Utiliza: `/poles tz nombre_de_la_zona` para ver la clasificación de las poles "
+"en otra zona horaria (también se puede administrar con `/polestzman`)"
 
 
 #: bot/action/extra/pole.py:323
@@ -51,7 +51,7 @@ msgid ""
 "I have not seen any {poles} here.\n"
 "Wait until next day start, make a {pole} and try again."
 msgstr ""
-"No veo ninguna {poles} aquí.\n"
+"No veo ninguna {pole} aquí.\n"
 "Espera hasta el día siguiente, haz una {pole} y prueba de nuevo."
 
 #: bot/action/extra/pole.py:330
@@ -62,7 +62,7 @@ msgstr "{poles} recientes:"
 #: bot/action/extra/pole.py:336
 #, python-brace-format
 msgid "Write {0} to see recent {poles}."
-msgstr "Escribe {} para ver las {poles} recientes"
+msgstr "Escribe {0} para ver las {poles} recientes"
 
 #: bot/action/extra/pole.py:338
 #, python-brace-format
@@ -72,7 +72,7 @@ msgstr "Clasificación de {poles}:"
 #: bot/action/extra/pole.py:343
 #, python-brace-format
 msgid "Invalid {pole} number. Range [1,total_{poles}]"
-msgstr "Número de {pole} no válido. Rangi [1, total_{poles}]"
+msgstr "Número de {pole} no válido. Rango [1, total_{poles}]"
 
 #: bot/action/extra/pole.py:344
 #, python-brace-format
