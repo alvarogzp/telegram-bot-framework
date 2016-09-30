@@ -68,6 +68,7 @@ msgstr "✍🏻 Escribe {0} para ver las {poles} recientes. ✍🏻"
 #, python-brace-format
 msgid "Ranking of {poles}:"
 msgstr ""
+"\n"
 "🕕🏎 Clasificación de {poles} 🏎🕕"
 "\n"
 "⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋"
