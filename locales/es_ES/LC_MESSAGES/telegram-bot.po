@@ -64,7 +64,7 @@ msgstr ""
 #: bot/action/extra/pole.py:336
 #, python-brace-format
 msgid "Write {0} to see recent {poles}."
-msgstr "✍🏻 Escribe {0} para ver las {poles} recientes. ✍🏻"
+msgstr "✍🏻 Escribe {0} para ver {poles} recientes. ✍🏻"
 
 #: bot/action/extra/pole.py:338
 #, python-brace-format
