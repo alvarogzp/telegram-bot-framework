@@ -79,7 +79,7 @@ msgstr ""
 #: bot/action/extra/pole.py:343
 #, python-brace-format
 msgid "Invalid {pole} number. Range [1,total_{poles}]"
-msgstr "Número de {pole} no válido. Rango [1, total_{poles}]"
+msgstr "🤖 Número de {pole} no válido. Rango [1, total_{poles}]"
 
 #: bot/action/extra/pole.py:344
 #, python-brace-format
