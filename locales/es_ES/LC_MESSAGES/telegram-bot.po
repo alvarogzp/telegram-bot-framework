@@ -57,7 +57,9 @@ msgstr ""
 #: bot/action/extra/pole.py:330
 #, python-brace-format
 msgid "Most recent {poles}:"
-msgstr "🏆 {poles} recientes:"
+msgstr ""
+"🏆 Las {poles} más recientes:"
+"\n"
 
 #: bot/action/extra/pole.py:336
 #, python-brace-format
@@ -68,6 +70,7 @@ msgstr "✍🏻 Escribe {0} para ver las {poles} recientes. ✍🏻"
 #, python-brace-format
 msgid "Ranking of {poles}:"
 msgstr ""
+"\n"
 "🕕🏎 Clasificación de {poles} 🏎🕕"
 "\n"
 "⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋"
@@ -81,7 +84,7 @@ msgstr "Número de {pole} no válido. Rango [1, total_{poles}]"
 #: bot/action/extra/pole.py:344
 #, python-brace-format
 msgid "This is the {0} last {pole}"
-msgstr "☝️ Esta es la {0}.ª {pole} 🏆"
+msgstr "🏆 Esta es la {0}.ª {pole}"
 
 #: bot/action/extra/pole.py:354
 #, python-brace-format
@@ -91,7 +94,7 @@ msgstr "✍🏻 Escribe {0} para ver más opciones. ✍🏻"
 #: bot/action/extra/pole.py:374
 #, python-brace-format
 msgid "{date} → {user} → {view_pole_command}"
-msgstr "{date} → {user} → {view_pole_command}"
+msgstr "{date} : {user} → {view_pole_command}"
 
 #: bot/action/extra/pole.py:422
 #, python-brace-format
