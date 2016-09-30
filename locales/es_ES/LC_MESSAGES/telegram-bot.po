@@ -82,7 +82,7 @@ msgstr "Número de {pole} no válido. Rango [1, total_{poles}]"
 #: bot/action/extra/pole.py:344
 #, python-brace-format
 msgid "This is the {0} last {pole}"
-msgstr "☝️ Esta es la {0}.ª {pole} 🏆"
+msgstr "🏆 Esta es la {0}.ª {pole}"
 
 #: bot/action/extra/pole.py:354
 #, python-brace-format
