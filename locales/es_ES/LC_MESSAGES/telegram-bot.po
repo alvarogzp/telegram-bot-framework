@@ -51,23 +51,27 @@ msgid ""
 "I have not seen any {poles} here.\n"
 "Wait until next day start, make a {pole} and try again."
 msgstr ""
-"No veo ninguna {pole} aquí.\n"
-"Espera hasta el día siguiente, haz una {pole} y prueba de nuevo."
+"🙊 No veo ninguna {pole} aquí.\n"
+"Espera hasta el día siguiente, haz una {pole} y prueba de nuevo. 🙊"
 
 #: bot/action/extra/pole.py:330
 #, python-brace-format
 msgid "Most recent {poles}:"
-msgstr "{poles} recientes:"
+msgstr "🏆 {poles} recientes:"
 
 #: bot/action/extra/pole.py:336
 #, python-brace-format
 msgid "Write {0} to see recent {poles}."
-msgstr "Escribe {0} para ver las {poles} recientes"
+msgstr "✍🏻Escribe {0} para ver las {poles} recientes.✍"
 
 #: bot/action/extra/pole.py:338
 #, python-brace-format
 msgid "Ranking of {poles}:"
-msgstr "Clasificación de {poles}:"
+msgstr ""
+"🕕🏎 Clasificación de {poles} 🏎🕕"
+"\n"
+"⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋"
+
 
 #: bot/action/extra/pole.py:343
 #, python-brace-format
@@ -77,12 +81,12 @@ msgstr "Número de {pole} no válido. Rango [1, total_{poles}]"
 #: bot/action/extra/pole.py:344
 #, python-brace-format
 msgid "This is the {0} last {pole}"
-msgstr "☝️ Esta es la {0}.ª {pole}"
+msgstr "☝️ Esta es la {0}.ª {pole} 🏆"
 
 #: bot/action/extra/pole.py:354
 #, python-brace-format
 msgid "Write {0} to see more options."
-msgstr "Escribe {0} para ver más opciones"
+msgstr "✍🏻 Escribe {0} para ver más opciones. ✍🏻"
 
 #: bot/action/extra/pole.py:374
 #, python-brace-format
@@ -92,4 +96,4 @@ msgstr "{date} → {user} → {view_pole_command}"
 #: bot/action/extra/pole.py:422
 #, python-brace-format
 msgid "{pole_count} → {user}"
-msgstr "{pole_count} → {user}"
+msgstr "🏁┇ {user} → {pole_count}"
