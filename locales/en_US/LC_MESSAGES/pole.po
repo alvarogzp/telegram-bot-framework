@@ -1,0 +1,107 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: telegram-bot\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-09-28 21:24+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: bot/action/extra/pole.py:312
+#, python-brace-format
+msgid ""
+"By default, display users with most {poles} (the ranking).\n"
+"\n"
+"Use *recent* to show recent {poles}.\n"
+"\n"
+"You can also add a number to the end in both modes to limit the users or "
+"{poles} to display (default is 10).\n"
+"\n"
+"Use *last* to show last {pole}, or previous ones adding a number (starting "
+"with 1).\n"
+"\n"
+"Use: `/poles tz timezone_name` to view rankings of poles in another timezone "
+"(they can be managed with `/polestzman`)"
+msgstr ""
+"By default, display users with most {poles} (the ranking).\n"
+"\n"
+"Use *recent* to show recent {poles}.\n"
+"\n"
+"You can also add a number to the end in both modes to limit the users or "
+"{poles} to display (default is 10).\n"
+"\n"
+"Use *last* to show last {pole}, or previous ones adding a number (starting "
+"with 1).\n"
+"\n"
+"Use: `/poles tz timezone_name` to view rankings of poles in another timezone "
+"(they can be managed with `/polestzman`)"
+
+
+#: bot/action/extra/pole.py:323
+#, python-brace-format
+msgid ""
+"I have not seen any {poles} here.\n"
+"Wait until next day start, make a {pole} and try again."
+msgstr ""
+"🙊 I have not seen any {poles} here. 🙊\n"
+"Wait until next day start, make a {pole} and try again."
+
+#: bot/action/extra/pole.py:330
+#, python-brace-format
+msgid "Most recent {poles}:"
+msgstr ""
+"🏆 Most recent {poles}:"
+"\n"
+
+#: bot/action/extra/pole.py:336
+#, python-brace-format
+msgid "Write {0} to see recent {poles}."
+msgstr "✍🏻 Write {0} to see recent {poles}. ✍🏻"
+
+#: bot/action/extra/pole.py:338
+#, python-brace-format
+msgid "Ranking of {poles}:"
+msgstr ""
+"\n"
+"🏎  Ranking of {poles}  🏆"
+"\n"
+"————————————————"
+
+
+
+
+
+#: bot/action/extra/pole.py:343
+#, python-brace-format
+msgid "Invalid {pole} number. Range [1,total_{poles}]"
+msgstr "🤖 Invalid {pole} number. Range [1,total_{poles}]"
+
+#: bot/action/extra/pole.py:344
+#, python-brace-format
+msgid "This is the {0} last {pole}"
+msgstr "🏆 This is the {0} last {pole}"
+
+#: bot/action/extra/pole.py:354
+#, python-brace-format
+msgid "Write {0} to see more options."
+msgstr "✍🏻 Write {0} to see more options. ✍🏻"
+
+#: bot/action/extra/pole.py:374
+#, python-brace-format
+msgid "{date} → {user} → {view_pole_command}"
+msgstr "{date} : {user} → {view_pole_command}"
+
+#: bot/action/extra/pole.py:422
+#, python-brace-format
+msgid "{pole_count} → {user}"
+msgstr "🏁┇ {user} → {pole_count}"
