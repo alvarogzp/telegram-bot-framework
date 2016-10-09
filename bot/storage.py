@@ -51,6 +51,8 @@ class Storage(AttributeObject):
                 f.write(value)
 
     def list_keys(self):
+        if not os.path.isdir(self._base_dir):
+            return []
         return os.listdir(self._base_dir)
 
     def __get_value_path(self, key):
