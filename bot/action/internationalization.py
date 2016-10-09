@@ -25,31 +25,28 @@ class InternationalizationAction(IntermediateAction):
         self.default_translation = get_translation(DEFAULT_DOMAIN, DEFAULT_LANGUAGE)
 
     def process(self, event):
-        event.i18n = InternationalizationHelper
+        i18n = InternationalizationHelper(event)
+        event.i18n = i18n
         self._continue(event)
-        if InternationalizationHelper.is_enabled(event):
-            InternationalizationHelper.disable(event)
+        if i18n.is_enabled():
             self.default_translation.install()
-        event.i18n = None
 
 
 class InternationalizationHelper:
-    @classmethod
-    def enable(cls, event, domain):
-        language = cls._get_language(event)
+    def __init__(self, event):
+        self.event = event
+        self.enabled = False
+
+    def enable(self, domain):
+        language = self._get_language()
         translation = get_translation(domain, language)
         translation.install()
-        _ = event._ = translation.gettext
+        _ = self.event._ = translation.gettext
+        self.enabled = True
         return _
 
-    @staticmethod
-    def _get_language(event):
-        return event.state.get_for("settings").get_value("language", DEFAULT_LANGUAGE)
+    def _get_language(self):
+        return self.event.state.get_for("settings").get_value("language", DEFAULT_LANGUAGE)
 
-    @staticmethod
-    def is_enabled(event):
-        return event._ is not None
-
-    @staticmethod
-    def disable(event):
-        event._ = None
+    def is_enabled(self):
+        return self.enabled

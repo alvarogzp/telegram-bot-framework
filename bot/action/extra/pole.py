@@ -261,7 +261,7 @@ class ListPoleAction(Action):
         self.pole_format_dict = {"poles": self.kind, "pole": self.kind[:-1]}
 
     def process(self, event):
-        event.i18n.enable(event, I18N_DOMAIN)
+        event.i18n.enable(I18N_DOMAIN)
         action, action_param, help_args, timezone = self.parse_args(event.command_args.split())
         original_command = event.command
         if timezone != "main":
