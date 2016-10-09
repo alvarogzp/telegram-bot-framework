@@ -10,6 +10,8 @@ from bot.action.util.format import DateFormatter, UserFormatter
 from bot.action.util.textformat import FormattedText
 from bot.api.domain import Message
 
+I18N_DOMAIN = "pole"
+
 DEFAULT_TIMEZONE = "CET"
 
 
@@ -259,6 +261,7 @@ class ListPoleAction(Action):
         self.pole_format_dict = {"poles": self.kind, "pole": self.kind[:-1]}
 
     def process(self, event):
+        event.i18n.enable(I18N_DOMAIN)
         action, action_param, help_args, timezone = self.parse_args(event.command_args.split())
         original_command = event.command
         if timezone != "main":
