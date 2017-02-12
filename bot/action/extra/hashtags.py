@@ -58,10 +58,10 @@ class ListHashtagsAction(Action):
         action_param = 10
         help_args = args[1:]
         if len(args) == 0:
-            action = "recent"
+            action = "popular"
         elif len(args) == 1:
             if args[0].isnumeric():
-                action = "recent"
+                action = "popular"
                 action_param = int(args[0])
             else:
                 action = args[0]
@@ -73,9 +73,9 @@ class ListHashtagsAction(Action):
 
     @staticmethod
     def get_response_help(event, help_args):
-        args = ["[recent] [number_of_hashtags]", "popular [number_of_hashtags]", "ranking [number_of_users]"]
-        description = "By default, display recent hashtags.\n\n" \
-                      "Use *popular* to show most popular ones.\n\n" \
+        args = ["[popular] [number_of_hashtags]", "recent [number_of_hashtags]", "ranking [number_of_users]"]
+        description = "By default, display most popular hashtags.\n\n" \
+                      "Use *recent* to show recent ones.\n\n" \
                       "Use *ranking* to show the users who wrote most hashtags.\n\n" \
                       "In any mode, you can also add a number to the end to limit the number of hashtags or users" \
                       " to display (default is 10)."
@@ -90,15 +90,15 @@ class ListHashtagsAction(Action):
         user_storage_handler = UserStorageHandler.get_instance(self.state)
         sorted_hashtags = hashtags.sorted_by_recent_use(number_of_hashtags_to_display)
         printable_hashtags = sorted_hashtags.printable_version(user_storage_handler)
-        popular_hashtags_command = UnderscoredCommandBuilder.build_command(event.command, "popular")
-        popular_hashtags_text = FormattedText().normal("Write ").normal(popular_hashtags_command).normal(" to see popular hashtags.")
-        return self.__build_success_response_message(event, "Most recent hashtags:", printable_hashtags, popular_hashtags_text)
+        ranking_hashtags_command = UnderscoredCommandBuilder.build_command(event.command, "ranking")
+        ranking_hashtags_text = FormattedText().normal("Write ").normal(ranking_hashtags_command).normal(" to see which users write most hashtags.")
+        return self.__build_success_response_message(event, "Most recent hashtags:", printable_hashtags, ranking_hashtags_text)
 
     def get_response_popular(self, event, hashtags, number_of_hashtags_to_display):
         printable_hashtags = hashtags.grouped_by_popularity(number_of_hashtags_to_display).printable_version()
-        ranking_hashtags_command = UnderscoredCommandBuilder.build_command(event.command, "ranking")
-        ranking_hashtags_text = FormattedText().normal("Write ").normal(ranking_hashtags_command).normal(" to see which users write most hashtags.")
-        return self.__build_success_response_message(event, "Most popular hashtags:", printable_hashtags, ranking_hashtags_text)
+        recent_hashtags_command = UnderscoredCommandBuilder.build_command(event.command, "recent")
+        recent_hashtags_text = FormattedText().normal("Write ").normal(recent_hashtags_command).normal(" to see recent hashtags.")
+        return self.__build_success_response_message(event, "Most popular hashtags:", printable_hashtags, recent_hashtags_text)
 
     def get_response_ranking(self, event, hashtags, number_of_users_to_display):
         user_storage_handler = UserStorageHandler.get_instance(self.state)
