@@ -84,7 +84,11 @@ class ListMessageAction(Action):
         message = messages.get(message_id)
         if message is None:
             return Message.create("Invalid message_id.\nUse " + event.command + " to get valid message_ids.")
-        user_storage_handler = UserStorageHandler.get_instance(self.state)
+        else:
+            user_storage_handler = UserStorageHandler.get_instance(self.state)
+            if OptOutChecker(self.state).has_user_opted_out(message.user_id) and message.user_id != str(event.message.from_):
+                user = UserFormatter.retrieve_and_format(message.user_id, user_storage_handler)
+                return FormattedText().normal("Sorry, ").bold(user).normal(" has opted-out from this feature.").build_message()
         return message.printable_full_message(user_storage_handler)
 
     def get_response_ranking(self, event, messages, number_of_users_to_display):
@@ -203,6 +207,14 @@ class MessageIdSorter:
         if keep_only_first is not None:
             int_ids = int_ids[:keep_only_first]
         return [str(id_) for id_ in int_ids]
+
+
+class OptOutChecker:
+    def __init__(self, global_state):
+        self.state = global_state
+
+    def has_user_opted_out(self, user_id):
+        return str(user_id) in self.state.opted_out_from_messages_feature.splitlines()
 
 
 class MessageStorageHandler:
