@@ -92,7 +92,7 @@ class ListMessageAction(Action):
             return Message.create("Invalid message_id.\nUse " + event.command + " to get valid message_ids.")
         else:
             user_storage_handler = UserStorageHandler.get_instance(self.state)
-            if OptOutManager(self.state).has_user_opted_out(message.user_id) and message.user_id != str(event.message.from_):
+            if OptOutManager(self.state).has_user_opted_out(message.user_id) and message.user_id != event.message.from_.id:
                 user = UserFormatter.retrieve_and_format(message.user_id, user_storage_handler)
                 return FormattedText().normal("🙁 Sorry, ").bold(user).normal(" has opted-out from this feature.").build_message()
         return message.printable_full_message(user_storage_handler)
@@ -109,7 +109,7 @@ class ListMessageAction(Action):
 
     def get_response_opt_out(self, event, action):
         manager = OptOutManager(self.state)
-        user_id = event.message.from_
+        user_id = event.message.from_.id
         had_user_opted_out = manager.has_user_opted_out(user_id)
         if action == "add-me":
             if had_user_opted_out:
@@ -128,7 +128,7 @@ class ListMessageAction(Action):
                 response = FormattedText().normal("🙃 You are in the opt-out list.")
             else:
                 response = FormattedText().normal("🙂 You are NOT in the opt-out list.")
-        return response
+        return response.build_message()
 
 
 class StoredMessage:
