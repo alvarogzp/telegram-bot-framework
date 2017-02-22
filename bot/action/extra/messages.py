@@ -8,15 +8,15 @@ from bot.action.util.format import UserFormatter, DateFormatter
 from bot.action.util.textformat import FormattedText
 from bot.api.domain import Message, ApiObject
 
-MIN_MESSAGES_TO_KEEP = 500
-MAX_MESSAGES_TO_KEEP = 1000
+MIN_MESSAGES_TO_KEEP = 5000
+MAX_MESSAGES_TO_KEEP = 15000
 
 
 class SaveMessageAction(Action):
     def process(self, event):
         storage_handler = MessageStorageHandler(event)
         storage_handler.save_message(event.message)
-        #storage_handler.delete_old_messages()
+        storage_handler.delete_old_messages()
 
 
 class ListMessageAction(Action):
