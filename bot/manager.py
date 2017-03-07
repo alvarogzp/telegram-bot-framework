@@ -14,7 +14,7 @@ from bot.action.extra.messages import SaveMessageAction, ListMessageAction
 from bot.action.extra.pole import SavePoleAction, ListPoleAction, ManagePoleTimezonesAction
 from bot.action.extra.random import RandomChoiceAction
 from bot.action.gapdetector import GlobalGapDetectorAction
-from bot.action.groupsettings import GroupSettingsAction
+from bot.action.chatsettings import ChatSettingsAction
 from bot.action.internationalization import InternationalizationAction
 from bot.action.perchat import PerChatAction
 from bot.action.toggle import GetSetFeatureAction, ToggleableFeatureAction
@@ -106,7 +106,7 @@ class BotManager:
 
                                         CommandAction("settings").then(
                                             GroupAdminAction().then(
-                                                GroupSettingsAction()
+                                                ChatSettingsAction()
                                             )
                                         ),
 
