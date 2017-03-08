@@ -97,6 +97,6 @@ debug()
 if is_first_execution
 then
     perform_first_execution_tasks
+else
+    perform_main_tasks
 fi
-
-perform_main_tasks

@@ -1,6 +1,7 @@
 import collections
 import json
 
+from bot.action.chatsettings import ChatSettings
 from bot.action.core.action import Action
 from bot.action.core.command import CommandUsageMessage, UnderscoredCommandBuilder
 from bot.action.userinfo import UserStorageHandler
@@ -14,9 +15,10 @@ MAX_MESSAGES_TO_KEEP = 15000
 
 class SaveMessageAction(Action):
     def process(self, event):
-        storage_handler = MessageStorageHandler(event)
-        storage_handler.save_message(event.message)
-        storage_handler.delete_old_messages()
+        if event.settings.get(ChatSettings.STORE_MESSAGES) == "on":
+            storage_handler = MessageStorageHandler(event)
+            storage_handler.save_message(event.message)
+            storage_handler.delete_old_messages()
 
 
 class ListMessageAction(Action):

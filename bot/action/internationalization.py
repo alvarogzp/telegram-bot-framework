@@ -1,11 +1,12 @@
 import gettext
 
+from bot.action.chatsettings import ChatSettings
 from bot.action.core.action import IntermediateAction
 
 LOCALE_DIR = "locales"
 
 DEFAULT_DOMAIN = "telegram-bot"
-DEFAULT_LANGUAGE = "en"
+DEFAULT_LANGUAGE = ChatSettings.get_default_value(ChatSettings.LANGUAGE)
 
 CACHED_TRANSLATIONS = {}
 
@@ -46,7 +47,7 @@ class InternationalizationHelper:
         return _
 
     def _get_language(self):
-        return self.event.state.get_for("settings").get_value("language", DEFAULT_LANGUAGE)
+        return self.event.settings.get(ChatSettings.LANGUAGE)
 
     def is_enabled(self):
         return self.enabled
