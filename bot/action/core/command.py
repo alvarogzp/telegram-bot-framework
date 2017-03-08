@@ -32,9 +32,6 @@ class CommandAction(IntermediateAction):
     def is_valid_command(entity):
         return entity.type == "bot_command" and entity.offset == 0
 
-    def get_command_args(self, parser, entity, command_text):
-        return parser.get_text_after_entity(entity)
-
 
 class CommandParser:
     def __init__(self, command):
