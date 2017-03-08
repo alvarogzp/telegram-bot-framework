@@ -1,6 +1,6 @@
 from bot.action.core.action import IntermediateAction
-from bot.action.core.command.parser import CommandParser, UnderscoredCommandParser
-from bot.api.domain import Message, MessageEntityParser
+from bot.action.core.command.parser import UnderscoredCommandParser, CommandParser
+from bot.api.domain import MessageEntityParser, Message
 
 
 class CommandAction(IntermediateAction):
