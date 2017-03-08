@@ -9,8 +9,8 @@ from bot.action.util.format import UserFormatter, DateFormatter
 from bot.action.util.textformat import FormattedText
 from bot.api.domain import Message, ApiObject
 
-MIN_MESSAGES_TO_KEEP = 500
-MAX_MESSAGES_TO_KEEP = 1000
+MIN_MESSAGES_TO_KEEP = 5000
+MAX_MESSAGES_TO_KEEP = 15000
 
 
 class SaveMessageAction(Action):
@@ -18,7 +18,7 @@ class SaveMessageAction(Action):
         if event.settings.get(ChatSettings.STORE_MESSAGES) == "on":
             storage_handler = MessageStorageHandler(event)
             storage_handler.save_message(event.message)
-            #storage_handler.delete_old_messages()
+            storage_handler.delete_old_messages()
 
 
 class ListMessageAction(Action):
@@ -34,6 +34,8 @@ class ListMessageAction(Action):
                 response = self.get_response_show(event, messages, action_param)
             else:
                 response = self.get_response_ranking(event, messages, action_param)
+        elif action == "opt-out":
+            response = self.get_response_opt_out(event, action_param)
         else:
             response = self.get_response_help(event, help_args)
         if response.reply_to_message_id is None:
@@ -54,21 +56,25 @@ class ListMessageAction(Action):
             elif args[0] != "show":
                 action = args[0]
         elif len(args) == 2:
-            if args[1].isnumeric():
-                action_param = int(args[1])
+            if args[1].isnumeric() or args[0] == "opt-out":
+                action_param = int(args[1]) if args[0] != "opt-out" else args[1]
                 action = args[0]
         return action, action_param, help_args
 
     @staticmethod
     def get_response_help(event, help_args):
-        args = ["[recent number_of_messages]", "[show] message_id", "ranking [number_of_users]"]
+        args = ["[recent number_of_messages]", "[show] message_id", "ranking [number_of_users]", "opt-out [action]"]
         description = "By default, display a list with information about last messages.\n" \
                       "You can use *recent* with a number to modify the number of messages to list" \
                       " (default is 10).\n\n" \
                       "Use *show* along with a message\\_id to view that particular message.\n\n" \
                       "Use *ranking* to display a ranking of the users who wrote most recent messages" \
                       " (approximately last 1000 messages are counted).\n" \
-                      "You can add a number to modify the number of top users to display (default is 10)."
+                      "You can add a number to modify the number of top users to display (default is 10).\n\n" \
+                      "Use *opt-out* followed by *add-me* or *remove-me* to be added or removed from the opt-out list" \
+                      " of this feature. Use *get-status* or nothing to query your status on the list.\n" \
+                      "While you are in the opt-out list, nobody but you can show the content of your messages using" \
+                      " this feature, in any group."
         return CommandUsageMessage.get_usage_message(event.command, args, description)
 
     @staticmethod
@@ -87,6 +93,9 @@ class ListMessageAction(Action):
         if message is None:
             return Message.create("Invalid message_id.\nUse " + event.command + " to get valid message_ids.")
         user_storage_handler = UserStorageHandler.get_instance(self.state)
+        if OptOutManager(self.state).has_user_opted_out(message.user_id) and message.user_id != event.message.from_.id:
+            user = UserFormatter.retrieve_and_format(message.user_id, user_storage_handler)
+            return FormattedText().normal("🙁 Sorry, ").bold(user).normal(" has opted-out from this feature.").build_message()
         return message.printable_full_message(user_storage_handler)
 
     def get_response_ranking(self, event, messages, number_of_users_to_display):
@@ -98,6 +107,29 @@ class ListMessageAction(Action):
     def __build_success_response_message(event, title, printable_messages):
         footer = FormattedText().normal("\n\nWrite ").bold(event.command + " help").normal(" to see more options.")
         return FormattedText().normal(title + "\n").concat(printable_messages).concat(footer).build_message()
+
+    def get_response_opt_out(self, event, action):
+        manager = OptOutManager(self.state)
+        user_id = event.message.from_.id
+        had_user_opted_out = manager.has_user_opted_out(user_id)
+        if action == "add-me":
+            if had_user_opted_out:
+                response = FormattedText().normal("❌ You had already opted-out.")
+            else:
+                manager.add_user(user_id)
+                response = FormattedText().normal("✅ You have been added to the opt-out list of this feature.")
+        elif action == "remove-me":
+            if not had_user_opted_out:
+                response = FormattedText().normal("❌ You are not currently on the list.")
+            else:
+                manager.remove_user(user_id)
+                response = FormattedText().normal("✅ You have been removed from the opt-out list of this feature.")
+        else:
+            if had_user_opted_out:
+                response = FormattedText().normal("🙃 You are in the opt-out list.")
+            else:
+                response = FormattedText().normal("🙂 You are NOT in the opt-out list.")
+        return response.build_message()
 
 
 class StoredMessage:
@@ -205,6 +237,22 @@ class MessageIdSorter:
         if keep_only_first is not None:
             int_ids = int_ids[:keep_only_first]
         return [str(id_) for id_ in int_ids]
+
+
+class OptOutManager:
+    def __init__(self, global_state):
+        self.state = global_state
+
+    def has_user_opted_out(self, user_id):
+        return str(user_id) in self.state.opted_out_from_messages_feature.splitlines()
+
+    def add_user(self, user_id):
+        self.state.set_value("opted_out_from_messages_feature", str(user_id) + "\n", append=True)
+
+    def remove_user(self, user_id):
+        users = self.state.opted_out_from_messages_feature.splitlines()
+        users.remove(str(user_id))
+        self.state.opted_out_from_messages_feature = "\n".join(users)
 
 
 class MessageStorageHandler:
