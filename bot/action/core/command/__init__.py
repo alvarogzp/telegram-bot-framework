@@ -1,5 +1,6 @@
 from bot.action.core.action import IntermediateAction
 from bot.action.core.command.parser import UnderscoredCommandParser, CommandParser
+from bot.action.core.command.throttler import NoThrottler
 from bot.action.core.command.throttler.shortlyrepeatedcommand import ShortlyRepeatedCommandThrottler
 from bot.api.domain import MessageEntityParser
 
@@ -8,10 +9,11 @@ class CommandAction(IntermediateAction):
     def __init__(self, command, underscores_as_spaces=True):
         super().__init__()
         self.parser = (UnderscoredCommandParser if underscores_as_spaces else CommandParser)(command)
-        self.throttler = ShortlyRepeatedCommandThrottler(self.api)
+        self.throttler = NoThrottler()  # overridden on post_setup where we have access to api
 
     def post_setup(self):
         self.parser.build_command_matcher(self.cache.bot_info.username)
+        self.throttler = ShortlyRepeatedCommandThrottler(self.api)
 
     def process(self, event):
         for entity in self.get_entities(event):
