@@ -1,7 +1,7 @@
 import random
 
 from bot.action.core.action import Action
-from bot.action.core.command import CommandUsageMessage
+from bot.action.core.command.usagemessage import CommandUsageMessage
 from bot.action.util.textformat import FormattedText
 
 

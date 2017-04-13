@@ -1,5 +1,5 @@
 from bot.action.core.action import Action, IntermediateAction
-from bot.action.core.command import CommandUsageMessage
+from bot.action.core.command.usagemessage import CommandUsageMessage
 from bot.api.domain import Message
 
 ON_VALUE = "on"
