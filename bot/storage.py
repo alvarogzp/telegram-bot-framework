@@ -1,8 +1,6 @@
 import os
-
 import shutil
 
-from bot.api.domain import Chat
 from bot.utils.attributeobject import DictionaryObject, AttributeObject
 
 
@@ -12,8 +10,8 @@ class Storage(AttributeObject):
         self._base_dir = base_dir
         self._cache = {}
 
-    def get_for_chat(self, chat: Chat):
-        chat_path = os.path.join("chat", str(chat.id))
+    def get_for_chat_id(self, chat_id):
+        chat_path = os.path.join("chat", str(chat_id))
         return self.get_for(chat_path)
 
     def get_for(self, key):
@@ -94,8 +92,8 @@ class State(Storage):
 
 
 class Cache(DictionaryObject):
-    def get_for_chat(self, chat: Chat):
-        return self.get_for("chat" + str(chat.id))
+    def get_for_chat_id(self, chat_id):
+        return self.get_for("chat" + str(chat_id))
 
     def get_for(self, key):
         return self._dictionary.setdefault(key, Cache())
