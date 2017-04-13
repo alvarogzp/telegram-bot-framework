@@ -1,10 +1,12 @@
 from bot.action import chatsettings
 from bot.action.chatsettings import ChatSettings
 from bot.action.core.command.throttler import Throttler
+from bot.action.util.textformat import FormattedText
 
 
 class ShortlyRepeatedCommandThrottler(Throttler):
-    def __init__(self):
+    def __init__(self, api):
+        self.api = api
         self.recent_commands = {}
 
     def should_execute(self, event):
@@ -19,12 +21,22 @@ class ShortlyRepeatedCommandThrottler(Throttler):
         else:
             throttling_state = self.recent_commands[command_key]
             throttling_state.add_invocation()
+        if throttling_state.should_warn():
+            self.__send_throttling_warning(event, throttling_state)
         return throttling_state.should_execute()
 
     def __cleanup_recent_commands(self, current_date):
         for key, state in self.recent_commands.copy().items():
             if state.has_expired(current_date):
                 del self.recent_commands[key]
+
+    def __send_throttling_warning(self, event, throttling_state):
+        remaining_seconds = throttling_state.remaining_seconds(event.message.date)
+        message = FormattedText().normal("Ignoring repeated command. Try again in ")\
+            .code_inline(remaining_seconds).normal(" seconds")\
+            .build_message()
+        message.to_chat_replying(event.message)
+        self.api.send_message(message)
 
 
 class CommandKey:
@@ -53,7 +65,15 @@ class CommandThrottlingState:
     def should_execute(self):
         return self.number_of_invocations <= 1
 
+    def should_warn(self):
+        return self.number_of_invocations == 2
+
     def has_expired(self, current_date):
         throttling_seconds = self.chat_settings.get(ChatSettings.THROTTLING_SECONDS)
         expiration_date = current_date - throttling_seconds
         return self.first_invocation <= expiration_date
+
+    def remaining_seconds(self, current_date):
+        throttling_seconds = self.chat_settings.get(ChatSettings.THROTTLING_SECONDS)
+        expiration_date = current_date - throttling_seconds
+        return self.first_invocation - expiration_date
