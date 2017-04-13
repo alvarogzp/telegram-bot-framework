@@ -1,5 +1,6 @@
 from bot.action.core.action import IntermediateAction
 from bot.action.core.command.parser import UnderscoredCommandParser, CommandParser
+from bot.action.core.command.throttler import NoThrottler
 from bot.api.domain import MessageEntityParser, Message
 
 
@@ -7,6 +8,7 @@ class CommandAction(IntermediateAction):
     def __init__(self, command, underscores_as_spaces=True):
         super().__init__()
         self.parser = (UnderscoredCommandParser if underscores_as_spaces else CommandParser)(command)
+        self.throttler = NoThrottler()
 
     def post_setup(self):
         self.parser.build_command_matcher(self.cache.bot_info.username)
@@ -20,7 +22,8 @@ class CommandAction(IntermediateAction):
                     event.command = self.parser.get_command_name(command_text)
                     additional_text = parser.get_text_after_entity(entity)
                     event.command_args = self.parser.get_command_args(command_text, additional_text).lstrip(" ")
-                    self._continue(event)
+                    if self.throttler.should_execute(event):
+                        self._continue(event)
 
     @staticmethod
     def get_entities(event):
