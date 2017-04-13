@@ -77,8 +77,8 @@ class ChatSettingsAction(Action):
         try:
             settings.set(key, new_value)
         except Exception as e:
-            return FormattedText().bold("Value could not be set").newline().newline()\
-                .normal("Please, input a valid value for this setting.").newline().newline()\
+            return FormattedText().bold("Setting could not be updated").newline().newline()\
+                .normal("Please, input a valid value.").newline().newline()\
                 .normal("Error was: ").code_inline(e)\
                 .build_message()
         current_value = self.__get_current_value(settings, key)
