@@ -1,4 +1,4 @@
-from bot.action.chatsettings import ChatSettings
+from bot.action import chatsettings
 from bot.action.core.action import IntermediateAction
 
 
@@ -8,5 +8,5 @@ class PerChatAction(IntermediateAction):
         event.config = self.config.get_for_chat_id(chat_id)
         event.state = self.state.get_for_chat_id(chat_id)
         event.cache = self.cache.get_for_chat_id(chat_id)
-        event.settings = ChatSettings(event)
+        event.settings = chatsettings.repository.get_for_event(event)
         self._continue(event)

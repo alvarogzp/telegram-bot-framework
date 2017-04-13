@@ -114,8 +114,8 @@ class ChatSettings:
     LANGUAGE = add_setting("language", "en")
     STORE_MESSAGES = add_setting("store_messages", "on")
 
-    def __init__(self, event):
-        self.settings_state = event.state.get_for("settings")
+    def __init__(self, settings_state):
+        self.settings_state = settings_state
 
     def get(self, name):
         value = self.settings_state.get_value(name)
@@ -156,3 +156,39 @@ class ChatSettings:
     @staticmethod
     def is_supported(name):
         return name in _SETTINGS
+
+
+class ChatSettingsRepository:
+    def __init__(self):
+        self.cache = {}
+
+    def get_for_event(self, event):
+        chat_id = event.chat.id
+        if self.__is_cached(chat_id):
+            return self.__get_cached(chat_id)
+        return self.__get_new_and_add_to_cache(event.state, chat_id)
+
+    def get_for_chat_id(self, global_state, chat_id):
+        if self.__is_cached(chat_id):
+            return self.__get_cached(chat_id)
+        chat_state = global_state.get_for_chat_id(chat_id)
+        return self.__get_new_and_add_to_cache(chat_state, chat_id)
+
+    def __is_cached(self, chat_id):
+        return chat_id in self.cache
+
+    def __get_cached(self, chat_id):
+        return self.cache[chat_id]
+
+    def __get_new_and_add_to_cache(self, chat_state, chat_id):
+        settings_state = chat_state.get_for("settings")
+        chat_settings = ChatSettings(settings_state)
+        self.__add_to_cache(chat_id, chat_settings)
+        return chat_settings
+
+    def __add_to_cache(self, chat_id, value):
+        assert chat_id not in self.cache
+        self.cache[chat_id] = value
+
+
+repository = ChatSettingsRepository()
