@@ -32,8 +32,8 @@ class ShortlyRepeatedCommandThrottler(Throttler):
 
     def __send_throttling_warning(self, event, throttling_state):
         remaining_seconds = throttling_state.remaining_seconds(event.message.date)
-        message = FormattedText().normal("Ignoring repeated command. Try again in ")\
-            .code_inline(remaining_seconds).normal(" seconds")\
+        message = FormattedText().bold("Ignoring repeated command.").normal(" Try again in ")\
+            .code_inline(remaining_seconds).normal(" seconds.")\
             .build_message()
         message.to_chat_replying(event.message)
         self.api.send_message(message)
