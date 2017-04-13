@@ -123,6 +123,7 @@ class ChatSettings:
     # To add one: SETTING = add_setting("name", "default_value")
     LANGUAGE = add_setting("language", "en")
     STORE_MESSAGES = add_setting("store_messages", "on")
+    THROTTLING_SECONDS = add_setting("throttling_seconds", 60, Codecs.INT)
 
     def __init__(self, settings_state):
         self.settings_state = settings_state
