@@ -27,12 +27,12 @@ class DateFormatter:
 class UserFormatter:
     @staticmethod
     def format(user):
-        if user.username is not None:
-            formatted_user = user.username
-        elif user.first_name is not None:
+        if user.first_name is not None:
             formatted_user = user.first_name
             if user.last_name is not None:
                 formatted_user += " " + user.last_name
+        elif user.username is not None:
+            formatted_user = user.username
         else:
             formatted_user = str(user.id)
         return formatted_user
