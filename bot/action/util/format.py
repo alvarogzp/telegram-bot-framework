@@ -60,3 +60,13 @@ class SizeFormatter:
                 break
             number /= cls.MULTIPLIER_FACTOR
         return "{:.2f} {}{}".format(number, unit, suffix)
+
+
+class TextSummarizer:
+    ELLIPSIS = "…"
+
+    @classmethod
+    def summarize(cls, text, max_number_of_characters=10):
+        if len(text) > max_number_of_characters:
+            text = text[:max_number_of_characters-len(cls.ELLIPSIS)] + cls.ELLIPSIS
+        return text
