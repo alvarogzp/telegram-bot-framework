@@ -5,7 +5,7 @@ from bot.action.chatsettings import ChatSettings
 from bot.action.core.action import Action
 from bot.action.core.command import UnderscoredCommandBuilder
 from bot.action.core.command.usagemessage import CommandUsageMessage
-from bot.action.extra.messages.analyzer import MessageTypeResolver
+from bot.action.extra.messages import analyzer
 from bot.action.userinfo import UserStorageHandler
 from bot.action.util.format import UserFormatter, DateFormatter
 from bot.action.util.textformat import FormattedText
@@ -149,7 +149,7 @@ class StoredMessage:
         formatted_user = UserFormatter.retrieve_and_format(self.message.from_, user_storage_handler)
         formatted_date = DateFormatter.format(self.message.date)
         edits_info = (" (%s edits)" % len(self.edited_messages)) if len(self.edited_messages) > 0 else ""
-        summary = MessageTypeResolver.infer_type(self.message).get_summary()
+        summary = analyzer.get_summary(self.message)
         return FormattedText().normal(show_command).normal(" at ").bold(formatted_date).normal(" by ")\
             .bold(formatted_user).normal(edits_info).normal(" ").concat(summary)
 

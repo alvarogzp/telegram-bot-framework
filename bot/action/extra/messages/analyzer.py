@@ -72,9 +72,9 @@ class VoiceMessageAnalyzer(MessageAnalyzer):
         pass
 
 
-class MessageTypeResolver:
+class MessageAnalyzerResolver:
     @staticmethod
-    def infer_type(message_data):
+    def get_analyzer(message_data):
         message_type = UnknownMessageAnalyzer
         if message_data.text is not None:
             message_type = TextMessageAnalyzer
@@ -87,3 +87,13 @@ class MessageTypeResolver:
         elif message_data.voice:
             message_type = VoiceMessageAnalyzer
         return message_type(message_data)
+
+
+# Following is the public API that is supposed to be used
+
+def get_summary(message_data):
+    return MessageAnalyzerResolver.get_analyzer(message_data).get_summary()
+
+
+def get_full_content(message_data):
+    return MessageAnalyzerResolver.get_analyzer(message_data).get_full_content()
