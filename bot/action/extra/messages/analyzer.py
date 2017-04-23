@@ -5,7 +5,7 @@ from bot.api import domain
 
 class MessageAnalyzer:
     def __init__(self, message_data):
-        self.message_data = message_data
+        self.message = message_data
 
     def get_summary(self):
         """:rtype: FormattedText"""
@@ -26,7 +26,7 @@ class UnknownMessageAnalyzer(MessageAnalyzer):
 
 class TextMessageAnalyzer(MessageAnalyzer):
     def get_summary(self):
-        summarized_text = TextSummarizer.summarize(self.message_data.text, max_number_of_characters=15)
+        summarized_text = TextSummarizer.summarize(self.message.text, max_number_of_characters=15)
         return FormattedText().normal("✍️ [ ").italic(summarized_text).normal(" ]")
 
     def get_full_content(self):
@@ -44,7 +44,7 @@ class PhotoMessageAnalyzer(MessageAnalyzer):
 class StickerMessageAnalyzer(MessageAnalyzer):
     def get_summary(self):
         summary = FormattedText()
-        emoji = self.message_data.sticker.emoji
+        emoji = self.message.sticker.emoji
         if emoji:
             summary.normal(emoji)
         else:
