@@ -5,6 +5,7 @@ from bot.action.chatsettings import ChatSettings
 from bot.action.core.action import Action
 from bot.action.core.command import UnderscoredCommandBuilder
 from bot.action.core.command.usagemessage import CommandUsageMessage
+from bot.action.extra.messages.analyzer import MessageTypeResolver
 from bot.action.userinfo import UserStorageHandler
 from bot.action.util.format import UserFormatter, DateFormatter, TextSummarizer
 from bot.action.util.textformat import FormattedText
@@ -148,26 +149,9 @@ class StoredMessage:
         formatted_user = UserFormatter.retrieve_and_format(self.message.from_, user_storage_handler)
         formatted_date = DateFormatter.format(self.message.date)
         edits_info = (" (%s edits)" % len(self.edited_messages)) if len(self.edited_messages) > 0 else ""
-        hint = FormattedText().normal(" ")
-        if self.message.text is not None:
-            summarized_text = TextSummarizer.summarize(self.message.text, max_number_of_characters=15)
-            hint.normal("✍️ [ ").italic(summarized_text).normal(" ]")
-        elif self.message.photo:
-            hint.bold("🌅 Photo")
-        elif self.message.sticker:
-            if self.message.sticker.emoji:
-                hint.normal(self.message.sticker.emoji)
-            else:
-                hint.normal("📃")
-            hint.bold(" Sticker")
-        elif self.message.document:
-            hint.bold("📄 Document")
-        elif self.message.voice:
-            hint.bold("🎤 Voice")
-        else:
-            hint.bold("❓ Unknown")
+        summary = MessageTypeResolver.infer_type(self.message).get_summary()
         return FormattedText().normal(show_command).normal(" at ").bold(formatted_date).normal(" by ")\
-            .bold(formatted_user).normal(edits_info).concat(hint)
+            .bold(formatted_user).normal(edits_info).normal(" ").concat(summary)
 
     def printable_full_message(self, user_storage_handler):
         formatted_date = DateFormatter.format_full(self.message.date)
