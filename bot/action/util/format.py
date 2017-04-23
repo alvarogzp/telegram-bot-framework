@@ -25,21 +25,50 @@ class DateFormatter:
 
 
 class UserFormatter:
-    @staticmethod
-    def format(user):
+    def __init__(self, user):
+        self.user = user
+
+    @property
+    def default_format(self):
+        user = self.user
         if user.username is not None:
-            formatted_user = user.username
+            return user.username
         elif user.first_name is not None:
-            formatted_user = user.first_name
-            if user.last_name is not None:
-                formatted_user += " " + user.last_name
+            return self.full_name
         else:
-            formatted_user = str(user.id)
+            return str(user.id)
+
+    @property
+    def full_name(self):
+        formatted_user = []
+        if self.user.first_name is not None:
+            formatted_user.append(self.user.first_name)
+        if self.user.last_name is not None:
+            formatted_user.append(self.user.last_name)
+        return " ".join(formatted_user)
+
+    @property
+    def username(self):
+        return self.user.username if self.user.username is not None else ""
+
+    @property
+    def full_format(self):
+        """
+        Returns the full name (first and last parts), and the username between brackets if the user has it.
+        """
+        formatted_user = self.full_name
+        if self.user.username is not None:
+            formatted_user += " [" + self.user.username + "]"
         return formatted_user
+
+    @staticmethod
+    def retrieve(user_id, user_storage_handler: UserStorageHandler):
+        user = user_storage_handler.get(user_id)
+        return UserFormatter(user)
 
     @classmethod
     def retrieve_and_format(cls, user_id, user_storage_handler: UserStorageHandler):
-        return cls.format(user_storage_handler.get(user_id))
+        return cls.retrieve(user_id, user_storage_handler).default_format
 
 
 class TimeFormatter:
