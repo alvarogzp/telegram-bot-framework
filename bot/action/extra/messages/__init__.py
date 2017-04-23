@@ -7,7 +7,7 @@ from bot.action.core.command import UnderscoredCommandBuilder
 from bot.action.core.command.usagemessage import CommandUsageMessage
 from bot.action.extra.messages.analyzer import MessageTypeResolver
 from bot.action.userinfo import UserStorageHandler
-from bot.action.util.format import UserFormatter, DateFormatter, TextSummarizer
+from bot.action.util.format import UserFormatter, DateFormatter
 from bot.action.util.textformat import FormattedText
 from bot.api.domain import Message, ApiObject
 
