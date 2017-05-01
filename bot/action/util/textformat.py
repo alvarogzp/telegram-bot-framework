@@ -41,7 +41,7 @@ class FormattedText:
         self.text += formatted_text.text
         return self
 
-    def join(self, *formatted_texts):
+    def join(self, formatted_texts):
         """:type formatted_texts: list[FormattedText]"""
         for formatted_text in formatted_texts:
             assert self.mode == formatted_text.mode, "Cannot join text with different modes"
