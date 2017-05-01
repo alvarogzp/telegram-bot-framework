@@ -423,9 +423,34 @@ class PoleGroup:
         self.grouped_poles = grouped_poles
 
     def printable_version(self, user_storage_handler):
-        return "\n".join((_("{pole_count} → {user}")
-                          .format(pole_count=count, user=UserFormatter.retrieve_and_format(user_id, user_storage_handler))
-                          for user_id, count in self.grouped_poles))
+        return PoleGroupPrintableVersionHelper(self.grouped_poles, user_storage_handler).printable_version()
+
+
+class PoleGroupPrintableVersionHelper:
+    def __init__(self, grouped_poles, user_storage_handler):
+        self.grouped_poles = grouped_poles
+        self.user_storage_handler = user_storage_handler
+        self.printable_poles = []
+
+    def printable_version(self):
+        self.printable_poles = []
+        if len(self.grouped_poles) > 0:
+            self.__add_grouped_pole(_("FIRST: {user} → {pole_count}"), self.grouped_poles[0])
+        if len(self.grouped_poles) > 1:
+            self.__add_grouped_pole(_("SECOND: {user} → {pole_count}"), self.grouped_poles[1])
+        if len(self.grouped_poles) > 2:
+            self.__add_grouped_pole(_("THIRD: {user} → {pole_count}"), self.grouped_poles[2])
+        if len(self.grouped_poles) > 3:
+            for grouped_pole in self.grouped_poles[3:]:
+                self.__add_grouped_pole(_("{user} → {pole_count}"), grouped_pole)
+        return FormattedText().newline().join(self.printable_poles)
+
+    def __add_grouped_pole(self, text, grouped_pole):
+        user_id, count = grouped_pole
+        formatted_user = UserFormatter.retrieve_and_format(user_id, self.user_storage_handler)
+        formatted_grouped_pole = FormattedText().normal(text).start_format()\
+            .bold(user=formatted_user).normal(pole_count=count).end_format()
+        self.printable_poles.append(formatted_grouped_pole)
 
 
 class PoleStorageHandler:
