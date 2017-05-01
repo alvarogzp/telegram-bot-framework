@@ -1,5 +1,5 @@
 from bot.api.domain import Message
-from bot.api.telegram import TelegramBotApi
+from bot.api.telegram import TelegramBotApi, TelegramBotApiException
 from bot.storage import State
 
 
@@ -34,4 +34,18 @@ class Api:
         self.state.next_update_id = str(last_update_id + 1)
 
     def __getattr__(self, item):
-        return self.telegram_api.__getattr__(item)
+        return self.__get_api_call_hook_for(item)
+
+    def __get_api_call_hook_for(self, api_call):
+        return lambda **params: self.__api_call_hook(api_call, **params)
+
+    def __api_call_hook(self, command, **params):
+        api_func = self.telegram_api.__getattr__(command)
+        try:
+            return api_func(**params)
+        except TelegramBotApiException as e:
+            error_callback = params.get("__error_callback")
+            if callable(error_callback):
+                return error_callback(e)
+            else:
+                raise e
