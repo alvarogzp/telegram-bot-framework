@@ -67,10 +67,6 @@ class Message(ApiObject):
         return Message.create(reply_text).to_chat(message).reply_to_message(message)
 
 
-class Chat(ApiObject):
-    pass
-
-
 class MessageEntityParser:
     def __init__(self, message):
         self.text_as_utf16_bytes = message.text.encode("utf-16")
