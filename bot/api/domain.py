@@ -1,3 +1,6 @@
+from bot.api import api
+
+
 class ApiObject:
     def __init__(self, _type=None, **data):
         self._type = _type
@@ -40,7 +43,7 @@ class ApiObjectList:
 
 class OutApiObject(ApiObject):
     def with_error_callback(self, func):
-        self.data["__error_callback"] = func
+        self.data[api.LOCAL_PARAM_ERROR_CALLBACK] = func
         return self
 
 
