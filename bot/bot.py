@@ -55,14 +55,6 @@ class Bot:
             self.send_to_admin("Error while processing update. Action " + self.action.get_name() + " failed with error: " + str(e))
             traceback.print_exc()
 
-    def process_message(self, message):
-        if message.text is not None:
-            self.process_text_message(message)
-
-    def process_text_message(self, message):
-        print(message.text)
-        self.api.send_message(message.reply_message("test response"))
-
     def send_to_admin(self, message):
         message_to_admin = "[admin] " + message
         self.api.send_message(Message.create(text=message_to_admin, chat_id=self.config.admin_user_id))

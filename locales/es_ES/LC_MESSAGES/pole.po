@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: telegram-bot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-28 21:24+0200\n"
+"POT-Creation-Date: 2017-05-02 04:54+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: bot/action/extra/pole.py:312
+#: bot/action/extra/pole.py:316
 #, python-brace-format
 msgid ""
 "By default, display users with most {poles} (the ranking).\n"
@@ -35,17 +35,16 @@ msgid ""
 msgstr ""
 "Por defecto, muestra los usuarios con más {poles} (la clasificación).\n"
 "\n"
-"También puedes añadir un número al final de ámbos modos para limitar los usuarios o "
-"{poles} a mostrar (10 por defecto).\n"
+"También puedes añadir un número al final de ámbos modos para limitar los "
+"usuarios o {poles} a mostrar (10 por defecto).\n"
 "\n"
-"Utiliza *last* para mostrar la última {pole}, o la anterior añadiendo un número "
-"empezando por 1).\n"
+"Utiliza *last* para mostrar la última {pole}, o la anterior añadiendo un "
+"número empezando por 1).\n"
 "\n"
-"Utiliza: `/poles tz nombre_de_la_zona` para ver la clasificación de las poles "
-"en otra zona horaria (también se puede administrar con `/polestzman`)"
+"Utiliza: `/poles tz nombre_de_la_zona` para ver la clasificación de las "
+"poles en otra zona horaria (también se puede administrar con `/polestzman`)"
 
-
-#: bot/action/extra/pole.py:323
+#: bot/action/extra/pole.py:327
 #, python-brace-format
 msgid ""
 "I have not seen any {poles} here.\n"
@@ -54,52 +53,88 @@ msgstr ""
 "🙊 No veo ninguna {pole} aquí. 🙊\n"
 "Espera hasta el día siguiente, haz una {pole} y prueba de nuevo. "
 
-#: bot/action/extra/pole.py:330
+#: bot/action/extra/pole.py:334
 #, python-brace-format
 msgid "Most recent {poles}:"
-msgstr ""
-"🏆 Las {poles} más recientes:"
-"\n"
+msgstr "🏆 Las {poles} más recientes:\n"
 
-#: bot/action/extra/pole.py:336
+#: bot/action/extra/pole.py:340
 #, python-brace-format
 msgid "Write {0} to see recent {poles}."
 msgstr "✍🏻 Escribe {0} para ver las {poles} recientes. ✍🏻"
 
-#: bot/action/extra/pole.py:338
+#: bot/action/extra/pole.py:342
 #, python-brace-format
 msgid "Ranking of {poles}:"
 msgstr ""
 "\n"
-"🏎  Clasificación de {poles}  🏆"
-"\n"
+"🏎  Clasificación de {poles}  🏆\n"
 "————————————————"
 
-
-
-
-
-#: bot/action/extra/pole.py:343
+#: bot/action/extra/pole.py:347
 #, python-brace-format
 msgid "Invalid {pole} number. Range [1,total_{poles}]"
 msgstr "🤖 Número de {pole} no válido. Rango [1, total_{poles}]"
 
-#: bot/action/extra/pole.py:344
+#: bot/action/extra/pole.py:348
 #, python-brace-format
 msgid "This is the {0} last {pole}"
 msgstr "🏆 Esta es la {0}.ª {pole}"
 
-#: bot/action/extra/pole.py:354
+#: bot/action/extra/pole.py:353
+#, python-brace-format
+msgid "Oops, the {0} last {pole} seems to be deleted."
+msgstr "Uy, la {0}.ª {pole} parece haber sido borrada. 😟"
+
+#: bot/action/extra/pole.py:357
+msgid "It was above this message."
+msgstr "Estaba encima de este mensaje. ⬆️"
+
+#: bot/action/extra/pole.py:360
+#, python-brace-format
+msgid ""
+"It was above this message, along with other {0} message(s) deleted or "
+"inaccessible to me (maybe from another bot)."
+msgstr ""
+"Estaba encima de este mensaje, junto a otros {0} mensaje/s borrado/s o "
+"inaccesibles para mí (quizá porque sean de otro bot). 🌚"
+
+#: bot/action/extra/pole.py:366
+#, python-brace-format
+msgid ""
+"And at least the next {0} messages are also deleted or inaccessible to me "
+"(maybe because they are from another bot), so I cannot find where the {pole} "
+"was."
+msgstr ""
+"Y al menos los siguientes {0} mensajes están también borrados o son inaccesibles para mí "
+"(quizá porque son de otro bot), así que no puedo encontrar dónde estaba la {pole}. 🤓"
+
+#: bot/action/extra/pole.py:391
 #, python-brace-format
 msgid "Write {0} to see more options."
 msgstr "✍🏻 Escribe {0} para ver más opciones. ✍🏻"
 
-#: bot/action/extra/pole.py:374
+#: bot/action/extra/pole.py:411
 #, python-brace-format
 msgid "{date} → {user} → {view_pole_command}"
 msgstr "{date} : {user} → {view_pole_command}"
 
-#: bot/action/extra/pole.py:422
+#: bot/action/extra/pole.py:471
 #, python-brace-format
-msgid "{pole_count} → {user}"
+msgid "FIRST: {user} → {pole_count}"
+msgstr "🥇┇ {user} → {pole_count}"
+
+#: bot/action/extra/pole.py:473
+#, python-brace-format
+msgid "SECOND: {user} → {pole_count}"
+msgstr "🥈┇ {user} → {pole_count}"
+
+#: bot/action/extra/pole.py:475
+#, python-brace-format
+msgid "THIRD: {user} → {pole_count}"
+msgstr "🥉┇ {user} → {pole_count}"
+
+#: bot/action/extra/pole.py:478
+#, python-brace-format
+msgid "{user} → {pole_count}"
 msgstr "🏁┇ {user} → {pole_count}"
