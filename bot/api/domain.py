@@ -38,7 +38,13 @@ class ApiObjectList:
             yield ApiObject.wrap_api_object(data)
 
 
-class Message(ApiObject):
+class OutApiObject(ApiObject):
+    def with_error_callback(self, func):
+        self.data["__error_callback"] = func
+        return self
+
+
+class Message(OutApiObject):
     def to_chat(self, message=None, chat=None, chat_id=None):
         if message is not None:
             chat = message.chat
