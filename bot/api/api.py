@@ -41,10 +41,10 @@ class Api:
         return self.__get_api_call_hook_for(item)
 
     def __get_api_call_hook_for(self, api_call):
-        return lambda **params: self.__api_call_hook(api_call, **params)
+        api_func = self.telegram_api.__getattr__(api_call)
+        return lambda **params: self.__api_call_hook(api_func, **params)
 
-    def __api_call_hook(self, command, **params):
-        api_func = self.telegram_api.__getattr__(command)
+    def __api_call_hook(self, api_func, **params):
         local_params = self.__separate_local_params(params)
         try:
             return api_func(**params)
