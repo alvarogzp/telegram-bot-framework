@@ -357,12 +357,14 @@ class ListPoleAction(Action):
             text.normal(_("It was above this message."))
         elif tries < 5:
             text.concat(FormattedText()
-                        .normal(_("It was above this message (along with other {0} more message(s) deleted)."))
+                        .normal(_("It was above this message, along with other {0} more message(s) deleted or "
+                                  "inaccessible to me (maybe from another bot)."))
                         .start_format().normal(tries).end_format()
                         )
         else:
             text.concat(FormattedText()
-                        .normal(_("And at least {0} more messages below it, so I cannot find where it was."))
+                        .normal(_("And at least the next {0} messages are deleted or inaccessible to me (maybe "
+                                  "because they are from another bot), so I cannot find where it was."))
                         .start_format().normal(tries).end_format()
                         )
             reply_to_message_id = None
