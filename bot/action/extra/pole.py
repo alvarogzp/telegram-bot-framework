@@ -352,7 +352,7 @@ class ListPoleAction(Action):
     def __deleted_pole_handler(self, tries, pole, event, pole_number):
         text = FormattedText().normal(_("Oops, the {0} last {pole} seems to be deleted.")).newline()\
             .start_format().normal(pole_number, **self.pole_format_dict).end_format()
-        reply_to_message = pole.message_id + tries + 1
+        reply_to_message_id = int(pole.message_id) + tries + 1
         if tries == 0:
             text.normal(_("It was above this message."))
         elif tries < 5:
@@ -365,10 +365,10 @@ class ListPoleAction(Action):
                         .normal(_("And at least {0} more messages below it, so I cannot find where it was."))
                         .start_format().normal(tries).end_format()
                         )
-            reply_to_message = None
-        message = text.build_message().to_chat(event.message.chat.id)
-        if reply_to_message:
-            message.reply_to_message(reply_to_message)
+            reply_to_message_id = None
+        message = text.build_message().to_chat(event.message.chat)
+        if reply_to_message_id:
+            message.reply_to_message(message_id=reply_to_message_id)
             message.with_error_callback(lambda e: self.__deleted_pole_handler(tries + 1, pole, event, pole_number))
         return self.api.send_message(message)
 
