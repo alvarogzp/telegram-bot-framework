@@ -1,10 +1,6 @@
-from bot.api.domain import Message
+from bot.api.domain import Message, OutApiObject
 from bot.api.telegram import TelegramBotApi, TelegramBotApiException
 from bot.storage import State
-
-
-LOCAL_PARAM_ERROR_CALLBACK = "__error_callback"
-LOCAL_PARAMS = [LOCAL_PARAM_ERROR_CALLBACK]
 
 
 class Api:
@@ -54,14 +50,14 @@ class Api:
     @staticmethod
     def __separate_local_params(params):
         local_params = {}
-        for local_param in LOCAL_PARAMS:
+        for local_param in OutApiObject.LOCAL_PARAMS:
             if local_param in params:
                 local_params[local_param] = params.pop(local_param)
         return local_params
 
     @staticmethod
     def __handle_api_error(e, local_params):
-        error_callback = local_params.get(LOCAL_PARAM_ERROR_CALLBACK)
+        error_callback = local_params.get(OutApiObject.LOCAL_PARAM_ERROR_CALLBACK)
         if callable(error_callback):
             return error_callback(e)
         else:
