@@ -42,8 +42,11 @@ class ApiObjectList:
 
 
 class OutApiObject(ApiObject):
+    LOCAL_PARAM_ERROR_CALLBACK = "__error_callback"
+    LOCAL_PARAMS = [LOCAL_PARAM_ERROR_CALLBACK]
+
     def with_error_callback(self, func):
-        self.data[api.LOCAL_PARAM_ERROR_CALLBACK] = func
+        self.data[self.LOCAL_PARAM_ERROR_CALLBACK] = func
         return self
 
 
