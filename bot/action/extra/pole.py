@@ -374,14 +374,21 @@ class ListPoleAction(Action):
 
     @staticmethod
     def __build_success_response_message(event, title, printable_poles, footer_text=None):
-        header = FormattedText().normal(title).newline()
-        footer = FormattedText().newline().newline()
-        if footer_text is not None:
-            footer.concat(footer_text)
+        # header
+        text = FormattedText().normal(title).newline()
+        # body
+        if isinstance(printable_poles, FormattedText):
+            text.concat(printable_poles)
         else:
-            footer.normal(_("Write {0} to see more options."))\
+            text.normal(printable_poles)
+        # footer
+        text.newline().newline()
+        if footer_text is not None:
+            text.concat(footer_text)
+        else:
+            text.normal(_("Write {0} to see more options."))\
                 .start_format().bold(event.command + " help").end_format()
-        return FormattedText().concat(header).normal(printable_poles).concat(footer).build_message()
+        return text.build_message()
 
     def __formatted(self, *text):
         if len(text) == 1:
