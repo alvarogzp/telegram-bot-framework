@@ -92,8 +92,9 @@ msgstr ""
 #: bot/action/extra/pole.py:366
 #, python-brace-format
 msgid ""
-"And at least the next {0} messages are also deleted or inaccessible to me (maybe "
-"because they are from another bot), so I cannot find where the {pole} was."
+"And at least the next {0} messages are also deleted or inaccessible to me "
+"(maybe because they are from another bot), so I cannot find where the {pole} "
+"was."
 msgstr ""
 "And at least the next {0} messages are also deleted or inaccessible to me (maybe "
 "because they are from another bot), so I cannot find where the {pole} was. 🤓"
