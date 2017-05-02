@@ -350,22 +350,22 @@ class ListPoleAction(Action):
             .with_error_callback(lambda e: self.__deleted_pole_handler(0, pole, event, number_of_pole_to_display))
 
     def __deleted_pole_handler(self, tries, pole, event, pole_number):
-        text = FormattedText().normal(_("Oops, the {0} last {pole} seems to be deleted.")).newline()\
+        text = FormattedText().normal(_("Oops, the {0} last {pole} seems to be deleted.")).newline().newline()\
             .start_format().normal(pole_number, **self.pole_format_dict).end_format()
         reply_to_message_id = int(pole.message_id) + tries + 1
         if tries == 0:
             text.normal(_("It was above this message."))
         elif tries < 5:
             text.concat(FormattedText()
-                        .normal(_("It was above this message, along with other {0} more message(s) deleted or "
+                        .normal(_("It was above this message, along with other {0} message(s) deleted or "
                                   "inaccessible to me (maybe from another bot)."))
                         .start_format().normal(tries).end_format()
                         )
         else:
             text.concat(FormattedText()
-                        .normal(_("And at least the next {0} messages are deleted or inaccessible to me (maybe "
-                                  "because they are from another bot), so I cannot find where it was."))
-                        .start_format().normal(tries).end_format()
+                        .normal(_("And at least the next {0} messages are also deleted or inaccessible to me (maybe "
+                                  "because they are from another bot), so I cannot find where the {pole} was."))
+                        .start_format().normal(tries, **self.pole_format_dict).end_format()
                         )
             reply_to_message_id = None
         message = text.build_message().to_chat(event.message.chat)
