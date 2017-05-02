@@ -48,7 +48,7 @@ class OutApiObject(ApiObject):
 
 
 class Message(OutApiObject):
-    def to_chat(self, message=None, chat=None, chat_id=None):
+    def to_chat(self, chat=None, message=None, chat_id=None):
         if message is not None:
             chat = message.chat
         if chat is not None:
@@ -63,7 +63,7 @@ class Message(OutApiObject):
         return self
 
     def to_chat_replying(self, message):
-        self.to_chat(message)
+        self.to_chat(message=message)
         self.reply_to_message(message)
         return self
 
@@ -73,7 +73,7 @@ class Message(OutApiObject):
 
     @staticmethod
     def create_reply(message, reply_text):
-        return Message.create(reply_text).to_chat(message).reply_to_message(message)
+        return Message.create(reply_text).to_chat(message=message).reply_to_message(message)
 
 
 class MessageEntityParser:
