@@ -209,7 +209,7 @@ class MessageList:
 
     def printable_info(self, event, user_storage_handler):
         return FormattedText().normal("\n")\
-            .join(*(message.printable_info(event, user_storage_handler) for message in self.__get_messages()))
+            .join((message.printable_info(event, user_storage_handler) for message in self.__get_messages()))
 
     def __get_messages(self):
         if self.cached_messages is None:

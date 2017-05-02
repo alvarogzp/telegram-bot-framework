@@ -346,18 +346,51 @@ class ListPoleAction(Action):
         if pole is None:
             return Message.create(self.__formatted(_("Invalid {pole} number. Range [1,total_{poles}]")))
         text = _("This is the {0} last {pole}").format(number_of_pole_to_display, **self.pole_format_dict)
-        return Message.create(text, chat_id=event.message.chat.id, reply_to_message_id=pole.message_id)
+        return Message.create(text, chat_id=event.message.chat.id, reply_to_message_id=pole.message_id)\
+            .with_error_callback(lambda e: self.__deleted_pole_handler(0, pole, event, number_of_pole_to_display))
+
+    def __deleted_pole_handler(self, tries, pole, event, pole_number):
+        text = FormattedText().normal(_("Oops, the {0} last {pole} seems to be deleted.")).newline().newline()\
+            .start_format().normal(pole_number, **self.pole_format_dict).end_format()
+        reply_to_message_id = int(pole.message_id) + tries + 1
+        if tries == 0:
+            text.normal(_("It was above this message."))
+        elif tries < 5:
+            text.concat(FormattedText()
+                        .normal(_("It was above this message, along with other {0} message(s) deleted or "
+                                  "inaccessible to me (maybe from another bot)."))
+                        .start_format().normal(tries).end_format()
+                        )
+        else:
+            text.concat(FormattedText()
+                        .normal(_("And at least the next {0} messages are also deleted or inaccessible to me (maybe "
+                                  "because they are from another bot), so I cannot find where the {pole} was."))
+                        .start_format().normal(tries, **self.pole_format_dict).end_format()
+                        )
+            reply_to_message_id = None
+        message = text.build_message().to_chat(event.message.chat)
+        if reply_to_message_id:
+            message.reply_to_message(message_id=reply_to_message_id)
+            message.with_error_callback(lambda e: self.__deleted_pole_handler(tries + 1, pole, event, pole_number))
+        return self.api.send_message(message)
 
     @staticmethod
     def __build_success_response_message(event, title, printable_poles, footer_text=None):
-        header = FormattedText().normal(title).newline()
-        footer = FormattedText().newline().newline()
-        if footer_text is not None:
-            footer.concat(footer_text)
+        # header
+        text = FormattedText().normal(title).newline()
+        # body
+        if isinstance(printable_poles, FormattedText):
+            text.concat(printable_poles)
         else:
-            footer.normal(_("Write {0} to see more options."))\
+            text.normal(printable_poles)
+        # footer
+        text.newline().newline()
+        if footer_text is not None:
+            text.concat(footer_text)
+        else:
+            text.normal(_("Write {0} to see more options."))\
                 .start_format().bold(event.command + " help").end_format()
-        return FormattedText().concat(header).normal(printable_poles).concat(footer).build_message()
+        return text.build_message()
 
     def __formatted(self, *text):
         if len(text) == 1:
@@ -423,9 +456,34 @@ class PoleGroup:
         self.grouped_poles = grouped_poles
 
     def printable_version(self, user_storage_handler):
-        return "\n".join((_("{pole_count} → {user}")
-                          .format(pole_count=count, user=UserFormatter.retrieve_and_format(user_id, user_storage_handler))
-                          for user_id, count in self.grouped_poles))
+        return PoleGroupPrintableVersionHelper(self.grouped_poles, user_storage_handler).printable_version()
+
+
+class PoleGroupPrintableVersionHelper:
+    def __init__(self, grouped_poles, user_storage_handler):
+        self.grouped_poles = grouped_poles
+        self.user_storage_handler = user_storage_handler
+        self.printable_poles = []
+
+    def printable_version(self):
+        self.printable_poles = []
+        if len(self.grouped_poles) > 0:
+            self.__add_grouped_pole(_("FIRST: {user} → {pole_count}"), self.grouped_poles[0])
+        if len(self.grouped_poles) > 1:
+            self.__add_grouped_pole(_("SECOND: {user} → {pole_count}"), self.grouped_poles[1])
+        if len(self.grouped_poles) > 2:
+            self.__add_grouped_pole(_("THIRD: {user} → {pole_count}"), self.grouped_poles[2])
+        if len(self.grouped_poles) > 3:
+            for grouped_pole in self.grouped_poles[3:]:
+                self.__add_grouped_pole(_("{user} → {pole_count}"), grouped_pole)
+        return FormattedText().newline().join(self.printable_poles)
+
+    def __add_grouped_pole(self, text, grouped_pole):
+        user_id, count = grouped_pole
+        formatted_user = UserFormatter.retrieve_and_format(user_id, self.user_storage_handler)
+        formatted_grouped_pole = FormattedText().normal(text).start_format()\
+            .bold(user=formatted_user).normal(pole_count=count).end_format()
+        self.printable_poles.append(formatted_grouped_pole)
 
 
 class PoleStorageHandler:
