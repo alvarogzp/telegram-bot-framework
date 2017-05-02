@@ -84,11 +84,11 @@ msgstr "🏆 Esta es la {0}.ª {pole}"
 #: bot/action/extra/pole.py:353
 #, python-brace-format
 msgid "Oops, the {0} last {pole} seems to be deleted."
-msgstr ""
+msgstr "Uy, la {0}.ª {pole} parece haber sido borrada. 😟"
 
 #: bot/action/extra/pole.py:357
 msgid "It was above this message."
-msgstr ""
+msgstr "Estaba encima de este mensaje. ⬆️"
 
 #: bot/action/extra/pole.py:360
 #, python-brace-format
@@ -96,6 +96,8 @@ msgid ""
 "It was above this message, along with other {0} more message(s) deleted or "
 "inaccessible to me (maybe from another bot)."
 msgstr ""
+"Estaba encima de este mensaje, junto a otros {0} mensaje/s borrado/s o "
+"inaccesibles para mí (quizá porque sean de otro bot). 🌚"
 
 #: bot/action/extra/pole.py:366
 #, python-brace-format
@@ -103,6 +105,8 @@ msgid ""
 "And at least the next {0} messages are deleted or inaccessible to me (maybe "
 "because they are from another bot), so I cannot find where it was."
 msgstr ""
+"Y al menos los siguientes {0} mensajes están también borrados o son inaccesibles para mí "
+"(quizá porque son de otro bot), así que no puedo encontrar dónde estaba la pole. 🤓"
 
 #: bot/action/extra/pole.py:391
 #, python-brace-format
@@ -117,22 +121,19 @@ msgstr "{date} : {user} → {view_pole_command}"
 #: bot/action/extra/pole.py:471
 #, python-brace-format
 msgid "FIRST: {user} → {pole_count}"
-msgstr ""
+msgstr "🥇┇ {user} → {pole_count}"
 
 #: bot/action/extra/pole.py:473
 #, python-brace-format
 msgid "SECOND: {user} → {pole_count}"
-msgstr ""
+msgstr "🥈┇ {user} → {pole_count}"
 
 #: bot/action/extra/pole.py:475
 #, python-brace-format
 msgid "THIRD: {user} → {pole_count}"
-msgstr ""
+msgstr "🥉┇ {user} → {pole_count}"
 
 #: bot/action/extra/pole.py:478
 #, python-brace-format
 msgid "{user} → {pole_count}"
-msgstr ""
-
-#~ msgid "{pole_count} → {user}"
-#~ msgstr "🏁┇ {user} → {pole_count}"
+msgstr "🏁┇ {user} → {pole_count}"
