@@ -31,10 +31,10 @@ class UserFormatter:
     @property
     def default_format(self):
         user = self.user
-        if user.username is not None:
-            return user.username
-        elif user.first_name is not None:
+        if user.first_name is not None:
             return self.full_name
+        elif user.username is not None:
+            return user.username
         else:
             return str(user.id)
 

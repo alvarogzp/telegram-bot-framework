@@ -17,6 +17,7 @@ from bot.action.gapdetector import GlobalGapDetectorAction
 from bot.action.chatsettings import ChatSettingsAction
 from bot.action.internationalization import InternationalizationAction
 from bot.action.perchat import PerChatAction
+from bot.action.silence import SilenceAction
 from bot.action.toggle import GetSetFeatureAction, ToggleableFeatureAction
 from bot.action.userinfo import SaveUserAction
 from bot.bot import Bot
@@ -107,6 +108,12 @@ class BotManager:
                                         CommandAction("settings").then(
                                             GroupAdminAction().then(
                                                 ChatSettingsAction()
+                                            )
+                                        ),
+
+                                        CommandAction("silence").then(
+                                            GroupAdminAction().then(
+                                                SilenceAction()
                                             )
                                         ),
 
