@@ -11,7 +11,17 @@ class Api:
     def send_message(self, message: Message, **params):
         message_params = message.data.copy()
         message_params.update(params)
-        return self.sendMessage(**message_params)
+        if self.__should_send_message(message_params):
+            return self.sendMessage(**message_params)
+
+    def __should_send_message(self, message_params):
+        chat_id = message_params.get("chat_id")
+        if chat_id:
+            chat_state = self.state.get_for_chat_id(chat_id)
+            is_silenced = chat_state.silenced
+            if is_silenced:
+                return False
+        return True
 
     def get_pending_updates(self):
         there_are_pending_updates = True
