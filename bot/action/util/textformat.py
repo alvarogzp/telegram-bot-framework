@@ -41,8 +41,9 @@ class FormattedText:
         self.text += formatted_text.text
         return self
 
-    def join(self, *formatted_texts):
+    def join(self, formatted_texts):
         """:type formatted_texts: list[FormattedText]"""
+        formatted_texts = list(formatted_texts)  # so that after the first iteration elements are not lost if generator
         for formatted_text in formatted_texts:
             assert self.mode == formatted_text.mode, "Cannot join text with different modes"
         self.text = self.text.join((formatted_text.text for formatted_text in formatted_texts))

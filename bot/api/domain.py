@@ -38,8 +38,17 @@ class ApiObjectList:
             yield ApiObject.wrap_api_object(data)
 
 
-class Message(ApiObject):
-    def to_chat(self, message=None, chat=None, chat_id=None):
+class OutApiObject(ApiObject):
+    LOCAL_PARAM_ERROR_CALLBACK = "__error_callback"
+    LOCAL_PARAMS = [LOCAL_PARAM_ERROR_CALLBACK]
+
+    def with_error_callback(self, func):
+        self.data[self.LOCAL_PARAM_ERROR_CALLBACK] = func
+        return self
+
+
+class Message(OutApiObject):
+    def to_chat(self, chat=None, message=None, chat_id=None):
         if message is not None:
             chat = message.chat
         if chat is not None:
@@ -54,7 +63,7 @@ class Message(ApiObject):
         return self
 
     def to_chat_replying(self, message):
-        self.to_chat(message)
+        self.to_chat(message=message)
         self.reply_to_message(message)
         return self
 
@@ -64,11 +73,7 @@ class Message(ApiObject):
 
     @staticmethod
     def create_reply(message, reply_text):
-        return Message.create(reply_text).to_chat(message).reply_to_message(message)
-
-
-class Chat(ApiObject):
-    pass
+        return Message.create(reply_text).to_chat(message=message).reply_to_message(message)
 
 
 class MessageEntityParser:
