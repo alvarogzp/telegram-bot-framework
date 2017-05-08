@@ -23,7 +23,7 @@ class MessageAnalyzer:
             .normal(" ").concat(self._get_summary())
 
     def __get_edits_info(self):
-        return (" (%s edits)" % len(self.edited_messages)) if len(self.edited_messages) > 0 else ""
+        return (" (%s edits)" % len(self.edited_messages)) if self.has_been_edited else ""
 
     def _get_summary(self):
         """:rtype: FormattedText"""
@@ -32,6 +32,17 @@ class MessageAnalyzer:
     def get_full_content(self):
         """:rtype: list[Message]"""
         raise NotImplementedError()
+
+    @property
+    def has_been_edited(self):
+        return len(self.edited_messages) > 0
+
+    @property
+    def last_message(self):
+        """Returns either the message or, if edited, the last edition message."""
+        if self.has_been_edited:
+            return self.edited_messages[-1]
+        return self.message
 
     @property
     def date(self):
@@ -91,7 +102,7 @@ class MessageAnalyzer:
             text.normal(" originally sent on ").bold(formatted_date).normal(".").newline()
 
     def __add_edit_info_if_needed(self, text):
-        if len(self.edited_messages) > 0:
+        if self.has_been_edited:
             text.normal(self.bullet).normal("This message has been edited ")\
                 .bold(len(self.edited_messages)).bold(" time(s)").normal(".").newline()
 
@@ -121,8 +132,7 @@ class UnknownMessageAnalyzer(MessageAnalyzer):
 
 class TextMessageAnalyzer(MessageAnalyzer):
     def _get_summary(self):
-        # todo print last edit?
-        summarized_text = TextSummarizer.summarize(self.message.text, max_number_of_characters=15)
+        summarized_text = TextSummarizer.summarize(self.last_message.text, max_number_of_characters=15)
         return FormattedText().normal("✍️ [ ").italic(summarized_text).normal(" ]")
 
     def get_full_content(self):
