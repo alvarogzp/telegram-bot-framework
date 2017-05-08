@@ -146,15 +146,10 @@ class StoredMessage:
 
     def printable_info(self, event, user_storage_handler):
         show_command = UnderscoredCommandBuilder.build_command(event.command, self.message_id)
-        formatted_user = UserFormatter.retrieve_and_format(self.message.from_, user_storage_handler)
-        formatted_date = DateFormatter.format(self.message.date)
-        edits_info = (" (%s edits)" % len(self.edited_messages)) if len(self.edited_messages) > 0 else ""
-        summary = analyzer.get_summary(self, user_storage_handler)
-        return FormattedText().normal(show_command).normal(" at ").bold(formatted_date).normal(" by ")\
-            .bold(formatted_user).normal(edits_info).normal(" ").concat(summary)
+        return analyzer.get_short_info(user_storage_handler, self, show_command)
 
     def printable_full_message(self, user_storage_handler):
-        return analyzer.get_full_content(self, user_storage_handler)
+        return analyzer.get_full_content(user_storage_handler, self)
 
     @staticmethod
     def deserialize(message_id, data):

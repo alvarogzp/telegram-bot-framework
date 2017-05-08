@@ -14,13 +14,28 @@ class MessageAnalyzer:
         self.edited_messages = stored_message.edited_messages
         self.user_storage_handler = user_storage_handler
 
-    def get_summary(self):
+    def get_short_info(self, show_command):
+        return FormattedText()\
+            .normal(show_command)\
+            .normal(" at ").bold(self.date)\
+            .normal(" by ").bold(self.user)\
+            .normal(self.__get_edits_info())\
+            .normal(" ").concat(self._get_summary())
+
+    def __get_edits_info(self):
+        return (" (%s edits)" % len(self.edited_messages)) if len(self.edited_messages) > 0 else ""
+
+    def _get_summary(self):
         """:rtype: FormattedText"""
         raise NotImplementedError()
 
     def get_full_content(self):
         """:rtype: list[Message]"""
         raise NotImplementedError()
+
+    @property
+    def date(self):
+        return DateFormatter.format(self.message.date)
 
     @property
     def full_date(self):
@@ -95,7 +110,7 @@ class MessageAnalyzer:
 
 
 class UnknownMessageAnalyzer(MessageAnalyzer):
-    def get_summary(self):
+    def _get_summary(self):
         return FormattedText().bold("❓ Unknown")
 
     def get_full_content(self):
@@ -105,7 +120,7 @@ class UnknownMessageAnalyzer(MessageAnalyzer):
 
 
 class TextMessageAnalyzer(MessageAnalyzer):
-    def get_summary(self):
+    def _get_summary(self):
         # todo print last edit?
         summarized_text = TextSummarizer.summarize(self.message.text, max_number_of_characters=15)
         return FormattedText().normal("✍️ [ ").italic(summarized_text).normal(" ]")
@@ -119,7 +134,7 @@ class TextMessageAnalyzer(MessageAnalyzer):
 
 
 class PhotoMessageAnalyzer(MessageAnalyzer):
-    def get_summary(self):
+    def _get_summary(self):
         # todo add caption if present?
         return FormattedText().bold("🌅 Photo")
 
@@ -128,7 +143,7 @@ class PhotoMessageAnalyzer(MessageAnalyzer):
 
 
 class StickerMessageAnalyzer(MessageAnalyzer):
-    def get_summary(self):
+    def _get_summary(self):
         summary = FormattedText()
         emoji = self.message.sticker.emoji
         if emoji:
@@ -143,7 +158,7 @@ class StickerMessageAnalyzer(MessageAnalyzer):
 
 
 class DocumentMessageAnalyzer(MessageAnalyzer):
-    def get_summary(self):
+    def _get_summary(self):
         # todo add caption if present?
         return FormattedText().bold("📄 Document")
 
@@ -152,7 +167,7 @@ class DocumentMessageAnalyzer(MessageAnalyzer):
 
 
 class VoiceMessageAnalyzer(MessageAnalyzer):
-    def get_summary(self):
+    def _get_summary(self):
         # todo add caption if present?
         return FormattedText().bold("🎤 Voice")
 
@@ -183,9 +198,9 @@ class MessageAnalyzerResolver:
 
 # Following is the public API that is supposed to be used
 
-def get_summary(stored_message, user_storage_handler):
-    return MessageAnalyzerResolver(user_storage_handler).get_analyzer(stored_message).get_summary()
+def get_short_info(user_storage_handler, stored_message, show_command):
+    return MessageAnalyzerResolver(user_storage_handler).get_analyzer(stored_message).get_short_info(show_command)
 
 
-def get_full_content(stored_message, user_storage_handler):
+def get_full_content(user_storage_handler, stored_message):
     return MessageAnalyzerResolver(user_storage_handler).get_analyzer(stored_message).get_full_content()
