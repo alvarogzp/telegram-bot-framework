@@ -149,29 +149,12 @@ class StoredMessage:
         formatted_user = UserFormatter.retrieve_and_format(self.message.from_, user_storage_handler)
         formatted_date = DateFormatter.format(self.message.date)
         edits_info = (" (%s edits)" % len(self.edited_messages)) if len(self.edited_messages) > 0 else ""
-        summary = analyzer.get_summary(self.message)
+        summary = analyzer.get_summary(self, user_storage_handler)
         return FormattedText().normal(show_command).normal(" at ").bold(formatted_date).normal(" by ")\
             .bold(formatted_user).normal(edits_info).normal(" ").concat(summary)
 
     def printable_full_message(self, user_storage_handler):
-        formatted_date = DateFormatter.format_full(self.message.date)
-        formatted_user = UserFormatter.retrieve_and_format(self.message.from_, user_storage_handler)
-        text = "Message %s sent on %s by %s.\n" % (self.message_id, formatted_date, formatted_user)
-        if len(self.edited_messages) > 0:
-            text += "This message has been edited %s times.\n" % len(self.edited_messages)
-        text += "\n"
-        if self.message.text is None:
-            text += "This is a non-text message. They are not supported yet :("
-        else:
-            text += "Text:\n"
-            text += self.message.text
-        for index, edited_message in enumerate(self.edited_messages):
-            formatted_date = DateFormatter.format_full(edited_message.edit_date)
-            text += "\n\n"
-            text += "· Edit %s, done at %s." % (index+1, formatted_date)
-            text += "\n  New text:\n"
-            text += edited_message.text
-        return Message.create(text)
+        return analyzer.get_full_content(self, user_storage_handler)
 
     @staticmethod
     def deserialize(message_id, data):
