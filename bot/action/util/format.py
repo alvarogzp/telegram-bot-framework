@@ -98,4 +98,4 @@ class TextSummarizer:
     def summarize(cls, text, max_number_of_characters=10):
         if len(text) > max_number_of_characters:
             text = text[:max_number_of_characters-len(cls.ELLIPSIS)] + cls.ELLIPSIS
-        return text
+        return text.replace("\n", " ")
