@@ -40,9 +40,14 @@ class ListMessageAction(Action):
             response = self.get_response_opt_out(event, action_param)
         else:
             response = self.get_response_help(event, help_args)
-        if response.reply_to_message_id is None:
-            response = response.to_chat_replying(event.message)
-        self.api.send_message(response)
+        if type(response) is not list:
+            response = [response]
+        last_message = event.message
+        for message in response:
+            message.to_chat(message=last_message)
+            if message.reply_to_message_id is None:
+                message.reply_to_message(last_message)
+            last_message = self.api.send_message(message)
 
     @staticmethod
     def parse_args(args):
