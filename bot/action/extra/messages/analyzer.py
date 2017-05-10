@@ -161,8 +161,15 @@ class PhotoMessageAnalyzer(MessageAnalyzer):
         text.concat(self._full_edits_content("caption"))
         text.newline().newline()
         text.normal(self.start_content).bold("Following is the photo:")
-        photo = Photo.create_photo(self.message.photo)
+        photo = Photo.create_photo(self.__get_photo_file_id())
         return [text.build_message(), photo]
+
+    def __get_photo_file_id(self):
+        photo = self.message.photo
+        if type(photo) is not str:
+            # backward compatibility for previous messages stored with full photo info
+            photo = list(self.message.photo)[0].file_id
+        return photo
 
 
 class StickerMessageAnalyzer(MessageAnalyzer):
