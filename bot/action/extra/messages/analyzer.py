@@ -145,8 +145,12 @@ class TextMessageAnalyzer(MessageAnalyzer):
 
 class PhotoMessageAnalyzer(MessageAnalyzer):
     def _get_summary(self):
-        # todo add caption if present?
-        return FormattedText().bold("🌅 Photo")
+        summary = FormattedText().bold("🌅 Photo")
+        caption = self.last_message.caption
+        if caption:
+            summarized_caption = TextSummarizer.summarize(caption, max_number_of_characters=9)
+            summary.normal(" [ ").italic(summarized_caption).normal(" ]")
+        return summary
 
     def get_full_content(self):
         pass
