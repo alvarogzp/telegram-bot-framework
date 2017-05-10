@@ -115,7 +115,7 @@ class MessageAnalyzer:
             text.newline().newline()
             text.normal(self.bullet).normal("Edit ").bold(index + 1).bold("/").bold(total_number_of_edits)\
                 .normal(", done at ").bold(formatted_date).normal(".").newline()
-            text.normal(self.start_content).normal("New ").normal(edited_field).normal(":").newline()
+            text.normal(self.start_content).bold("New ").bold(edited_field).bold(":").newline()
             text.normal(edited_content)
         return text
 
@@ -137,7 +137,7 @@ class TextMessageAnalyzer(MessageAnalyzer):
 
     def get_full_content(self):
         text = self._full_content_header()
-        text.normal(self.start_content).normal("Text:").newline()
+        text.normal(self.start_content).bold("Text:").newline()
         text.normal(self.message.text)
         text.concat(self._full_edits_content("text"))
         return text.build_message()
