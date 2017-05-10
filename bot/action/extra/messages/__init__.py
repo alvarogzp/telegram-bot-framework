@@ -251,17 +251,31 @@ class MessageStorageHandler:
         self.__delete_if_present(data, "chat")
         self.__delete_if_present(data, "message_id")
         self.__delete_if_present(data, "entities")
+        self.__replace_list_with_item_with_biggest(data, "photo", "height")
+        self.__replace_with_id_if_present(data, "photo", "file_id")
         dump = json.dumps(data)
         self.state.set_value(str(message.message_id), dump + "\n", append=True)
 
-    @staticmethod
-    def __replace_with_id_if_present(dict, key, id_key="id"):
-        if dict.get(key) is not None:
+    def __replace_with_id_if_present(self, dict, key, id_key="id"):
+        if self.__is_present(dict, key):
             dict[key] = dict[key][id_key]
 
     @staticmethod
     def __delete_if_present(dict, key):
         dict.pop(key, None)
+
+    def __replace_list_with_item_with_biggest(self, dict, key, attr):
+        if self.__is_present(dict, key):
+            biggest = None
+            for item in dict[key]:
+                if biggest is None or item[attr] >= biggest[attr]:
+                    biggest = item
+            if biggest is not None:
+                dict[key] = biggest
+
+    @staticmethod
+    def __is_present(dict, key):
+        return dict.get(key) is not None
 
     def delete_old_messages(self):
         stored_ids = self.state.list_keys()
