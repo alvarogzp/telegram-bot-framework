@@ -76,6 +76,12 @@ class Message(OutApiObject):
         return Message.create(reply_text).to_chat(message=message).reply_to_message(message)
 
 
+class Photo(Message):
+    @staticmethod
+    def create_photo(file_id):
+        return Photo(_type=Photo, photo=file_id)
+
+
 class MessageEntityParser:
     def __init__(self, message):
         self.text_as_utf16_bytes = message.text.encode("utf-16")
