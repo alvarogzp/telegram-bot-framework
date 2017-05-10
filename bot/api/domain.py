@@ -3,6 +3,9 @@ class ApiObject:
         self._type = _type
         self.data = data
 
+    def get_type(self):
+        return self._type
+
     def get_or_fail(self, key):
         value = self.data[key]
         return self.wrap_api_object(value)
