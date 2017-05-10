@@ -1,7 +1,6 @@
 from bot.action.util.format import TextSummarizer, DateFormatter, UserFormatter
 from bot.action.util.textformat import FormattedText
-from bot.api.domain import Message
-
+from bot.api.domain import Message, Photo
 
 BULLET_STRING = "➡️ "
 START_CONTENT_STRING = "⬇ "
@@ -30,7 +29,7 @@ class MessageAnalyzer:
         raise NotImplementedError()
 
     def get_full_content(self):
-        """:rtype: list[Message]"""
+        """:rtype: list[Message]|Message"""
         raise NotImplementedError()
 
     @property
@@ -153,7 +152,17 @@ class PhotoMessageAnalyzer(MessageAnalyzer):
         return summary
 
     def get_full_content(self):
-        pass
+        text = self._full_content_header()
+        text.normal(self.bullet).bold("Message is a 🌅 Photo")
+        if self.message.caption:
+            text.newline().newline()
+            text.normal(self.start_content).bold("Caption:").newline()
+            text.normal(self.message.caption)
+        text.concat(self._full_edits_content("caption"))
+        text.newline().newline()
+        text.normal(self.start_content).bold("Following is the photo:")
+        photo = Photo.create_photo(self.message.photo)
+        return [text.build_message(), photo]
 
 
 class StickerMessageAnalyzer(MessageAnalyzer):
