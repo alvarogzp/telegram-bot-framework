@@ -114,8 +114,11 @@ class MessageAnalyzer:
             text.newline().newline()
             text.normal(self.bullet).normal("Edit ").bold(index + 1).bold("/").bold(total_number_of_edits)\
                 .normal(", done at ").bold(formatted_date).normal(".").newline()
-            text.normal(self.start_content).bold("New ").bold(edited_field).bold(":").newline()
-            text.normal(edited_content)
+            if edited_content is None:
+                text.normal(self.bullet).bold(edited_field.capitalize()).bold(" deleted")
+            else:
+                text.normal(self.start_content).bold("New ").bold(edited_field).bold(":").newline()
+                text.normal(edited_content)
         return text
 
 
