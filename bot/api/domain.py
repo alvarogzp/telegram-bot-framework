@@ -84,6 +84,10 @@ class Photo(Message):
     def create_photo(file_id):
         return Photo(_type=Photo, photo=file_id)
 
+    def with_caption(self, caption_text):
+        self.data["caption"] = caption_text
+        return self
+
 
 class MessageEntityParser:
     def __init__(self, message):

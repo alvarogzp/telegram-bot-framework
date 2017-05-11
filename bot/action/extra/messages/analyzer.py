@@ -162,6 +162,8 @@ class PhotoMessageAnalyzer(MessageAnalyzer):
         text.newline().newline()
         text.normal(self.start_content).bold("Following is the photo:")
         photo = Photo.create_photo(self.__get_photo_file_id())
+        if self.message.caption:
+            photo.with_caption(self.message.caption)
         return [text.build_message(), photo]
 
     def __get_photo_file_id(self):
