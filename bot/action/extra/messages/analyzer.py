@@ -236,8 +236,7 @@ class StickerMessageAnalyzer(MessageAnalyzer):
 
 class DocumentMessageAnalyzer(MessageAnalyzer):
     def _get_summary(self):
-        # todo add caption if present?
-        return FormattedText().bold("📄 Document")
+        return FormattedText().bold("📄 Document").concat(self._summarized_caption(max_characters=6))
 
     def get_full_content(self):
         pass
