@@ -113,6 +113,17 @@ class MessageAnalyzer:
             text.normal(self.bullet).normal("This message has been edited ")\
                 .bold(len(self.edited_messages)).bold(" time(s)").normal(".").newline()
 
+    def _full_content(self, content_field="text", prepend_newlines_if_content=False):
+        text = FormattedText()
+        content = getattr(self.message, content_field)
+        if content is not None:
+            if prepend_newlines_if_content:
+                text.newline().newline()
+            text.normal(self.start_content).bold(content_field.capitalize()).bold(":").newline()
+            text.normal(content)
+        text.concat(self._full_edits_content(content_field))
+        return text
+
     def _full_edits_content(self, edited_field="text"):
         text = FormattedText()
         total_number_of_edits = len(self.edited_messages)
@@ -160,9 +171,7 @@ class TextMessageAnalyzer(MessageAnalyzer):
 
     def get_full_content(self):
         text = self._full_content_header()
-        text.normal(self.start_content).bold("Text:").newline()
-        text.normal(self.message.text)
-        text.concat(self._full_edits_content("text"))
+        text.concat(self._full_content("text"))
         return text.build_message()
 
 
@@ -182,11 +191,7 @@ class PhotoMessageAnalyzer(MessageAnalyzer):
             .bold(photo="🌅 Photo")\
             .end_format()
         text.concat(description)
-        if self.message.caption:
-            text.newline().newline()
-            text.normal(self.start_content).bold("Caption:").newline()
-            text.normal(self.message.caption)
-        text.concat(self._full_edits_content("caption"))
+        text.concat(self._full_content("caption", prepend_newlines_if_content=True))
         text.newline().newline()
         text.normal(self.start_content).bold("Following is the photo:")
         photo_message = Photo.create_photo(photo.file_id)
