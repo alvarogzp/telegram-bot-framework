@@ -1,6 +1,6 @@
 from bot.action.util.format import TextSummarizer, DateFormatter, UserFormatter, SizeFormatter
 from bot.action.util.textformat import FormattedText
-from bot.api.domain import Message, Photo, ApiObjectList
+from bot.api.domain import Message, Photo, ApiObjectList, Sticker
 
 BULLET_STRING = "➡️ "
 START_CONTENT_STRING = "⬇ "
@@ -204,7 +204,22 @@ class StickerMessageAnalyzer(MessageAnalyzer):
         return FormattedText().normal(self.__get_emoji()).bold(" Sticker")
 
     def get_full_content(self):
-        pass
+        text = self._full_content_header()
+        sticker = self.message.sticker
+        description = FormattedText()\
+            .normal("{bullet}Message is a {dimensions}{size} {emoji} {sticker}")\
+            .start_format()\
+            .normal(bullet=self.bullet)\
+            .bold(dimensions=self._printable_dimensions(sticker.width, sticker.height))\
+            .concat(size=self._formatted_size(sticker.file_size))\
+            .normal(emoji=self.__get_emoji())\
+            .bold(sticker="Sticker")\
+            .end_format()
+        text.concat(description)
+        text.newline().newline()
+        text.normal(self.start_content).bold("Following is the sticker:")
+        sticker_message = Sticker.create_sticker(sticker.file_id)
+        return [text.build_message(), sticker_message]
 
     def __get_emoji(self, default="📃"):
         emoji = self.message.sticker.emoji
