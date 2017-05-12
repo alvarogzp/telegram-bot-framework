@@ -37,7 +37,7 @@ class FormattedText:
 
     def concat(self, formatted_text):
         """:type formatted_text: FormattedText"""
-        assert self.mode == formatted_text.mode, "Cannot concat text with different modes"
+        assert self._is_compatible(formatted_text), "Cannot concat text with different modes"
         self.text += formatted_text.text
         return self
 
@@ -45,9 +45,13 @@ class FormattedText:
         """:type formatted_texts: list[FormattedText]"""
         formatted_texts = list(formatted_texts)  # so that after the first iteration elements are not lost if generator
         for formatted_text in formatted_texts:
-            assert self.mode == formatted_text.mode, "Cannot join text with different modes"
+            assert self._is_compatible(formatted_text), "Cannot join text with different modes"
         self.text = self.text.join((formatted_text.text for formatted_text in formatted_texts))
         return self
+
+    def _is_compatible(self, formatted_text):
+        """:type formatted_text: FormattedText"""
+        return self.mode == formatted_text.mode
 
     def build_message(self):
         return Message.create(self.text, parse_mode=self.mode)
