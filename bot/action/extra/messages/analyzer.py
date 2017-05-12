@@ -70,6 +70,14 @@ class MessageAnalyzer:
     def start_content(self):
         return START_CONTENT_STRING
 
+    def _summarized_caption(self, max_characters):
+        text = FormattedText()
+        caption = self.last_message.caption
+        if caption:
+            summarized_caption = TextSummarizer.summarize(caption, max_number_of_characters=max_characters)
+            text.normal(" [ ").italic(summarized_caption).normal(" ]")
+        return text
+
     def _full_content_header(self):
         text = FormattedText()\
             .normal(self.bullet)\
@@ -160,12 +168,7 @@ class TextMessageAnalyzer(MessageAnalyzer):
 
 class PhotoMessageAnalyzer(MessageAnalyzer):
     def _get_summary(self):
-        summary = FormattedText().bold("🌅 Photo")
-        caption = self.last_message.caption
-        if caption:
-            summarized_caption = TextSummarizer.summarize(caption, max_number_of_characters=9)
-            summary.normal(" [ ").italic(summarized_caption).normal(" ]")
-        return summary
+        return FormattedText().bold("🌅 Photo").concat(self._summarized_caption(max_characters=9))
 
     def get_full_content(self):
         text = self._full_content_header()
