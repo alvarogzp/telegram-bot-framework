@@ -257,7 +257,6 @@ class MessageStorageHandler:
         self.__delete_if_present(data, "message_id")
         self.__delete_if_present(data, "entities")
         self.__replace_list_with_item_with_biggest(data, "photo", "height")
-        self.__replace_with_id_if_present(data, "photo", "file_id")
         dump = json.dumps(data)
         self.state.set_value(str(message.message_id), dump + "\n", append=True)
 
