@@ -121,6 +121,19 @@ class MessageAnalyzer:
                 text.normal(edited_content)
         return text
 
+    @staticmethod
+    def _printable_dimensions(width, height):
+        return "{width}↔️ x {height}↕️".format(width=width, height=height)
+
+    @staticmethod
+    def _formatted_size(size_in_bytes):
+        if size_in_bytes is not None:
+            size = SizeFormatter.format(size_in_bytes)
+            return FormattedText().normal(" ({size})")\
+                .start_format().bold(size=size).end_format()
+        else:
+            return FormattedText()
+
 
 class UnknownMessageAnalyzer(MessageAnalyzer):
     def _get_summary(self):
@@ -161,8 +174,8 @@ class PhotoMessageAnalyzer(MessageAnalyzer):
             .normal("{bullet}Message is a {dimensions}{size} {photo}")\
             .start_format()\
             .normal(bullet=self.bullet)\
-            .concat(dimensions=self.__get_formatted_photo_dimensions(photo),
-                    size=self.__get_formatted_photo_size(photo))\
+            .bold(dimensions=self._printable_dimensions(photo.width, photo.height))\
+            .concat(size=self._formatted_size(photo.file_size))\
             .bold(photo="🌅 Photo")\
             .end_format()
         text.concat(description)
@@ -177,22 +190,6 @@ class PhotoMessageAnalyzer(MessageAnalyzer):
         if self.message.caption:
             photo_message.with_caption(self.message.caption)
         return [text.build_message(), photo_message]
-
-    @staticmethod
-    def __get_formatted_photo_dimensions(photo):
-        height = photo.height
-        width = photo.width
-        return FormattedText().bold("{width}↔️ x {height}↕️")\
-            .start_format().normal(width=width, height=height).end_format()
-
-    @staticmethod
-    def __get_formatted_photo_size(photo):
-        size = photo.file_size
-        if size is not None:
-            size = SizeFormatter.format(size)
-            return FormattedText().normal(" ({size})")\
-                .start_format().bold(size=size).end_format()
-        return FormattedText()
 
     def __get_photo(self):
         photo = self.message.photo
