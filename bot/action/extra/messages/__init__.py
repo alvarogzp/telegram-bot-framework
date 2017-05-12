@@ -257,6 +257,7 @@ class MessageStorageHandler:
         self.__delete_if_present(data, "message_id")
         self.__delete_if_present(data, "entities")
         self.__replace_list_with_item_with_biggest(data, "photo", "height")
+        self.__delete_if_present(data.get("sticker"), "thumb")
         dump = json.dumps(data)
         self.state.set_value(str(message.message_id), dump + "\n", append=True)
 
@@ -266,7 +267,8 @@ class MessageStorageHandler:
 
     @staticmethod
     def __delete_if_present(dict, key):
-        dict.pop(key, None)
+        if dict is not None:
+            dict.pop(key, None)
 
     def __replace_list_with_item_with_biggest(self, dict, key, attr):
         if self.__is_present(dict, key):
