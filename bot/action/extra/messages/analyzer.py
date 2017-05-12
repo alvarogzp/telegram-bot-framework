@@ -201,17 +201,14 @@ class PhotoMessageAnalyzer(MessageAnalyzer):
 
 class StickerMessageAnalyzer(MessageAnalyzer):
     def _get_summary(self):
-        summary = FormattedText()
-        emoji = self.message.sticker.emoji
-        if emoji:
-            summary.normal(emoji)
-        else:
-            summary.normal("📃")
-        summary.bold(" Sticker")
-        return summary
+        return FormattedText().normal(self.__get_emoji()).bold(" Sticker")
 
     def get_full_content(self):
         pass
+
+    def __get_emoji(self, default="📃"):
+        emoji = self.message.sticker.emoji
+        return emoji if emoji else default
 
 
 class DocumentMessageAnalyzer(MessageAnalyzer):
