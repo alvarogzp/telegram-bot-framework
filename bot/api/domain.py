@@ -89,6 +89,12 @@ class Photo(Message):
         return self
 
 
+class Sticker(Message):
+    @staticmethod
+    def create_sticker(file_id):
+        return Sticker(_type=Sticker, sticker=file_id)
+
+
 class MessageEntityParser:
     def __init__(self, message):
         self.text_as_utf16_bytes = message.text.encode("utf-16")

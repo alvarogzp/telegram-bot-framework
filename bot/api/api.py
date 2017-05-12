@@ -1,4 +1,4 @@
-from bot.api.domain import Message, OutApiObject, Photo
+from bot.api.domain import Message, OutApiObject, Photo, Sticker
 from bot.api.telegram import TelegramBotApi, TelegramBotApiException
 from bot.storage import State
 
@@ -27,6 +27,8 @@ class Api:
     def __get_send_func(self, message_type):
         if message_type == Photo:
             return self.sendPhoto
+        elif message_type == Sticker:
+            return self.sendSticker
         else:
             # fallback to sendMessage
             return self.sendMessage
