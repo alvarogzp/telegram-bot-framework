@@ -1,6 +1,6 @@
-from bot.action.util.format import TextSummarizer, DateFormatter, UserFormatter
+from bot.action.util.format import TextSummarizer, DateFormatter, UserFormatter, SizeFormatter
 from bot.action.util.textformat import FormattedText
-from bot.api.domain import Message, Photo
+from bot.api.domain import Message, Photo, ApiObjectList
 
 BULLET_STRING = "➡️ "
 START_CONTENT_STRING = "⬇ "
@@ -156,7 +156,16 @@ class PhotoMessageAnalyzer(MessageAnalyzer):
 
     def get_full_content(self):
         text = self._full_content_header()
-        text.normal(self.bullet).bold("Message is a 🌅 Photo")
+        photo = self.__get_photo()
+        description = FormattedText()\
+            .normal("{bullet}Message is a {dimensions}{size} {photo}")\
+            .start_format()\
+            .normal(bullet=self.bullet)\
+            .concat(dimensions=self.__get_formatted_photo_dimensions(photo),
+                    size=self.__get_formatted_photo_size(photo))\
+            .bold(photo="🌅 Photo")\
+            .end_format()
+        text.concat(description)
         if self.message.caption:
             text.newline().newline()
             text.normal(self.start_content).bold("Caption:").newline()
@@ -164,16 +173,32 @@ class PhotoMessageAnalyzer(MessageAnalyzer):
         text.concat(self._full_edits_content("caption"))
         text.newline().newline()
         text.normal(self.start_content).bold("Following is the photo:")
-        photo = Photo.create_photo(self.__get_photo_file_id())
+        photo_message = Photo.create_photo(photo.file_id)
         if self.message.caption:
-            photo.with_caption(self.message.caption)
-        return [text.build_message(), photo]
+            photo_message.with_caption(self.message.caption)
+        return [text.build_message(), photo_message]
 
-    def __get_photo_file_id(self):
+    @staticmethod
+    def __get_formatted_photo_dimensions(photo):
+        height = photo.height
+        width = photo.width
+        return FormattedText().bold("{width}↔️ x {height}↕️")\
+            .start_format().normal(width=width, height=height).end_format()
+
+    @staticmethod
+    def __get_formatted_photo_size(photo):
+        size = photo.file_size
+        if size is not None:
+            size = SizeFormatter.format(size)
+            return FormattedText().normal(" ({size})")\
+                .start_format().bold(size=size).end_format()
+        return FormattedText()
+
+    def __get_photo(self):
         photo = self.message.photo
-        if type(photo) is not str:
-            # backward compatibility for previous messages stored with full photo info
-            photo = list(self.message.photo)[0].file_id
+        if type(photo) is ApiObjectList:
+            # backward compatibility for previous messages stored with an array of photo info
+            photo = list(photo)[-1]
         return photo
 
 
