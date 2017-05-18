@@ -79,14 +79,16 @@ class Message(OutApiObject):
         return Message.create(reply_text).to_chat(message=message).reply_to_message(message)
 
 
-class Photo(Message):
-    @staticmethod
-    def create_photo(file_id):
-        return Photo(_type=Photo, photo=file_id)
-
+class CaptionableMessage(Message):
     def with_caption(self, caption_text):
         self.data["caption"] = caption_text
         return self
+
+
+class Photo(CaptionableMessage):
+    @staticmethod
+    def create_photo(file_id):
+        return Photo(_type=Photo, photo=file_id)
 
 
 class Sticker(Message):
