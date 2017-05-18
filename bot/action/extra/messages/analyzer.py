@@ -269,17 +269,14 @@ class DocumentMessageAnalyzer(MessageAnalyzer):
         return ""
 
     def __get_mime_type_and_file_name(self, document):
-        texts = []
+        text = FormattedText()
         mime_type = document.mime_type
         file_name = document.file_name
-        if mime_type is not None:
-            texts.append(FormattedText().normal("Type: ").bold(mime_type))
         if file_name is not None:
-            texts.append(FormattedText().normal("Name: ").bold(file_name))
-        if len(texts) > 0:
-            return FormattedText().newline().normal(self.bullet)\
-                .concat(FormattedText().normal(" | ").join(texts))
-        return FormattedText()
+            text.newline().normal(self.bullet).normal("Name: ").bold(file_name)
+        if mime_type is not None:
+            text.newline().normal(self.bullet).normal("Type: ").bold(mime_type)
+        return text
 
 
 class GifMessageAnalyzer(DocumentMessageAnalyzer):
