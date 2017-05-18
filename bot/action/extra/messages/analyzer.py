@@ -244,10 +244,9 @@ class DocumentMessageAnalyzer(MessageAnalyzer):
         text = self._full_content_header()
         document = self.message.document
         description = FormattedText()\
-            .normal("{bullet}Message is a{dimensions}{size} {document}")\
+            .normal("{bullet}Message is a{size} {document}")\
             .start_format()\
             .normal(bullet=self.bullet)\
-            .bold(dimensions=self._document_dimensions(document))\
             .concat(size=self._formatted_size(document.file_size))\
             .bold(document="📄 Document")\
             .end_format()
@@ -260,13 +259,6 @@ class DocumentMessageAnalyzer(MessageAnalyzer):
         if self.message.caption:
             document_message.with_caption(self.message.caption)
         return [text.build_message(), document_message]
-
-    def _document_dimensions(self, document):
-        width = document.width
-        height = document.height
-        if width and height:
-            return " " + self._printable_dimensions(width, height)
-        return ""
 
     def __get_mime_type_and_file_name(self, document):
         text = FormattedText()
@@ -287,10 +279,9 @@ class GifMessageAnalyzer(DocumentMessageAnalyzer):
         text = self._full_content_header()
         gif = self.message.document
         description = FormattedText()\
-            .normal("{bullet}Message is a{dimensions}{size} {gif}")\
+            .normal("{bullet}Message is a{size} {gif}")\
             .start_format()\
             .normal(bullet=self.bullet)\
-            .bold(dimensions=self._document_dimensions(gif))\
             .concat(size=self._formatted_size(gif.file_size))\
             .bold(gif="🎥 GIF")\
             .end_format()
