@@ -351,22 +351,22 @@ class MessageAnalyzerResolver:
 
     def get_analyzer(self, stored_message):
         message_data = stored_message.message
-        message_type = UnknownMessageAnalyzer
+        analyzer = UnknownMessageAnalyzer
         if message_data.text is not None:
-            message_type = TextMessageAnalyzer
+            analyzer = TextMessageAnalyzer
         elif message_data.photo:
-            message_type = PhotoMessageAnalyzer
+            analyzer = PhotoMessageAnalyzer
         elif message_data.sticker:
-            message_type = StickerMessageAnalyzer
+            analyzer = StickerMessageAnalyzer
         elif message_data.document:
             if message_data.document.mime_type == GIF_MIME_TYPE:
                 # treating all files of that mime type as gifs, until better way of identifying gifs is known
-                message_type = GifMessageAnalyzer
+                analyzer = GifMessageAnalyzer
             else:
-                message_type = DocumentMessageAnalyzer
+                analyzer = DocumentMessageAnalyzer
         elif message_data.voice:
-            message_type = VoiceMessageAnalyzer
-        return message_type(stored_message, self.user_storage_handler)
+            analyzer = VoiceMessageAnalyzer
+        return analyzer(stored_message, self.user_storage_handler)
 
 
 # Following is the public API that is supposed to be used
