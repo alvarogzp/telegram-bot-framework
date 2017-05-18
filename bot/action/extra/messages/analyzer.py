@@ -72,13 +72,16 @@ class MessageAnalyzer:
     def start_content(self):
         return START_CONTENT_STRING
 
-    def _summarized_caption(self, max_characters):
+    def _summarized(self, field="text", max_characters=15):
         text = FormattedText()
-        caption = self.last_message.caption
-        if caption:
-            summarized_caption = TextSummarizer.summarize(caption, max_number_of_characters=max_characters)
-            text.normal(" [ ").italic(summarized_caption).normal(" ]")
+        content = getattr(self.last_message, field)
+        if content:
+            summarized_content = TextSummarizer.summarize(content, max_number_of_characters=max_characters)
+            text.normal(" [ ").italic(summarized_content).normal(" ]")
         return text
+
+    def _summarized_caption(self, max_characters):
+        return self._summarized("caption", max_characters)
 
     def _full_content_header(self):
         text = FormattedText()\
@@ -168,8 +171,7 @@ class UnknownMessageAnalyzer(MessageAnalyzer):
 
 class TextMessageAnalyzer(MessageAnalyzer):
     def _get_summary(self):
-        summarized_text = TextSummarizer.summarize(self.last_message.text, max_number_of_characters=15)
-        return FormattedText().normal("✍️ [ ").italic(summarized_text).normal(" ]")
+        return FormattedText().normal("✍️").concat(self._summarized("text", max_characters=15))
 
     def get_full_content(self):
         text = self._full_content_header()
