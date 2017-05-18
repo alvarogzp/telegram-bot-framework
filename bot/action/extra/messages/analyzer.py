@@ -1,6 +1,6 @@
 from bot.action.util.format import TextSummarizer, DateFormatter, UserFormatter, SizeFormatter
 from bot.action.util.textformat import FormattedText
-from bot.api.domain import Message, Photo, ApiObjectList, Sticker, Document
+from bot.api.domain import ApiObjectĹist, Message, CaptionableMessage, Photo, Sticker, Document
 
 BULLET_STRING = "➡️ "
 START_CONTENT_STRING = "⬇ "
@@ -158,6 +158,11 @@ class MessageAnalyzer:
         else:
             return FormattedText()
 
+    def _add_caption_if_present(self, captionable_message: CaptionableMessage):
+        caption = self.message.caption
+        if caption:
+            captionable_message.with_caption(caption)
+
 
 class UnknownMessageAnalyzer(MessageAnalyzer):
     def _get_summary(self):
@@ -203,8 +208,7 @@ class PhotoMessageAnalyzer(MessageAnalyzer):
         text.newline().newline()
         text.normal(self.start_content).bold("Following is the photo:")
         photo_message = Photo.create_photo(photo.file_id)
-        if self.message.caption:
-            photo_message.with_caption(self.message.caption)
+        self._add_caption_if_present(photo_message)
         return [text.build_message(), photo_message]
 
     def __get_photo(self):
@@ -269,8 +273,7 @@ class DocumentMessageAnalyzer(MessageAnalyzer):
         text.newline().newline()
         text.normal(self.start_content).bold("Following is the document:")
         document_message = Document.create_document(document.file_id)
-        if self.message.caption:
-            document_message.with_caption(self.message.caption)
+        self._add_caption_if_present(document_message)
         return [text.build_message(), document_message]
 
     def __get_mime_type_and_file_name(self, document):
@@ -307,8 +310,7 @@ class GifMessageAnalyzer(DocumentMessageAnalyzer):
         text.newline().newline()
         text.normal(self.start_content).bold("Following is the GIF:")
         gif_message = Document.create_document(gif.file_id)
-        if self.message.caption:
-            gif_message.with_caption(self.message.caption)
+        self._add_caption_if_present(gif_message)
         return [text.build_message(), gif_message]
 
 
