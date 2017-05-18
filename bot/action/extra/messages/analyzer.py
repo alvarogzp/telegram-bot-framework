@@ -180,8 +180,12 @@ class TextMessageAnalyzer(MessageAnalyzer):
 
 
 class PhotoMessageAnalyzer(MessageAnalyzer):
+    @property
+    def printable_type(self):
+        return "🌅 Photo"
+
     def _get_summary(self):
-        return FormattedText().bold("🌅 Photo").concat(self._summarized_caption(max_characters=9))
+        return FormattedText().bold(self.printable_type).concat(self._summarized_caption(max_characters=9))
 
     def get_full_content(self):
         text = self._full_content_header()
@@ -192,7 +196,7 @@ class PhotoMessageAnalyzer(MessageAnalyzer):
             .normal(bullet=self.bullet)\
             .bold(dimensions=self._printable_dimensions(photo.width, photo.height))\
             .concat(size=self._formatted_size(photo.file_size))\
-            .bold(photo="🌅 Photo")\
+            .bold(photo=self.printable_type)\
             .end_format()
         text.concat(description)
         text.concat(self._full_content("caption", prepend_newlines_if_content=True))
@@ -212,20 +216,23 @@ class PhotoMessageAnalyzer(MessageAnalyzer):
 
 
 class StickerMessageAnalyzer(MessageAnalyzer):
+    @property
+    def printable_type(self):
+        return self.__get_emoji() + " Sticker"
+
     def _get_summary(self):
-        return FormattedText().normal(self.__get_emoji()).bold(" Sticker")
+        return FormattedText().bold(self.printable_type)
 
     def get_full_content(self):
         text = self._full_content_header()
         sticker = self.message.sticker
         description = FormattedText()\
-            .normal("{bullet}Message is a {dimensions}{size} {emoji} {sticker}")\
+            .normal("{bullet}Message is a {dimensions}{size} {sticker}")\
             .start_format()\
             .normal(bullet=self.bullet)\
             .bold(dimensions=self._printable_dimensions(sticker.width, sticker.height))\
             .concat(size=self._formatted_size(sticker.file_size))\
-            .normal(emoji=self.__get_emoji())\
-            .bold(sticker="Sticker")\
+            .bold(sticker=self.printable_type)\
             .end_format()
         text.concat(description)
         text.newline().newline()
@@ -239,8 +246,12 @@ class StickerMessageAnalyzer(MessageAnalyzer):
 
 
 class DocumentMessageAnalyzer(MessageAnalyzer):
+    @property
+    def printable_type(self):
+        return "📄 Document"
+
     def _get_summary(self):
-        return FormattedText().bold("📄 Document").concat(self._summarized_caption(max_characters=6))
+        return FormattedText().bold(self.printable_type).concat(self._summarized_caption(max_characters=6))
 
     def get_full_content(self):
         text = self._full_content_header()
@@ -250,7 +261,7 @@ class DocumentMessageAnalyzer(MessageAnalyzer):
             .start_format()\
             .normal(bullet=self.bullet)\
             .concat(size=self._formatted_size(document.file_size))\
-            .bold(document="📄 Document")\
+            .bold(document=self.printable_type)\
             .end_format()
         text.concat(description)
         text.concat(self.__get_mime_type_and_file_name(document))
@@ -274,8 +285,12 @@ class DocumentMessageAnalyzer(MessageAnalyzer):
 
 
 class GifMessageAnalyzer(DocumentMessageAnalyzer):
+    @property
+    def printable_type(self):
+        return "🎥 GIF"
+
     def _get_summary(self):
-        return FormattedText().bold("🎥 GIF").concat(self._summarized_caption(max_characters=11))
+        return FormattedText().bold(self.printable_type).concat(self._summarized_caption(max_characters=11))
 
     def get_full_content(self):
         text = self._full_content_header()
@@ -285,7 +300,7 @@ class GifMessageAnalyzer(DocumentMessageAnalyzer):
             .start_format()\
             .normal(bullet=self.bullet)\
             .concat(size=self._formatted_size(gif.file_size))\
-            .bold(gif="🎥 GIF")\
+            .bold(gif=self.printable_type)\
             .end_format()
         text.concat(description)
         text.concat(self._full_content("caption", prepend_newlines_if_content=True))
@@ -298,6 +313,10 @@ class GifMessageAnalyzer(DocumentMessageAnalyzer):
 
 
 class VoiceMessageAnalyzer(MessageAnalyzer):
+    @property
+    def printable_type(self):
+        return "🎤 Voice"
+
     def _get_summary(self):
         # todo add caption if present?
         return FormattedText().bold("🎤 Voice")
