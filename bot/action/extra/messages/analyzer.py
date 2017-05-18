@@ -157,6 +157,12 @@ class MessageAnalyzer:
         else:
             return FormattedText()
 
+    def _formatted_mime_type(self, mime_type):
+        if mime_type is not None:
+            return FormattedText().newline().normal(self.bullet).normal("Type: ").bold(mime_type)
+        else:
+            return FormattedText()
+
     def _add_caption_if_present(self, captionable_message: CaptionableMessage):
         caption = self.message.caption
         if caption:
@@ -267,7 +273,8 @@ class DocumentMessageAnalyzer(MessageAnalyzer):
             .bold(document=self.printable_type)\
             .end_format()
         text.concat(description)
-        text.concat(self.__get_mime_type_and_file_name(document))
+        text.concat(self.__formatted_file_name(document.file_name))
+        text.concat(self._formatted_mime_type(document.mime_type))
         text.concat(self._full_content("caption", prepend_newlines_if_content=True))
         text.newline().newline()
         text.normal(self.start_content).bold("Following is the document:")
@@ -275,15 +282,11 @@ class DocumentMessageAnalyzer(MessageAnalyzer):
         self._add_caption_if_present(document_message)
         return [text.build_message(), document_message]
 
-    def __get_mime_type_and_file_name(self, document):
-        text = FormattedText()
-        mime_type = document.mime_type
-        file_name = document.file_name
+    def __formatted_file_name(self, file_name):
         if file_name is not None:
-            text.newline().normal(self.bullet).normal("Name: ").bold(file_name)
-        if mime_type is not None:
-            text.newline().normal(self.bullet).normal("Type: ").bold(mime_type)
-        return text
+            return FormattedText().newline().normal(self.bullet).normal("Name: ").bold(file_name)
+        else:
+            return FormattedText()
 
 
 class GifMessageAnalyzer(DocumentMessageAnalyzer):
