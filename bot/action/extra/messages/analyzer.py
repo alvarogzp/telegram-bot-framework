@@ -153,8 +153,7 @@ class MessageAnalyzer:
     def _formatted_size(size_in_bytes):
         if size_in_bytes is not None:
             size = SizeFormatter.format(size_in_bytes)
-            return FormattedText().normal(" ({size})")\
-                .start_format().bold(size=size).end_format()
+            return FormattedText().normal(" ({size})").start_format().bold(size=size).end_format()
         else:
             return FormattedText()
 
