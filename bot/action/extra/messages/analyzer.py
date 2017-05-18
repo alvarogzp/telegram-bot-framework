@@ -1,6 +1,6 @@
-from bot.action.util.format import TextSummarizer, DateFormatter, UserFormatter, SizeFormatter
+from bot.action.util.format import TextSummarizer, DateFormatter, UserFormatter, SizeFormatter, TimeFormatter
 from bot.action.util.textformat import FormattedText
-from bot.api.domain import ApiObjectĹist, Message, CaptionableMessage, Photo, Sticker, Document
+from bot.api.domain import ApiObjectList, Message, CaptionableMessage, Photo, Sticker, Document, Voice
 
 BULLET_STRING = "➡️ "
 START_CONTENT_STRING = "⬇ "
@@ -322,11 +322,27 @@ class VoiceMessageAnalyzer(MessageAnalyzer):
         return "🎤 Voice"
 
     def _get_summary(self):
-        # todo add caption if present?
-        return FormattedText().bold("🎤 Voice")
+        return FormattedText().bold(self.printable_type).concat(self._summarized_caption(max_characters=9))
 
     def get_full_content(self):
-        pass
+        text = self._full_content_header()
+        voice = self.message.voice
+        description = FormattedText()\
+            .normal("{bullet}Message is a {duration}{size} {voice}")\
+            .start_format()\
+            .normal(bullet=self.bullet)\
+            .bold(duration=TimeFormatter.format(voice.duration))\
+            .concat(size=self._formatted_size(voice.file_size))\
+            .bold(voice=self.printable_type)\
+            .end_format()
+        text.concat(description)
+        text.concat(self._formatted_mime_type(voice.mime_type))
+        text.concat(self._full_content("caption", prepend_newlines_if_content=True))
+        text.newline().newline()
+        text.normal(self.start_content).bold("Following is the voice:")
+        voice_message = Voice.create_voice(voice.file_id)
+        self._add_caption_if_present(voice_message)
+        return [text.build_message(), voice_message]
 
 
 class MessageAnalyzerResolver:
