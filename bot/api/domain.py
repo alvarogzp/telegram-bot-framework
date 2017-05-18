@@ -103,6 +103,12 @@ class Document(CaptionableMessage):
         return Document(_type=Document, document=file_id)
 
 
+class Voice(CaptionableMessage):
+    @staticmethod
+    def create_voice(file_id):
+        return Voice(_type=Voice, voice=file_id)
+
+
 class MessageEntityParser:
     def __init__(self, message):
         self.text_as_utf16_bytes = message.text.encode("utf-16")
