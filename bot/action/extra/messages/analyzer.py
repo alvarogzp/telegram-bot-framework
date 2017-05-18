@@ -1,6 +1,6 @@
 from bot.action.util.format import TextSummarizer, DateFormatter, UserFormatter, SizeFormatter
 from bot.action.util.textformat import FormattedText
-from bot.api.domain import Message, Photo, ApiObjectList, Sticker
+from bot.api.domain import Message, Photo, ApiObjectList, Sticker, Document
 
 BULLET_STRING = "➡️ "
 START_CONTENT_STRING = "⬇ "
@@ -239,7 +239,70 @@ class DocumentMessageAnalyzer(MessageAnalyzer):
         return FormattedText().bold("📄 Document").concat(self._summarized_caption(max_characters=6))
 
     def get_full_content(self):
-        pass
+        text = self._full_content_header()
+        document = self.message.document
+        description = FormattedText()\
+            .normal("{bullet}Message is a{dimensions}{size} {document}")\
+            .start_format()\
+            .normal(bullet=self.bullet)\
+            .bold(dimensions=self._document_dimensions(document))\
+            .concat(size=self._formatted_size(document.file_size))\
+            .bold(document="📄 Document")\
+            .end_format()
+        text.concat(description)
+        text.concat(self.__get_mime_type_and_file_name(document))
+        text.concat(self._full_content("caption", prepend_newlines_if_content=True))
+        text.newline().newline()
+        text.normal(self.start_content).bold("Following is the document:")
+        document_message = Document.create_document(document.file_id)
+        if self.message.caption:
+            document_message.with_caption(self.message.caption)
+        return [text.build_message(), document_message]
+
+    def _document_dimensions(self, document):
+        width = document.width
+        height = document.height
+        if width and height:
+            return " " + self._printable_dimensions(width, height)
+        return ""
+
+    def __get_mime_type_and_file_name(self, document):
+        texts = []
+        mime_type = document.mime_type
+        file_name = document.file_name
+        if mime_type is not None:
+            texts.append(FormattedText().normal("Type: ").bold(mime_type))
+        if file_name is not None:
+            texts.append(FormattedText().normal("Name: ").bold(file_name))
+        if len(texts) > 0:
+            return FormattedText().newline().normal(self.bullet)\
+                .concat(FormattedText().normal(" | ").join(texts))
+        return FormattedText()
+
+
+class GifMessageAnalyzer(DocumentMessageAnalyzer):
+    def _get_summary(self):
+        return FormattedText().bold("🎥 GIF").concat(self._summarized_caption(max_characters=11))
+
+    def get_full_content(self):
+        text = self._full_content_header()
+        gif = self.message.document
+        description = FormattedText()\
+            .normal("{bullet}Message is a{dimensions}{size} {gif}")\
+            .start_format()\
+            .normal(bullet=self.bullet)\
+            .bold(dimensions=self._document_dimensions(gif))\
+            .concat(size=self._formatted_size(gif.file_size))\
+            .bold(gif="🎥 GIF")\
+            .end_format()
+        text.concat(description)
+        text.concat(self._full_content("caption", prepend_newlines_if_content=True))
+        text.newline().newline()
+        text.normal(self.start_content).bold("Following is the GIF:")
+        gif_message = Document.create_document(gif.file_id)
+        if self.message.caption:
+            gif_message.with_caption(self.message.caption)
+        return [text.build_message(), gif_message]
 
 
 class VoiceMessageAnalyzer(MessageAnalyzer):
