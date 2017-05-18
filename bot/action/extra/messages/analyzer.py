@@ -5,6 +5,8 @@ from bot.api.domain import Message, Photo, ApiObjectList, Sticker, Document
 BULLET_STRING = "➡️ "
 START_CONTENT_STRING = "⬇ "
 
+GIF_MIME_TYPE = "video/mp4"
+
 
 class MessageAnalyzer:
     def __init__(self, stored_message, user_storage_handler):
@@ -328,8 +330,11 @@ class MessageAnalyzerResolver:
         elif message_data.sticker:
             message_type = StickerMessageAnalyzer
         elif message_data.document:
-            # todo differentiate gifs
-            message_type = DocumentMessageAnalyzer
+            if message_data.document.mime_type == GIF_MIME_TYPE:
+                # treating all files of that mime type as gifs, until better way of identifying gifs is known
+                message_type = GifMessageAnalyzer
+            else:
+                message_type = DocumentMessageAnalyzer
         elif message_data.voice:
             message_type = VoiceMessageAnalyzer
         return message_type(stored_message, self.user_storage_handler)
