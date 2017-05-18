@@ -1,4 +1,4 @@
-from bot.api.domain import Message, OutApiObject, Photo, Sticker
+from bot.api.domain import Message, OutApiObject, Photo, Sticker, Document
 from bot.api.telegram import TelegramBotApi, TelegramBotApiException
 from bot.storage import State
 
@@ -29,6 +29,8 @@ class Api:
             return self.sendPhoto
         elif message_type == Sticker:
             return self.sendSticker
+        elif message_type == Document:
+            return self.sendDocument
         else:
             # fallback to sendMessage
             return self.sendMessage

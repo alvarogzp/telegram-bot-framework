@@ -97,6 +97,12 @@ class Sticker(Message):
         return Sticker(_type=Sticker, sticker=file_id)
 
 
+class Document(CaptionableMessage):
+    @staticmethod
+    def create_document(file_id):
+        return Document(_type=Document, document=file_id)
+
+
 class MessageEntityParser:
     def __init__(self, message):
         self.text_as_utf16_bytes = message.text.encode("utf-16")
