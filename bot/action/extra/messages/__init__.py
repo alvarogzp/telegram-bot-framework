@@ -259,6 +259,7 @@ class MessageStorageHandler:
         self.__replace_list_with_item_with_biggest(data, "photo", "height")
         self.__delete_if_present(data.get("sticker"), "thumb")
         self.__delete_if_present(data.get("document"), "thumb")
+        self.__delete_if_present(data.get("video_note"), "thumb")
         dump = json.dumps(data)
         self.state.set_value(str(message.message_id), dump + "\n", append=True)
 
