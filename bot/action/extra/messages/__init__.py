@@ -260,6 +260,7 @@ class MessageStorageHandler:
         self.__delete_if_present(data.get("sticker"), "thumb")
         self.__delete_if_present(data.get("document"), "thumb")
         self.__delete_if_present(data.get("video_note"), "thumb")
+        self.__delete_if_present(data.get("video"), "thumb")
         dump = json.dumps(data)
         self.state.set_value(str(message.message_id), dump + "\n", append=True)
 
