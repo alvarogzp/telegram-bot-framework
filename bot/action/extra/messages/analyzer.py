@@ -1,6 +1,7 @@
 from bot.action.util.format import TextSummarizer, DateFormatter, UserFormatter, SizeFormatter, TimeFormatter
 from bot.action.util.textformat import FormattedText
-from bot.api.domain import ApiObjectList, Message, CaptionableMessage, Photo, Sticker, Document, Voice, VideoNote, Audio
+from bot.api.domain import ApiObjectList, Message, CaptionableMessage, Photo, Sticker, Document, Voice, VideoNote, \
+    Audio, Video
 
 BULLET_STRING = "➡️ "
 START_CONTENT_STRING = "⬇ "
@@ -406,6 +407,36 @@ class AudioMessageAnalyzer(MessageAnalyzer):
         return [text.build_message(), audio_message]
 
 
+class VideoMessageAnalyzer(MessageAnalyzer):
+    @property
+    def printable_type(self):
+        return "🎬 Video"
+
+    def _get_summary(self):
+        return FormattedText().bold(self.printable_type).concat(self._summarized_caption(max_characters=9))
+
+    def get_full_content(self):
+        text = self._full_content_header()
+        video = self.message.video
+        description = FormattedText()\
+            .normal("{bullet}Message is a {dimensions}, {duration}{size} {video}")\
+            .start_format()\
+            .normal(bullet=self.bullet)\
+            .bold(dimensions=self._printable_dimensions(video.width, video.height))\
+            .bold(duration=TimeFormatter.format(video.duration))\
+            .concat(size=self._formatted_size(video.file_size))\
+            .bold(video=self.printable_type)\
+            .end_format()
+        text.concat(description)
+        text.concat(self._formatted_mime_type(video.mime_type))
+        text.concat(self._full_content("caption", prepend_newlines_if_content=True))
+        text.newline().newline()
+        text.normal(self.start_content).bold("Following is the video:")
+        video_message = Video.create_video(video.file_id)
+        self._add_caption_if_present(video_message)
+        return [text.build_message(), video_message]
+
+
 class MessageAnalyzerResolver:
     def __init__(self, user_storage_handler):
         self.user_storage_handler = user_storage_handler
@@ -431,6 +462,8 @@ class MessageAnalyzerResolver:
             analyzer = VideoNoteMessageAnalyzer
         elif message_data.audio:
             analyzer = AudioMessageAnalyzer
+        elif message_data.video:
+            analyzer = VideoMessageAnalyzer
         return analyzer(stored_message, self.user_storage_handler)
 
 
