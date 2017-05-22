@@ -111,8 +111,9 @@ class Voice(CaptionableMessage):
 
 class VideoNote(Message):
     @staticmethod
-    def create_video_note(file_id):
-        return VideoNote(_type=VideoNote, video_note=file_id)
+    def create_video_note(file_id, length):
+        # for some reason, api fails if length is not provided, although it is an optional field
+        return VideoNote(_type=VideoNote, video_note=file_id, length=length)
 
 
 class MessageEntityParser:
