@@ -91,9 +91,16 @@ class MessageAnalyzer:
             .normal(" sent on ").bold(self.full_date)\
             .normal(" by ").bold(self.full_user)\
             .normal(".").newline()
+        self.__add_reply_info_if_needed(text)
         self.__add_forwarded_info_if_needed(text)
         self.__add_edit_info_if_needed(text)
         return text.newline()
+
+    def __add_reply_info_if_needed(self, text):
+        reply_to_message = self.message.reply_to_message
+        if reply_to_message is not None:
+            text.normal(self.bullet).normal("The message is a ").bold("reply").normal(" to message ")\
+                .bold(reply_to_message).normal(".").newline()
 
     def __add_forwarded_info_if_needed(self, text):
         if self.message.forward_date:
