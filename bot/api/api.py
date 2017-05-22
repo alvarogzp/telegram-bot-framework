@@ -1,4 +1,4 @@
-from bot.api.domain import Message, OutApiObject, Photo, Sticker, Document, Voice
+from bot.api.domain import Message, OutApiObject, Photo, Sticker, Document, Voice, VideoNote
 from bot.api.telegram import TelegramBotApi, TelegramBotApiException
 from bot.storage import State
 
@@ -33,6 +33,8 @@ class Api:
             return self.sendDocument
         elif message_type == Voice:
             return self.sendVoice
+        elif message_type == VideoNote:
+            return self.sendVideoNote
         else:
             # fallback to sendMessage
             return self.sendMessage
