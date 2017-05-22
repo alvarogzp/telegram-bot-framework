@@ -1,6 +1,6 @@
 from bot.action.util.format import TextSummarizer, DateFormatter, UserFormatter, SizeFormatter, TimeFormatter
 from bot.action.util.textformat import FormattedText
-from bot.api.domain import ApiObjectList, Message, CaptionableMessage, Photo, Sticker, Document, Voice
+from bot.api.domain import ApiObjectList, Message, CaptionableMessage, Photo, Sticker, Document, Voice, VideoNote
 
 BULLET_STRING = "➡️ "
 START_CONTENT_STRING = "⬇ "
@@ -345,6 +345,33 @@ class VoiceMessageAnalyzer(MessageAnalyzer):
         return [text.build_message(), voice_message]
 
 
+class VideoNoteMessageAnalyzer(MessageAnalyzer):
+    @property
+    def printable_type(self):
+        return "📹 Video message"
+
+    def _get_summary(self):
+        return FormattedText().bold(self.printable_type)
+
+    def get_full_content(self):
+        text = self._full_content_header()
+        video_note = self.message.video_note
+        description = FormattedText()\
+            .normal("{bullet}Message is a {dimensions} {duration}{size} {video_note}")\
+            .start_format()\
+            .normal(bullet=self.bullet)\
+            .concat(dimensions=FormattedText().bold(video_note.length).bold("px"))\
+            .bold(duration=TimeFormatter.format(video_note.duration))\
+            .concat(size=self._formatted_size(video_note.file_size))\
+            .bold(video_note=self.printable_type)\
+            .end_format()
+        text.concat(description)
+        text.newline().newline()
+        text.normal(self.start_content).bold("Following is the video message:")
+        video_note_message = VideoNote.create_video_note(video_note.file_id, video_note.length)
+        return [text.build_message(), video_note_message]
+
+
 class MessageAnalyzerResolver:
     def __init__(self, user_storage_handler):
         self.user_storage_handler = user_storage_handler
@@ -366,6 +393,8 @@ class MessageAnalyzerResolver:
                 analyzer = DocumentMessageAnalyzer
         elif message_data.voice:
             analyzer = VoiceMessageAnalyzer
+        elif message_data.video_note:
+            analyzer = VideoNoteMessageAnalyzer
         return analyzer(stored_message, self.user_storage_handler)
 
 
