@@ -158,8 +158,11 @@ class MessageAnalyzer:
             return FormattedText()
 
     def _formatted_mime_type(self, mime_type):
-        if mime_type is not None:
-            return FormattedText().newline().normal(self.bullet).normal("Type: ").bold(mime_type)
+        return self._formatted_line_if_present(mime_type, "Type")
+
+    def _formatted_line_if_present(self, value, display_name):
+        if value is not None:
+            return FormattedText().newline().normal(self.bullet).normal(display_name).normal(": ").bold(value)
         else:
             return FormattedText()
 
