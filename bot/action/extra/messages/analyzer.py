@@ -361,7 +361,7 @@ class VideoNoteMessageAnalyzer(MessageAnalyzer):
         text = self._full_content_header()
         video_note = self.message.video_note
         description = FormattedText()\
-            .normal("{bullet}Message is a {dimensions} {duration}{size} {video_note}")\
+            .normal("{bullet}Message is a {dimensions}, {duration}{size} {video_note}")\
             .start_format()\
             .normal(bullet=self.bullet)\
             .concat(dimensions=FormattedText().bold(video_note.length).bold("px"))\
