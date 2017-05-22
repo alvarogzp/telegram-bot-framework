@@ -71,7 +71,14 @@ class ListMessageAction(Action):
     @staticmethod
     def get_response_help(event, help_args):
         args = ["[recent number_of_messages]", "[show] message_id", "ranking [number_of_users]", "opt-out [action]"]
-        description = "By default, display a list with information about last messages.\n" \
+        description = "_Have you ever wondered that, like in WhatsApp, Telegram messages could not be deleted or" \
+                      " edited once sent?_\n" \
+                      "Then this is for you! It allows you to recover deleted messages content, or original text"\
+                      " of edited messages.\n\n" \
+                      "Note that there is a way to opt-out to avoid your messages being recovered (see at the end of"\
+                      " this message). Keep in mind that group admins can still configure the group to override"\
+                      " opt-out on that specific group.\n\n" \
+                      "By default, this command displays a list with information about last messages.\n" \
                       "You can use *recent* with a number to modify the number of messages to list" \
                       " (default is 10).\n\n" \
                       "Use *show* along with a message\\_id to view that particular message.\n\n" \
