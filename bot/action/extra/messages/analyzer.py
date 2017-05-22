@@ -1,6 +1,6 @@
 from bot.action.util.format import TextSummarizer, DateFormatter, UserFormatter, SizeFormatter, TimeFormatter
 from bot.action.util.textformat import FormattedText
-from bot.api.domain import ApiObjectList, Message, CaptionableMessage, Photo, Sticker, Document, Voice, VideoNote
+from bot.api.domain import ApiObjectList, Message, CaptionableMessage, Photo, Sticker, Document, Voice, VideoNote, Audio
 
 BULLET_STRING = "➡️ "
 START_CONTENT_STRING = "⬇ "
@@ -375,6 +375,37 @@ class VideoNoteMessageAnalyzer(MessageAnalyzer):
         return [text.build_message(), video_note_message]
 
 
+class AudioMessageAnalyzer(MessageAnalyzer):
+    @property
+    def printable_type(self):
+        return "🎧 Audio"
+
+    def _get_summary(self):
+        return FormattedText().bold(self.printable_type).concat(self._summarized_caption(max_characters=9))
+
+    def get_full_content(self):
+        text = self._full_content_header()
+        audio = self.message.audio
+        description = FormattedText()\
+            .normal("{bullet}Message is a {duration}{size} {audio}")\
+            .start_format()\
+            .normal(bullet=self.bullet)\
+            .bold(duration=TimeFormatter.format(audio.duration))\
+            .concat(size=self._formatted_size(audio.file_size))\
+            .bold(audio=self.printable_type)\
+            .end_format()
+        text.concat(description)
+        text.concat(self._formatted_line_if_present(audio.performer, "Performer"))
+        text.concat(self._formatted_line_if_present(audio.title, "Title"))
+        text.concat(self._formatted_mime_type(audio.mime_type))
+        text.concat(self._full_content("caption", prepend_newlines_if_content=True))
+        text.newline().newline()
+        text.normal(self.start_content).bold("Following is the audio:")
+        audio_message = Audio.create_audio(audio.file_id)
+        self._add_caption_if_present(audio_message)
+        return [text.build_message(), audio_message]
+
+
 class MessageAnalyzerResolver:
     def __init__(self, user_storage_handler):
         self.user_storage_handler = user_storage_handler
@@ -398,6 +429,8 @@ class MessageAnalyzerResolver:
             analyzer = VoiceMessageAnalyzer
         elif message_data.video_note:
             analyzer = VideoNoteMessageAnalyzer
+        elif message_data.audio:
+            analyzer = AudioMessageAnalyzer
         return analyzer(stored_message, self.user_storage_handler)
 
 
