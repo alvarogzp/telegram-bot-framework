@@ -1,7 +1,7 @@
 from bot.action.util.format import TextSummarizer, DateFormatter, UserFormatter, SizeFormatter, TimeFormatter
 from bot.action.util.textformat import FormattedText
 from bot.api.domain import ApiObjectList, Message, CaptionableMessage, Photo, Sticker, Document, Voice, VideoNote, \
-    Audio, Video
+    Audio, Video, Location
 
 BULLET_STRING = "➡️ "
 START_CONTENT_STRING = "⬇ "
@@ -444,6 +444,33 @@ class VideoMessageAnalyzer(MessageAnalyzer):
         return [text.build_message(), video_message]
 
 
+class LocationMessageAnalyzer(MessageAnalyzer):
+    @property
+    def printable_type(self):
+        return "🗺 Location"
+
+    def _get_summary(self):
+        return FormattedText().bold(self.printable_type)
+
+    def get_full_content(self):
+        text = self._full_content_header()
+        location = self.message.location
+        description = FormattedText()\
+            .normal("{bullet}Message is a {location}")\
+            .start_format()\
+            .normal(bullet=self.bullet)\
+            .bold(location=self.printable_type)\
+            .end_format()
+        text.concat(description)
+        text.newline()
+        text.concat(self._formatted_line_if_present(location.latitude, "Latitude"))
+        text.concat(self._formatted_line_if_present(location.longitude, "Longitude"))
+        text.newline().newline()
+        text.normal(self.start_content).bold("Following is the location:")
+        location_message = Location.create_location(location.latitude, location.longitude)
+        return [text.build_message(), location_message]
+
+
 class MessageAnalyzerResolver:
     def __init__(self, user_storage_handler):
         self.user_storage_handler = user_storage_handler
@@ -471,6 +498,8 @@ class MessageAnalyzerResolver:
             analyzer = AudioMessageAnalyzer
         elif message_data.video:
             analyzer = VideoMessageAnalyzer
+        elif message_data.location:
+            analyzer = LocationMessageAnalyzer
         return analyzer(stored_message, self.user_storage_handler)
 
 

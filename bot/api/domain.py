@@ -128,6 +128,12 @@ class Video(CaptionableMessage):
         return Voice(_type=Video, video=file_id)
 
 
+class Location(Message):
+    @staticmethod
+    def create_location(latitude, longitude):
+        return VideoNote(_type=Location, latitude=latitude, longitude=longitude)
+
+
 class MessageEntityParser:
     def __init__(self, message):
         self.text_as_utf16_bytes = message.text.encode("utf-16")
