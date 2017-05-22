@@ -116,6 +116,12 @@ class VideoNote(Message):
         return VideoNote(_type=VideoNote, video_note=file_id, length=length)
 
 
+class Audio(CaptionableMessage):
+    @staticmethod
+    def create_audio(file_id):
+        return Voice(_type=Audio, audio=file_id)
+
+
 class MessageEntityParser:
     def __init__(self, message):
         self.text_as_utf16_bytes = message.text.encode("utf-16")
