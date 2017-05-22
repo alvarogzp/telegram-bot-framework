@@ -119,19 +119,19 @@ class VideoNote(Message):
 class Audio(CaptionableMessage):
     @staticmethod
     def create_audio(file_id):
-        return Voice(_type=Audio, audio=file_id)
+        return Audio(_type=Audio, audio=file_id)
 
 
 class Video(CaptionableMessage):
     @staticmethod
     def create_video(file_id):
-        return Voice(_type=Video, video=file_id)
+        return Video(_type=Video, video=file_id)
 
 
 class Location(Message):
     @staticmethod
     def create_location(latitude, longitude):
-        return VideoNote(_type=Location, latitude=latitude, longitude=longitude)
+        return Location(_type=Location, latitude=latitude, longitude=longitude)
 
 
 class MessageEntityParser:
