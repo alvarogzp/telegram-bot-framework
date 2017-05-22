@@ -1,7 +1,7 @@
 from bot.action.util.format import TextSummarizer, DateFormatter, UserFormatter, SizeFormatter, TimeFormatter
 from bot.action.util.textformat import FormattedText
 from bot.api.domain import ApiObjectList, Message, CaptionableMessage, Photo, Sticker, Document, Voice, VideoNote, \
-    Audio, Video, Location
+    Audio, Video, Location, Contact
 
 BULLET_STRING = "➡️ "
 START_CONTENT_STRING = "⬇ "
@@ -471,6 +471,36 @@ class LocationMessageAnalyzer(MessageAnalyzer):
         return [text.build_message(), location_message]
 
 
+class ContactMessageAnalyzer(MessageAnalyzer):
+    @property
+    def printable_type(self):
+        return "👤 Contact"
+
+    def _get_summary(self):
+        return FormattedText().bold(self.printable_type)
+
+    def get_full_content(self):
+        text = self._full_content_header()
+        contact = self.message.contact
+        description = FormattedText()\
+            .normal("{bullet}Message is a{telegram} {contact}")\
+            .start_format()\
+            .normal(bullet=self.bullet)\
+            .bold(telegram=" telegram" if contact.user_id is not None else "")\
+            .bold(contact=self.printable_type)\
+            .end_format()
+        text.concat(description)
+        text.newline()
+        text.concat(self._formatted_line_if_present(contact.user_id, "Telegram ID"))
+        text.concat(self._formatted_line_if_present(contact.first_name, "First name"))
+        text.concat(self._formatted_line_if_present(contact.last_name, "Last name"))
+        text.concat(self._formatted_line_if_present(contact.phone_number, "Phone number"))
+        text.newline().newline()
+        text.normal(self.start_content).bold("Following is the contact:")
+        contact_message = Contact.create_contact(contact.phone_number, contact.first_name, contact.last_name)
+        return [text.build_message(), contact_message]
+
+
 class MessageAnalyzerResolver:
     def __init__(self, user_storage_handler):
         self.user_storage_handler = user_storage_handler
@@ -500,6 +530,8 @@ class MessageAnalyzerResolver:
             analyzer = VideoMessageAnalyzer
         elif message_data.location:
             analyzer = LocationMessageAnalyzer
+        elif message_data.contact:
+            analyzer = ContactMessageAnalyzer
         return analyzer(stored_message, self.user_storage_handler)
 
 

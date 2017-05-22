@@ -134,6 +134,12 @@ class Location(Message):
         return Location(_type=Location, latitude=latitude, longitude=longitude)
 
 
+class Contact(Message):
+    @staticmethod
+    def create_contact(phone_number, first_name, last_name=None):
+        return Contact(_type=Contact, phone_number=phone_number, first_name=first_name, last_name=last_name)
+
+
 class MessageEntityParser:
     def __init__(self, message):
         self.text_as_utf16_bytes = message.text.encode("utf-16")
