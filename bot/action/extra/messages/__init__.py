@@ -245,7 +245,7 @@ class OptOutManager:
     def remove_user(self, user_id):
         users = self.state.opted_out_from_messages_feature.splitlines()
         users.remove(str(user_id))
-        self.state.opted_out_from_messages_feature = "\n".join(users)
+        self.state.opted_out_from_messages_feature = "".join((user + "\n" for user in users))
 
 
 class MessageStorageHandler:
