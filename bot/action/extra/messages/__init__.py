@@ -107,7 +107,7 @@ class ListMessageAction(Action):
         if message is None:
             return Message.create("Invalid message_id.\nUse " + event.command + " to get valid message_ids.")
         user_storage_handler = UserStorageHandler.get_instance(self.state)
-        if OptOutManager(self.state).has_user_opted_out(message.user_id) and message.user_id != event.message.from_.id:
+        if not OptOutManager(self.state).should_display_message(event, message.user_id):
             user = UserFormatter.retrieve_and_format(message.user_id, user_storage_handler)
             return FormattedText().normal("🙁 Sorry, ").bold(user).normal(" has opted-out from this feature.").build_message()
         return message.printable_full_message(user_storage_handler)
@@ -235,6 +235,11 @@ class MessageIdSorter:
 class OptOutManager:
     def __init__(self, global_state):
         self.state = global_state
+
+    def should_display_message(self, event, user_id):
+        return event.settings.get(ChatSettings.OVERRIDE_MESSAGES_OPT_OUT) == "on" or \
+               not self.has_user_opted_out(user_id) or \
+               user_id == event.message.from_.id
 
     def has_user_opted_out(self, user_id):
         return str(user_id) in self.state.opted_out_from_messages_feature.splitlines()
