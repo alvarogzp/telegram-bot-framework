@@ -164,21 +164,21 @@ class ListMessageAction(Action):
         had_user_opted_out = manager.has_user_opted_out(user_id)
         if action == "add-me":
             if had_user_opted_out:
-                response = FormattedText().normal("❌ You had already opted-out.")
+                response = FormattedText().bold("❌ You had already opted-out.")
             else:
                 manager.add_user(user_id)
-                response = FormattedText().normal("✅ You have been added to the opt-out list of this feature.")
+                response = FormattedText().bold("✅ You have been added to the opt-out list of this feature.")
         elif action == "remove-me":
             if not had_user_opted_out:
-                response = FormattedText().normal("❌ You are not currently on the list.")
+                response = FormattedText().bold("❌ You are not currently on the list.")
             else:
                 manager.remove_user(user_id)
-                response = FormattedText().normal("✅ You have been removed from the opt-out list of this feature.")
+                response = FormattedText().bold("✅ You have been removed from the opt-out list of this feature.")
         else:
             if had_user_opted_out:
-                response = FormattedText().normal("🙃 You are in the opt-out list.")
+                response = FormattedText().bold("🙃 You are in the opt-out list.")
             else:
-                response = FormattedText().normal("🙂 You are NOT in the opt-out list.")
+                response = FormattedText().bold("🙂 You are NOT in the opt-out list.")
         if manager.is_override_enabled_on_chat(event):
             response.newline().newline()\
                 .bold("⚠️ Opt-out override is currently enabled on this chat ⚠️").newline()\
