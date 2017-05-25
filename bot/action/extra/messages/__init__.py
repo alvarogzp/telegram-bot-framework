@@ -75,9 +75,12 @@ class ListMessageAction(Action):
                       " edited once sent?_\n" \
                       "Then this is for you! It allows you to recover deleted messages content, or original text"\
                       " of edited messages.\n\n" \
-                      "Note that there is a way to opt-out to avoid your messages being recovered (see at the end of"\
-                      " this message). Keep in mind that group admins can still configure the group to override"\
-                      " opt-out on that specific group.\n\n" \
+                      "There is a way to opt-out to avoid your messages being recovered (see at the end of this"\
+                      " message). Keep in mind that group admins can still configure the group to override opt-out"\
+                      " on that specific group (by setting `override_messages_opt_out` to `off` in `/settings`).\n\n" \
+                      "Group admins can also disable completely this feature on the group. That will disable" \
+                      " message storing and retrieving via this command. To do it, set `store_messages`" \
+                      " to `off` using the `/settings` command.\n\n" \
                       "By default, this command displays a list with information about last messages.\n" \
                       "You can use *recent* with a number to modify the number of messages to list" \
                       " (default is 10).\n\n" \
