@@ -43,6 +43,8 @@ class ListMessageAction(Action):
                     response = self.get_response_show(event, messages, action_param)
                 else:
                     response = self.get_response_ranking(event, messages, action_param)
+        elif action == "whereis":
+            response = self.get_response_whereis(event, action_param)
         elif action == "opt-out":
             response = self.get_response_opt_out(event, action_param)
         else:
@@ -67,7 +69,7 @@ class ListMessageAction(Action):
             if args[0].isnumeric():
                 action = "show"
                 action_param = int(args[0])
-            elif args[0] != "show":
+            elif args[0] not in ("show", "whereis"):
                 action = args[0]
         elif len(args) == 2:
             if args[1].isnumeric() or args[0] == "opt-out":
@@ -138,6 +140,18 @@ class ListMessageAction(Action):
     def __build_success_response_message(event, title, printable_messages):
         footer = FormattedText().normal("\n\nWrite ").bold(event.command + " help").normal(" to see more options.")
         return FormattedText().normal(title + "\n").concat(printable_messages).concat(footer).build_message()
+
+    def get_response_whereis(self, event, message_id):
+        return FormattedText().bold("👆 Here is message ").code_inline(message_id).bold(".")\
+            .build_message().reply_to_message(message_id=message_id)\
+            .with_error_callback(lambda e: self.api.send_message(
+                FormattedText().bold("❌ Sorry, message ").code_inline(message_id).bold(" cannot be located.")
+                .newline().newline().normal("Possible causes:").newline()
+                .normal("· The message may have been deleted.").newline()
+                .normal("· The message ID you entered may not be valid. They should be positive numbers.").newline()
+                .normal("· If you recently converted the group to a supergroup, messages sent before the conversion"
+                        " took place cannot be replied to.")
+                .build_message().to_chat_replying(event.message)))
 
     def get_response_opt_out(self, event, action):
         manager = OptOutManager(self.state)
