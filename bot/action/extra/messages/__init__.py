@@ -179,6 +179,10 @@ class ListMessageAction(Action):
                 response = FormattedText().normal("🙃 You are in the opt-out list.")
             else:
                 response = FormattedText().normal("🙂 You are NOT in the opt-out list.")
+        if manager.is_override_enabled_on_chat(event):
+            response.newline().newline()\
+                .bold("⚠️ Opt-out override is currently enabled on this chat ⚠️").newline()\
+                .normal("Opt-out list is not in effect here while override is enabled.")
         return response.build_message()
 
 
@@ -273,9 +277,13 @@ class OptOutManager:
         self.state = global_state
 
     def should_display_message(self, event, user_id):
-        return event.settings.get(ChatSettings.OVERRIDE_MESSAGES_OPT_OUT) == "on" or \
+        return self.is_override_enabled_on_chat(event) or \
                not self.has_user_opted_out(user_id) or \
                user_id == event.message.from_.id
+
+    @staticmethod
+    def is_override_enabled_on_chat(event):
+        return event.settings.get(ChatSettings.OVERRIDE_MESSAGES_OPT_OUT) == "on"
 
     def has_user_opted_out(self, user_id):
         return str(user_id) in self.state.opted_out_from_messages_feature.splitlines()
