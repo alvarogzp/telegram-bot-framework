@@ -15,9 +15,13 @@ MIN_MESSAGES_TO_KEEP = 5000
 MAX_MESSAGES_TO_KEEP = 15000
 
 
+def is_store_messages_enabled(event):
+    return event.settings.get(ChatSettings.STORE_MESSAGES) == "on"
+
+
 class SaveMessageAction(Action):
     def process(self, event):
-        if event.settings.get(ChatSettings.STORE_MESSAGES) == "on":
+        if is_store_messages_enabled(event):
             storage_handler = MessageStorageHandler(event)
             storage_handler.save_message(event.message)
             storage_handler.delete_old_messages()
@@ -27,15 +31,18 @@ class ListMessageAction(Action):
     def process(self, event):
         action, action_param, help_args = self.parse_args(event.command_args.split())
         if action in ("recent", "show", "ranking"):
-            messages = MessageStorageHandler(event).get_stored_messages()
-            if messages.is_empty():
-                response = self.get_response_empty()
-            elif action == "recent":
-                response = self.get_response_recent(event, messages, action_param)
-            elif action == "show":
-                response = self.get_response_show(event, messages, action_param)
+            if not is_store_messages_enabled(event):
+                response = self.get_response_disabled()
             else:
-                response = self.get_response_ranking(event, messages, action_param)
+                messages = MessageStorageHandler(event).get_stored_messages()
+                if messages.is_empty():
+                    response = self.get_response_empty()
+                elif action == "recent":
+                    response = self.get_response_recent(event, messages, action_param)
+                elif action == "show":
+                    response = self.get_response_show(event, messages, action_param)
+                else:
+                    response = self.get_response_ranking(event, messages, action_param)
         elif action == "opt-out":
             response = self.get_response_opt_out(event, action_param)
         else:
@@ -93,6 +100,13 @@ class ListMessageAction(Action):
                       "While you are in the opt-out list, nobody but you can show the content of your messages using" \
                       " this feature, in any group."
         return CommandUsageMessage.get_usage_message(event.command, args, description)
+
+    @staticmethod
+    def get_response_disabled():
+        return FormattedText().bold("Sorry, this feature is disabled on this chat. 😕").newline().newline()\
+            .normal("Group admins can enable it using the following command:").newline()\
+            .code_inline("/settings set store_messages on")\
+            .build_message()
 
     @staticmethod
     def get_response_empty():
