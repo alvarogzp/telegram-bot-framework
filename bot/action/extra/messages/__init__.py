@@ -72,9 +72,12 @@ class ListMessageAction(Action):
             elif args[0] not in ("show", "whereis"):
                 action = args[0]
         elif len(args) == 2:
-            if args[1].isnumeric() or args[0] == "opt-out":
-                action_param = int(args[1]) if args[0] != "opt-out" else args[1]
+            if args[0] == "opt-out":
                 action = args[0]
+                action_param = args[1]
+            elif args[1].isnumeric():
+                action = args[0]
+                action_param = int(args[1])
         return action, action_param, help_args
 
     @staticmethod
