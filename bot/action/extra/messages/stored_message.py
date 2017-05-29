@@ -14,24 +14,24 @@ class StoredMessageMapper:
         self.__delete_if_present(data.get("video"), "thumb")
         return data
 
-    def __replace_with_id_if_present(self, dict, key, id_key="id"):
-        if self.__is_present(dict, key):
-            dict[key] = dict[key][id_key]
+    def __replace_with_id_if_present(self, data, key, id_key="id"):
+        if self.__is_present(data, key):
+            data[key] = data[key][id_key]
 
     @staticmethod
-    def __delete_if_present(dict, key):
-        if dict is not None:
-            dict.pop(key, None)
+    def __delete_if_present(data, key):
+        if data is not None:
+            data.pop(key, None)
 
-    def __replace_list_with_item_with_biggest(self, dict, key, attr):
-        if self.__is_present(dict, key):
+    def __replace_list_with_item_with_biggest(self, data, key, attr):
+        if self.__is_present(data, key):
             biggest = None
-            for item in dict[key]:
+            for item in data[key]:
                 if biggest is None or item[attr] >= biggest[attr]:
                     biggest = item
             if biggest is not None:
-                dict[key] = biggest
+                data[key] = biggest
 
     @staticmethod
-    def __is_present(dict, key):
-        return dict.get(key) is not None
+    def __is_present(data, key):
+        return data.get(key) is not None
