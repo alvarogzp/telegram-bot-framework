@@ -274,13 +274,30 @@ class MessageGroup:
 
 
 class MessageIdOperations:
-    @staticmethod
-    def sorted(ids, reverse=False, keep_only_first=None):
-        int_ids = [int(id_) for id_ in ids]
+    @classmethod
+    def sorted(cls, ids, reverse=False, keep_only_first=None):
+        int_ids = cls.__to_int(ids)
         int_ids.sort(reverse=reverse)
-        if keep_only_first is not None:
-            int_ids = int_ids[:keep_only_first]
-        return [str(id_) for id_ in int_ids]
+        int_ids = cls.keep_only_first(int_ids, keep_only_first)
+        return cls.__to_str(int_ids)
+
+    @classmethod
+    def __to_int(cls, ids):
+        return cls.__to(int, ids)
+
+    @classmethod
+    def __to_str(cls, ids):
+        return cls.__to(str, ids)
+
+    @staticmethod
+    def __to(func, ids):
+        return [func(id_) for id_ in ids]
+
+    @staticmethod
+    def keep_only_first(ids, number_of_elements_to_keep):
+        if number_of_elements_to_keep is not None:
+            ids = ids[:number_of_elements_to_keep]
+        return ids
 
 
 class OptOutManager:
