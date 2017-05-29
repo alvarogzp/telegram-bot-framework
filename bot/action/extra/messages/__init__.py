@@ -153,7 +153,9 @@ class ListMessageAction(Action):
     @staticmethod
     def __build_success_response_message(event, title, printable_messages):
         footer = FormattedText().normal("\n\nWrite ").bold(event.command + " help").normal(" to see more options.")
-        return FormattedText().normal(title + "\n").concat(printable_messages).concat(footer).build_message()
+        if not isinstance(title, FormattedText):
+            title = FormattedText().normal(title)
+        return FormattedText().concat(title).newline().concat(printable_messages).concat(footer).build_message()
 
     def get_response_whereis(self, event, message_id):
         return FormattedText().bold("👆 Here is message ").code_inline(message_id).bold(".")\
