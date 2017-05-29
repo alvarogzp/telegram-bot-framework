@@ -80,6 +80,7 @@ class ListMessageAction(Action):
     @staticmethod
     def get_response_help(event, help_args):
         args = ["[recent number_of_messages]",
+                "from [message_id] [number_of_messages]",
                 "[show] message_id",
                 "ranking [number_of_users]",
                 "whereis message_id",
@@ -97,6 +98,11 @@ class ListMessageAction(Action):
                       "By default, this command displays a list with information about last messages.\n" \
                       "You can use *recent* with a number to modify the number of messages to list" \
                       " (default is 10).\n\n" \
+                      "Use *from* to get a list of messages sent after a specific one.\n" \
+                      "The message you want to use as a reference can be specified by its `message_id`, or by sending" \
+                      " this command as a reply to the message you want to use as reference.\n" \
+                      "You can also add the `number_of_messages` you want to be listed. If using this command by "\
+                      "replying a message, this is the only parameter accepted.\n\n" \
                       "Use *show* along with a `message_id` to view that particular message.\n\n" \
                       "Use *ranking* to display a ranking of the users who wrote most recent messages" \
                       " (approximately last 1000 messages are counted).\n" \
