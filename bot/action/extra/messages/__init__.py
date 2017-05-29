@@ -247,7 +247,7 @@ class MessageList:
         if limit <= 0:
             ids = []
         else:
-            ids = MessageIdOperations.sorted(self.ids, reverse=True, keep_only_first=limit)
+            ids = reversed(MessageIdOperations.sorted(self.ids, reverse=True, keep_only_first=limit))
         return MessageList(ids, self.storage)
 
     def printable_info(self, event, user_storage_handler):
