@@ -245,7 +245,7 @@ class MessageList:
         if limit <= 0:
             ids = []
         else:
-            ids = MessageIdSorter.sorted(self.ids, reverse=True, keep_only_first=limit)
+            ids = MessageIdOperations.sorted(self.ids, reverse=True, keep_only_first=limit)
         return MessageList(ids, self.storage)
 
     def printable_info(self, event, user_storage_handler):
@@ -271,7 +271,7 @@ class MessageGroup:
              for user_id, count in self.grouped_messages)))
 
 
-class MessageIdSorter:
+class MessageIdOperations:
     @staticmethod
     def sorted(ids, reverse=False, keep_only_first=None):
         int_ids = [int(id_) for id_ in ids]
@@ -355,7 +355,7 @@ class MessageStorageHandler:
         stored_ids = self.state.list_keys()
         if len(stored_ids) > MAX_MESSAGES_TO_KEEP:
             number_of_messages_to_delete = len(stored_ids) - MIN_MESSAGES_TO_KEEP
-            ids_to_delete = MessageIdSorter.sorted(stored_ids, keep_only_first=number_of_messages_to_delete)
+            ids_to_delete = MessageIdOperations.sorted(stored_ids, keep_only_first=number_of_messages_to_delete)
             self.__delete_messages(ids_to_delete)
 
     def __delete_messages(self, message_ids_to_delete):
