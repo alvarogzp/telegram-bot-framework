@@ -29,8 +29,8 @@ class SaveMessageAction(Action):
 
 class ListMessageAction(Action):
     def process(self, event):
-        action, action_param, help_args = self.parse_args(event.command_args.split())
-        if action in ("recent", "show", "ranking"):
+        action, action_param, help_args = self.parse_args(event.command_args.split(), event.message.reply_to_message)
+        if action in ("recent", "from", "show", "ranking"):
             if not is_store_messages_enabled(event):
                 response = self.get_response_disabled()
             else:
@@ -39,6 +39,8 @@ class ListMessageAction(Action):
                     response = self.get_response_empty()
                 elif action == "recent":
                     response = self.get_response_recent(event, messages, action_param)
+                elif action == "from":
+                    response = self.get_response_from(event, messages, *action_param)
                 elif action == "show":
                     response = self.get_response_show(event, messages, action_param)
                 else:
@@ -59,7 +61,7 @@ class ListMessageAction(Action):
             last_message = self.api.send_message(message)
 
     @staticmethod
-    def parse_args(args):
+    def parse_args(args, reply_to_message):
         action = "help"
         action_param = 10
         help_args = args[1:]
@@ -69,8 +71,11 @@ class ListMessageAction(Action):
             if args[0].isnumeric():
                 action = "show"
                 action_param = int(args[0])
-            elif args[0] not in ("show", "whereis"):
+            elif args[0] not in ("show", "whereis", "from"):
                 action = args[0]
+            elif args[0] == "from" and reply_to_message is not None:
+                action = args[0]
+                action_param = (reply_to_message.message_id, action_param)
         elif len(args) == 2:
             if args[0] == "opt-out":
                 action = args[0]
@@ -78,6 +83,15 @@ class ListMessageAction(Action):
             elif args[1].isnumeric():
                 action = args[0]
                 action_param = int(args[1])
+            if args[0] == "from":
+                if reply_to_message is None:
+                    action_param = (action_param, 10)
+                else:
+                    action_param = (reply_to_message.message_id, action_param)
+        elif len(args) == 3:
+            if args[0] == "from" and reply_to_message is None and args[1].isnumeric() and args[2].isnumeric():
+                action = args[0]
+                action_param = (int(args[1]), int(args[2]))
         return action, action_param, help_args
 
     @staticmethod
@@ -134,6 +148,13 @@ class ListMessageAction(Action):
         sorted_messages = messages.most_recent(number_of_messages_to_display)
         printable_messages = sorted_messages.printable_info(event, user_storage_handler)
         return self.__build_success_response_message(event, "Most recent messages:", printable_messages)
+
+    def get_response_from(self, event, messages, from_message_id, number_of_messages_to_display):
+        user_storage_handler = UserStorageHandler.get_instance(self.state)
+        sorted_messages = messages.slice_from(from_message_id, number_of_messages_to_display)
+        printable_messages = sorted_messages.printable_info(event, user_storage_handler)
+        title = FormattedText().normal("Messages from {0}:").start_format().bold(from_message_id).end_format()
+        return self.__build_success_response_message(event, title, printable_messages)
 
     def get_response_show(self, event, messages, message_id):
         message = messages.get(message_id)
@@ -250,6 +271,13 @@ class MessageList:
             ids = reversed(MessageIdOperations.sorted(self.ids, reverse=True, keep_only_first=limit))
         return MessageList(ids, self.storage)
 
+    def slice_from(self, from_id, limit):
+        if limit <= 0:
+            ids = []
+        else:
+            ids = MessageIdOperations.sliced(self.ids, from_id=from_id, keep_only_first=limit)
+        return MessageList(ids, self.storage)
+
     def printable_info(self, event, user_storage_handler):
         return FormattedText().normal("\n")\
             .join((message.printable_info(event, user_storage_handler) for message in self.__get_messages()))
@@ -278,6 +306,21 @@ class MessageIdOperations:
     def sorted(cls, ids, reverse=False, keep_only_first=None):
         int_ids = cls.__to_int(ids)
         int_ids.sort(reverse=reverse)
+        int_ids = cls.keep_only_first(int_ids, keep_only_first)
+        return cls.__to_str(int_ids)
+
+    @classmethod
+    def sliced(cls, ids, from_id, keep_only_first=None):
+        int_ids = cls.__to_int(ids)
+        int_ids.sort()
+        if len(int_ids) == 0 or from_id > int_ids[-1]:
+            return []
+        min_id = int_ids[0]
+        from_id = from_id if from_id > min_id else min_id
+        while from_id not in int_ids:
+            from_id += 1
+        index = int_ids.index(from_id)
+        int_ids = int_ids[index:]
         int_ids = cls.keep_only_first(int_ids, keep_only_first)
         return cls.__to_str(int_ids)
 
