@@ -1,22 +1,27 @@
-from bot.api.domain import Message
+from bot.action.util.textformat import FormattedText
 
 
 class CommandUsageMessage:
     @classmethod
-    def get_usage_message(cls, command, args=None, description=""):
-        message = "*Usage*\n"
+    def get_formatted_usage_text(cls, command, args=None, description=""):
+        text = FormattedText().bold("Usage").newline()
         if type(args) is list:
-            message += "\n".join((cls.__get_command_with_args(command, arg) for arg in args))
+            text.concat(FormattedText().newline().join((cls.__get_command_with_args(command, arg) for arg in args)))
         else:
-            message += cls.__get_command_with_args(command, args)
+            text.concat(cls.__get_command_with_args(command, args))
         if description:
-            message += "\n\n" + description
-        return Message.create(message, parse_mode="Markdown", disable_web_page_preview=True)
+            if not isinstance(description, FormattedText):
+                description = FormattedText().normal(description)
+            text.newline().newline().concat(description)
+        return text
+
+    @classmethod
+    def get_usage_message(cls, command, args=None, description=""):
+        return cls.get_formatted_usage_text(command, args, description).build_message()
 
     @staticmethod
     def __get_command_with_args(command, args):
-        text = "`" + command
+        text = command
         if args:
             text += " " + args
-        text += "`"
-        return text
+        return FormattedText().code_inline(text)
