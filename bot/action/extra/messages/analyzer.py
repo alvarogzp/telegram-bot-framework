@@ -3,6 +3,7 @@ from bot.action.util.textformat import FormattedText
 from bot.api.domain import ApiObjectList, Message, CaptionableMessage, Photo, Sticker, Document, Voice, VideoNote, \
     Audio, Video, Location, Contact
 
+INFO_STRING = "ℹ️ "
 BULLET_STRING = "➡️ "
 START_CONTENT_STRING = "⬇ "
 
@@ -14,6 +15,7 @@ class MessageAnalyzer:
         self.message_id = stored_message.message_id
         self.message = stored_message.message
         self.edited_messages = stored_message.edited_messages
+        self.incomplete = stored_message.incomplete
         self.user_storage_handler = user_storage_handler
 
     def get_short_info(self, show_command):
@@ -66,6 +68,10 @@ class MessageAnalyzer:
         return UserFormatter.retrieve(user_id, self.user_storage_handler)
 
     @property
+    def info(self):
+        return INFO_STRING
+
+    @property
     def bullet(self):
         return BULLET_STRING
 
@@ -91,10 +97,17 @@ class MessageAnalyzer:
             .normal(" sent on ").bold(self.full_date)\
             .normal(" by ").bold(self.full_user)\
             .normal(".").newline()
+        self.__add_incomplete_info_if_needed(text)
         self.__add_reply_info_if_needed(text)
         self.__add_forwarded_info_if_needed(text)
         self.__add_edit_info_if_needed(text)
         return text.newline()
+
+    def __add_incomplete_info_if_needed(self, text):
+        if self.incomplete:
+            text.normal(self.info).normal("Message not found in local database."
+                                          " Some information is missing (edits and reply info).")\
+                .newline()
 
     def __add_reply_info_if_needed(self, text):
         reply_to_message = self.message.reply_to_message
