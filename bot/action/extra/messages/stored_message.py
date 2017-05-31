@@ -1,15 +1,16 @@
 import json
 
 from bot.action.core.command import UnderscoredCommandBuilder
-from bot.action.extra.messages import analyzer
+from bot.action.extra.messages import analyzer, StoredMessageMapper
 from bot.api.domain import ApiObject
 
 
 class StoredMessage:
-    def __init__(self, message_id, message, *edited_messages):
+    def __init__(self, message_id, message, *edited_messages, incomplete=False):
         self.message_id = message_id
         self.message = message
         self.edited_messages = edited_messages
+        self.incomplete = incomplete
 
     @property
     def user_id(self):
@@ -30,3 +31,10 @@ class StoredMessage:
             message = ApiObject.wrap_api_object(message_data)
             messages.append(message)
         return StoredMessage(message_id, *messages)
+
+    @staticmethod
+    def from_message(message):
+        message_id = message.message_id
+        data = StoredMessageMapper.from_api(message).map().to_data()
+        mapped_message = ApiObject.wrap_api_object(data)
+        return StoredMessage(message_id, mapped_message, incomplete=True)
