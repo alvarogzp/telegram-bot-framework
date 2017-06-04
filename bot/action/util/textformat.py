@@ -69,6 +69,16 @@ class FormattedText:
         return FormattedTextStringFormat(self)
 
 
+class FormattedTextFactory:
+    @staticmethod
+    def get_new_markdown():
+        return FormattedText(mode="Markdown")
+
+    @staticmethod
+    def get_new_html():
+        return FormattedText(mode="HTML")
+
+
 class TextFormatter:
     def escape(self, text):
         return text
