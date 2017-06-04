@@ -28,11 +28,11 @@ class FormattedText:
         return self
 
     def code_inline(self, text: str):
-        self.text += self.formatter.code_inline(self._escaped(text))
+        self.text += self.formatter.code_inline(self._escaped_code(text))
         return self
 
     def code_block(self, text: str):
-        self.text += self.formatter.code_block(self._escaped(text))
+        self.text += self.formatter.code_block(self._escaped_code(text))
         return self
 
     def newline(self):
@@ -61,9 +61,16 @@ class FormattedText:
         return Message.create(self.text, parse_mode=self.mode)
 
     def _escaped(self, text):
+        return self.__escaped(text, self.formatter.escape)
+
+    def _escaped_code(self, text):
+        return self.__escaped(text, self.formatter.escape_code)
+
+    @staticmethod
+    def __escaped(text, escape_func):
         if type(text) is not str:
             text = str(text)
-        return self.formatter.escape(text)
+        return escape_func(text)
 
     def start_format(self):
         return FormattedTextStringFormat(self)
@@ -82,6 +89,10 @@ class FormattedTextFactory:
 class TextFormatter:
     def escape(self, text):
         return text
+
+    def escape_code(self, text):
+        """Override if code uses different escape rules"""
+        return self.escape(text)
 
     def bold(self, text):
         return text
@@ -137,6 +148,9 @@ class MarkdownTextFormatter(TextFormatter):
                    .replace("_", "\\_")\
                    .replace("*", "\\*")\
                    .replace("`", "\\`")
+
+    def escape_code(self, text):
+        return text
 
     def bold(self, text):
         return self._wrap(text, "*")
