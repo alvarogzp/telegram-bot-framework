@@ -7,6 +7,10 @@ class FormattedText:
         self.mode = mode
         self.text = ""
 
+    def raw(self, text: str):
+        self.text += text
+        return self
+
     def normal(self, text: str):
         self.text += self._escaped(text)
         return self
