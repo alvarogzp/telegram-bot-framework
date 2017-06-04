@@ -1,7 +1,8 @@
 import json
 
 from bot.action.core.command import UnderscoredCommandBuilder
-from bot.action.extra.messages import analyzer, StoredMessageMapper
+from bot.action.extra.messages import analyzer
+from bot.action.extra.messages.mapper import StoredMessageMapper
 from bot.api.domain import ApiObject
 
 
