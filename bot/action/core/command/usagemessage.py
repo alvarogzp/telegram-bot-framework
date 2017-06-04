@@ -1,17 +1,21 @@
-from bot.action.util.textformat import FormattedText
+from bot.action.util.textformat import FormattedText, FormattedTextFactory
 
 
 class CommandUsageMessage:
     @classmethod
     def get_formatted_usage_text(cls, command, args=None, description=""):
-        text = FormattedText().bold("Usage").newline()
+        text = FormattedTextFactory.get_new_markdown().bold("Usage").newline()
         if type(args) is list:
-            text.concat(FormattedText().newline().join((cls.__get_command_with_args(command, arg) for arg in args)))
+            text.concat(
+                FormattedTextFactory.get_new_markdown().newline().join(
+                    (cls.__get_command_with_args(command, arg) for arg in args)
+                )
+            )
         else:
             text.concat(cls.__get_command_with_args(command, args))
         if description:
             if not isinstance(description, FormattedText):
-                description = FormattedText().normal(description)
+                description = FormattedTextFactory.get_new_markdown().raw(description)
             text.newline().newline().concat(description)
         return text
 
@@ -24,4 +28,4 @@ class CommandUsageMessage:
         text = command
         if args:
             text += " " + args
-        return FormattedText().code_inline(text)
+        return FormattedTextFactory.get_new_markdown().code_inline(text)
