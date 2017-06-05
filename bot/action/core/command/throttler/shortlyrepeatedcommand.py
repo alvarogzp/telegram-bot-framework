@@ -44,7 +44,8 @@ class CommandKey:
         chat_id = event.chat.id
         command = event.command
         command_args = event.command_args
-        self.__key = (chat_id, command, command_args)
+        reply_to_message_id = event.message.reply_to_message.message_id if event.message.reply_to_message else None
+        self.__key = (chat_id, command, command_args, reply_to_message_id)
 
     def __hash__(self):
         return hash(self.__key)
