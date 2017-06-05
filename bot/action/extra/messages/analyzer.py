@@ -97,16 +97,16 @@ class MessageAnalyzer:
             .normal(" sent on ").bold(self.full_date)\
             .normal(" by ").bold(self.full_user)\
             .normal(".").newline()
-        self.__add_incomplete_info_if_needed(text)
         self.__add_reply_info_if_needed(text)
         self.__add_forwarded_info_if_needed(text)
         self.__add_edit_info_if_needed(text)
+        self.__add_incomplete_info_if_needed(text)
         return text.newline()
 
     def __add_incomplete_info_if_needed(self, text):
         if self.incomplete:
-            text.normal(self.info).normal("Message not found in local database."
-                                          " Some information is missing (edits and reply info).")\
+            text.normal(self.info).bold("Message is not in local database")\
+                .normal(". Some information is missing (edits and reply info).")\
                 .newline()
 
     def __add_reply_info_if_needed(self, text):
