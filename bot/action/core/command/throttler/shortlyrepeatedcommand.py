@@ -45,13 +45,13 @@ class CommandKey:
         command = event.command
         command_args = event.command_args
         reply_to_message_id = event.message.reply_to_message.message_id if event.message.reply_to_message else None
-        self.__key = (chat_id, command, command_args, reply_to_message_id)
+        self.key = (chat_id, command, command_args, reply_to_message_id)
 
     def __hash__(self):
-        return hash(self.__key)
+        return hash(self.key)
 
     def __eq__(self, other):
-        return self.__key == other.__key
+        return self.key == other.key
 
 
 class CommandThrottlingState:
