@@ -10,6 +10,7 @@ from bot.action.enterexit import GreetAction, LeaveAction
 from bot.action.extra.audios import SaveVoiceAction, ListVoiceAction
 from bot.action.extra.hashtags import SaveHashtagsAction, ListHashtagsAction
 from bot.action.extra.legacypole import LegacyPoleAction
+from bot.action.extra.message import ShowMessageAction
 from bot.action.extra.messages import SaveMessageAction, ListMessageAction
 from bot.action.extra.pole import SavePoleAction, ListPoleAction, ManagePoleTimezonesAction
 from bot.action.extra.random import RandomChoiceAction
@@ -17,6 +18,7 @@ from bot.action.gapdetector import GlobalGapDetectorAction
 from bot.action.chatsettings import ChatSettingsAction
 from bot.action.internationalization import InternationalizationAction
 from bot.action.perchat import PerChatAction
+from bot.action.silence import SilenceAction
 from bot.action.toggle import GetSetFeatureAction, ToggleableFeatureAction
 from bot.action.userinfo import SaveUserAction
 from bot.bot import Bot
@@ -110,6 +112,12 @@ class BotManager:
                                             )
                                         ),
 
+                                        CommandAction("silence").then(
+                                            GroupAdminAction().then(
+                                                SilenceAction()
+                                            )
+                                        ),
+
                                         CommandAction("hashtags").then(
                                             ListHashtagsAction()
                                         ),
@@ -138,6 +146,10 @@ class BotManager:
 
                                         CommandAction("messages").then(
                                             ListMessageAction()
+                                        ),
+
+                                        CommandAction("message").then(
+                                            ShowMessageAction()
                                         ),
 
                                         CommandAction("audios").then(

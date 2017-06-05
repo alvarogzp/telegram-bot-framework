@@ -1,4 +1,5 @@
-from bot.api.domain import Message, OutApiObject
+from bot.api.domain import Message, OutApiObject, Photo, Sticker, Document, Voice, VideoNote, Audio, Video, Location, \
+    Contact
 from bot.api.telegram import TelegramBotApi, TelegramBotApiException
 from bot.storage import State
 
@@ -11,7 +12,41 @@ class Api:
     def send_message(self, message: Message, **params):
         message_params = message.data.copy()
         message_params.update(params)
-        return self.sendMessage(**message_params)
+        if self.__should_send_message(message_params):
+            send_func = self.__get_send_func(message.get_type())
+            return send_func(**message_params)
+
+    def __should_send_message(self, message_params):
+        chat_id = message_params.get("chat_id")
+        if chat_id:
+            chat_state = self.state.get_for_chat_id(chat_id)
+            is_silenced = chat_state.silenced
+            if is_silenced:
+                return False
+        return True
+
+    def __get_send_func(self, message_type):
+        if message_type == Photo:
+            return self.sendPhoto
+        elif message_type == Sticker:
+            return self.sendSticker
+        elif message_type == Document:
+            return self.sendDocument
+        elif message_type == Voice:
+            return self.sendVoice
+        elif message_type == VideoNote:
+            return self.sendVideoNote
+        elif message_type == Audio:
+            return self.sendAudio
+        elif message_type == Video:
+            return self.sendVideo
+        elif message_type == Location:
+            return self.sendLocation
+        elif message_type == Contact:
+            return self.sendContact
+        else:
+            # fallback to sendMessage
+            return self.sendMessage
 
     def get_pending_updates(self):
         there_are_pending_updates = True

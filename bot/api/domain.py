@@ -3,6 +3,9 @@ class ApiObject:
         self._type = _type
         self.data = data
 
+    def get_type(self):
+        return self._type
+
     def get_or_fail(self, key):
         value = self.data[key]
         return self.wrap_api_object(value)
@@ -69,11 +72,72 @@ class Message(OutApiObject):
 
     @staticmethod
     def create(text, chat_id=None, **kwargs):
-        return Message(_type=Message, text=text, chat_id=chat_id, **kwargs)
+        return Message(_type=Message, text=text, chat_id=chat_id, disable_web_page_preview=True, **kwargs)
 
     @staticmethod
     def create_reply(message, reply_text):
         return Message.create(reply_text).to_chat(message=message).reply_to_message(message)
+
+
+class CaptionableMessage(Message):
+    def with_caption(self, caption_text):
+        self.data["caption"] = caption_text
+        return self
+
+
+class Photo(CaptionableMessage):
+    @staticmethod
+    def create_photo(file_id):
+        return Photo(_type=Photo, photo=file_id)
+
+
+class Sticker(Message):
+    @staticmethod
+    def create_sticker(file_id):
+        return Sticker(_type=Sticker, sticker=file_id)
+
+
+class Document(CaptionableMessage):
+    @staticmethod
+    def create_document(file_id):
+        return Document(_type=Document, document=file_id)
+
+
+class Voice(CaptionableMessage):
+    @staticmethod
+    def create_voice(file_id):
+        return Voice(_type=Voice, voice=file_id)
+
+
+class VideoNote(Message):
+    @staticmethod
+    def create_video_note(file_id, length):
+        # for some reason, api fails if length is not provided, although it is an optional field
+        return VideoNote(_type=VideoNote, video_note=file_id, length=length)
+
+
+class Audio(CaptionableMessage):
+    @staticmethod
+    def create_audio(file_id):
+        return Audio(_type=Audio, audio=file_id)
+
+
+class Video(CaptionableMessage):
+    @staticmethod
+    def create_video(file_id):
+        return Video(_type=Video, video=file_id)
+
+
+class Location(Message):
+    @staticmethod
+    def create_location(latitude, longitude):
+        return Location(_type=Location, latitude=latitude, longitude=longitude)
+
+
+class Contact(Message):
+    @staticmethod
+    def create_contact(phone_number, first_name, last_name=None):
+        return Contact(_type=Contact, phone_number=phone_number, first_name=first_name, last_name=last_name)
 
 
 class MessageEntityParser:
