@@ -7,6 +7,10 @@ class FormattedText:
         self.mode = mode
         self.text = ""
 
+    def raw(self, text: str):
+        self.text += text
+        return self
+
     def normal(self, text: str):
         self.text += self._escaped(text)
         return self
@@ -24,11 +28,11 @@ class FormattedText:
         return self
 
     def code_inline(self, text: str):
-        self.text += self.formatter.code_inline(self._escaped(text))
+        self.text += self.formatter.code_inline(self._escaped_code(text))
         return self
 
     def code_block(self, text: str):
-        self.text += self.formatter.code_block(self._escaped(text))
+        self.text += self.formatter.code_block(self._escaped_code(text))
         return self
 
     def newline(self):
@@ -37,7 +41,7 @@ class FormattedText:
 
     def concat(self, formatted_text):
         """:type formatted_text: FormattedText"""
-        assert self.mode == formatted_text.mode, "Cannot concat text with different modes"
+        assert self._is_compatible(formatted_text), "Cannot concat text with different modes"
         self.text += formatted_text.text
         return self
 
@@ -45,25 +49,50 @@ class FormattedText:
         """:type formatted_texts: list[FormattedText]"""
         formatted_texts = list(formatted_texts)  # so that after the first iteration elements are not lost if generator
         for formatted_text in formatted_texts:
-            assert self.mode == formatted_text.mode, "Cannot join text with different modes"
+            assert self._is_compatible(formatted_text), "Cannot join text with different modes"
         self.text = self.text.join((formatted_text.text for formatted_text in formatted_texts))
         return self
+
+    def _is_compatible(self, formatted_text):
+        """:type formatted_text: FormattedText"""
+        return self.mode == formatted_text.mode
 
     def build_message(self):
         return Message.create(self.text, parse_mode=self.mode)
 
     def _escaped(self, text):
+        return self.__escaped(text, self.formatter.escape)
+
+    def _escaped_code(self, text):
+        return self.__escaped(text, self.formatter.escape_code)
+
+    @staticmethod
+    def __escaped(text, escape_func):
         if type(text) is not str:
             text = str(text)
-        return self.formatter.escape(text)
+        return escape_func(text)
 
     def start_format(self):
         return FormattedTextStringFormat(self)
 
 
+class FormattedTextFactory:
+    @staticmethod
+    def get_new_markdown():
+        return FormattedText(mode="Markdown")
+
+    @staticmethod
+    def get_new_html():
+        return FormattedText(mode="HTML")
+
+
 class TextFormatter:
     def escape(self, text):
         return text
+
+    def escape_code(self, text):
+        """Override if code uses different escape rules"""
+        return self.escape(text)
 
     def bold(self, text):
         return text
@@ -119,6 +148,9 @@ class MarkdownTextFormatter(TextFormatter):
                    .replace("_", "\\_")\
                    .replace("*", "\\*")\
                    .replace("`", "\\`")
+
+    def escape_code(self, text):
+        return text
 
     def bold(self, text):
         return self._wrap(text, "*")
@@ -206,6 +238,20 @@ class FormattedTextStringFormat:
 
     def _escaped(self, text):
         return self.formatted_text._escaped(text)
+
+    def concat(self, *args, **kwargs):
+        """
+        :type args: FormattedText
+        :type kwargs: FormattedText
+        """
+        for arg in args:
+            assert self.formatted_text._is_compatible(arg), "Cannot concat text with different modes"
+            self.format_args.append(arg.text)
+        for kwarg in kwargs:
+            value = kwargs[kwarg]
+            assert self.formatted_text._is_compatible(value), "Cannot concat text with different modes"
+            self.format_kwargs[kwarg] = value.text
+        return self
 
     def end_format(self):
         self.formatted_text.text = self.formatted_text.text.format(*self.format_args, **self.format_kwargs)

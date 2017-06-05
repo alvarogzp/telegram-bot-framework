@@ -41,16 +41,17 @@ class ShortlyRepeatedCommandThrottler(Throttler):
 
 class CommandKey:
     def __init__(self, event):
-        self.chat_id = event.chat.id
-        self.command = event.command
-        self.command_args = event.command_args
-        self.__key = (self.chat_id, self.command, self.command_args)
+        chat_id = event.chat.id
+        command = event.command
+        command_args = event.command_args
+        reply_to_message_id = event.message.reply_to_message.message_id if event.message.reply_to_message else None
+        self.key = (chat_id, command, command_args, reply_to_message_id)
 
     def __hash__(self):
-        return hash(self.__key)
+        return hash(self.key)
 
     def __eq__(self, other):
-        return self.__key == other.__key
+        return self.key == other.key
 
 
 class CommandThrottlingState:
