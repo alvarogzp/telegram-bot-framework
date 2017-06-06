@@ -15,7 +15,7 @@ def get_translation(domain, language):
     key = (domain, language)
     translation = CACHED_TRANSLATIONS.get(key)
     if translation is None:
-        translation = gettext.translation(domain, LOCALE_DIR, languages=[language], fallback=True)
+        translation = gettext.translation(domain, LOCALE_DIR, languages=[language, DEFAULT_LANGUAGE], fallback=True)
         CACHED_TRANSLATIONS[key] = translation
     return translation
 
