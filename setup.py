@@ -3,10 +3,6 @@ import os
 from setuptools import setup, find_packages
 
 
-def get_version_from_git_most_recent_tag():
-    return os.popen("git tag -l v* | tail --lines=1").read().strip().lstrip("v")
-
-
 def get_readme_content():
     current_file_dir = os.path.dirname(__file__)
     readme_file_path = os.path.join(current_file_dir, "README.md")
@@ -16,7 +12,7 @@ def get_readme_content():
 setup(
     name='telegram-bot',
 
-    version=get_version_from_git_most_recent_tag(),
+    use_scm_version=True,
 
     description='Python Telegram bot API framework',
     long_description=get_readme_content(),
@@ -29,6 +25,10 @@ setup(
     license='GPL-3.0',
 
     packages=find_packages(),
+
+    setup_requires=[
+        'setuptools_scm'
+    ],
 
     install_requires=[
         'requests',
