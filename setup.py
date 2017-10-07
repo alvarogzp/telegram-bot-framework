@@ -1,6 +1,6 @@
 import os
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 
 def get_version_from_git_most_recent_tag():
@@ -28,7 +28,7 @@ setup(
 
     license='GPL-3.0',
 
-    packages=['bot'],
+    packages=find_packages(),
 
     install_requires=[
         'requests',
