@@ -43,6 +43,14 @@ class MessageAction(IntermediateAction):
             self._continue(event)
 
 
+class InlineQueryAction(IntermediateAction):
+    def process(self, event):
+        inline_query = event.update.inline_query
+        if inline_query is not None:
+            event.query = inline_query
+            self._continue(event)
+
+
 class NoPendingAction(IntermediateAction):
     def process(self, event):
         if not event.is_pending:
