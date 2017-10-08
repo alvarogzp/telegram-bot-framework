@@ -2,3 +2,5 @@
 /config
 /state
 __pycache__/
+/*.egg-info
+/.eggs
