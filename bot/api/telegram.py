@@ -21,7 +21,7 @@ class TelegramBotApi:
         self.__log_response(response)
         if not response["ok"]:
             raise TelegramBotApiException(response["description"])
-        return ApiObject.wrap_api_object(response["result"])
+        return response["result"]
 
     def __log_request(self, request):
         if self.debug:

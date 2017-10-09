@@ -1,5 +1,5 @@
 from bot.api.domain import Message, OutApiObject, Photo, Sticker, Document, Voice, VideoNote, Audio, Video, Location, \
-    Contact
+    Contact, ApiObject
 from bot.api.telegram import TelegramBotApi, TelegramBotApiException
 from bot.storage import State
 
@@ -78,7 +78,7 @@ class Api:
     def __api_call_hook(self, api_func, params):
         local_params = self.__separate_local_params(params)
         try:
-            return api_func(**params)
+            return self.__do_api_call(api_func, params)
         except TelegramBotApiException as e:
             return self.__handle_api_error(e, local_params)
 
@@ -89,6 +89,10 @@ class Api:
             if local_param in params:
                 local_params[local_param] = params.pop(local_param)
         return local_params
+
+    @staticmethod
+    def __do_api_call(api_func, params):
+        return ApiObject.wrap_api_object(api_func(**params))
 
     @staticmethod
     def __handle_api_error(e, local_params):
