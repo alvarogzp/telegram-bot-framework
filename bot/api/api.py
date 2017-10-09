@@ -76,14 +76,14 @@ class Api:
         return lambda **params: self.__api_call_hook(api_func, params)
 
     def __api_call_hook(self, api_func, params):
-        local_params = self.__separate_local_params(params)
+        local_params = self.__pop_local_params(params)
         try:
             return self.__do_api_call(api_func, params)
         except TelegramBotApiException as e:
             return self.__handle_api_error(e, local_params)
 
     @staticmethod
-    def __separate_local_params(params):
+    def __pop_local_params(params):
         local_params = {}
         for local_param in OutApiObject.LOCAL_PARAMS:
             if local_param in params:
