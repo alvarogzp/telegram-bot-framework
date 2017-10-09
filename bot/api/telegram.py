@@ -12,9 +12,9 @@ class TelegramBotApi:
         return self.__get_request_from_function_name(item)
 
     def __get_request_from_function_name(self, function_name):
-        return lambda **params: self.__send_request(function_name, **params)
+        return lambda **params: self.__send_request(function_name, params)
 
-    def __send_request(self, command, **params):
+    def __send_request(self, command, params):
         request = requests.get(self.base_url + command, params=params, timeout=60)
         self.__log_request(request)
         response = request.json()
