@@ -1,5 +1,5 @@
-from bot.action import chatsettings
 from bot.action.core.action import IntermediateAction
+from bot.action.standard import chatsettings
 
 
 class PerChatAction(IntermediateAction):

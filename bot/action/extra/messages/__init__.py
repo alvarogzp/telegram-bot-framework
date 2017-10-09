@@ -1,4 +1,3 @@
-from bot.action.chatsettings import ChatSettings
 from bot.action.core.action import Action
 from bot.action.core.command.usagemessage import CommandUsageMessage
 from bot.action.extra.messages import analyzer
@@ -7,7 +6,8 @@ from bot.action.extra.messages.operations import MessageGroup, MessageList, Mess
 from bot.action.extra.messages.opt_out import OptOutManager
 from bot.action.extra.messages.storage import MessageStorageHandler
 from bot.action.extra.messages.stored_message import StoredMessage
-from bot.action.userinfo import UserStorageHandler
+from bot.action.standard.chatsettings import ChatSettings
+from bot.action.standard.userinfo import UserStorageHandler
 from bot.action.util.format import UserFormatter
 from bot.action.util.textformat import FormattedText
 from bot.api.domain import Message

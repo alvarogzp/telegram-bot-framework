@@ -1,8 +1,7 @@
+import datetime
 import time
 
-import datetime
-
-from bot.action.userinfo import UserStorageHandler
+from bot.action.standard.userinfo import UserStorageHandler
 
 
 class DateFormatter:
