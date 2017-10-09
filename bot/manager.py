@@ -12,7 +12,7 @@ from bot.action.extra.random import RandomChoiceAction
 from bot.action.standard.admin import RestartAction, EvalAction, AdminActionWithErrorMessage, AdminAction, HaltAction, \
     GroupAdminAction
 from bot.action.standard.answer import AnswerAction
-from bot.action.standard.chatsettings import ChatSettingsAction
+from bot.action.standard.chatsettings.action import ChatSettingsAction
 from bot.action.standard.config import ConfigAction
 from bot.action.standard.enterexit import GreetAction, LeaveAction
 from bot.action.standard.gapdetector import GlobalGapDetectorAction
