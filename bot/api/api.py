@@ -1,5 +1,7 @@
+import json
+
 from bot.api.domain import Message, OutApiObject, Photo, Sticker, Document, Voice, VideoNote, Audio, Video, Location, \
-    Contact, ApiObject
+    Contact, ApiObject, ApiObjectList
 from bot.api.telegram import TelegramBotApi, TelegramBotApiException
 from bot.storage import State
 
@@ -77,6 +79,7 @@ class Api:
 
     def __api_call_hook(self, api_func, params):
         local_params = self.__pop_local_params(params)
+        self.__flat_params(params)
         try:
             return self.__do_api_call(api_func, params)
         except TelegramBotApiException as e:
@@ -89,6 +92,15 @@ class Api:
             if local_param in params:
                 local_params[local_param] = params.pop(local_param)
         return local_params
+
+    @staticmethod
+    def __flat_params(params):
+        for param, value in params.copy().items():
+            if isinstance(value, (ApiObjectList, ApiObject)):
+                value = value.unwrap_api_object()
+                # not saving now as we assume it will also enter the next if
+            if type(value) in (list, dict, tuple):
+                params[param] = json.dumps(value, separators=(',', ':'))
 
     @staticmethod
     def __do_api_call(api_func, params):
