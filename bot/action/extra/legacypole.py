@@ -1,6 +1,6 @@
 from bot.action.core.action import Action
 from bot.action.extra.pole import SavePoleAction, TimezoneStorageHandler
-from bot.action.toggle import FeatureStateHandler
+from bot.action.standard.toggle import FeatureStateHandler
 from bot.api.domain import Message
 
 SECONDS_IN_A_DAY = 86400

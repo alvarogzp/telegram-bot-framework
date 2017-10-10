@@ -1,6 +1,6 @@
-from bot.action import chatsettings
-from bot.action.chatsettings import ChatSettings
 from bot.action.core.command.throttler import Throttler
+from bot.action.standard import chatsettings
+from bot.action.standard.chatsettings import ChatSettings
 from bot.action.util.textformat import FormattedText
 
 

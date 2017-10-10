@@ -1,5 +1,7 @@
+import json
+
 from bot.api.domain import Message, OutApiObject, Photo, Sticker, Document, Voice, VideoNote, Audio, Video, Location, \
-    Contact
+    Contact, ApiObject, ApiObjectList
 from bot.api.telegram import TelegramBotApi, TelegramBotApiException
 from bot.storage import State
 
@@ -73,22 +75,36 @@ class Api:
 
     def __get_api_call_hook_for(self, api_call):
         api_func = self.telegram_api.__getattr__(api_call)
-        return lambda **params: self.__api_call_hook(api_func, **params)
+        return lambda **params: self.__api_call_hook(api_func, params)
 
-    def __api_call_hook(self, api_func, **params):
-        local_params = self.__separate_local_params(params)
+    def __api_call_hook(self, api_func, params):
+        local_params = self.__pop_local_params(params)
+        self.__flat_params(params)
         try:
-            return api_func(**params)
+            return self.__do_api_call(api_func, params)
         except TelegramBotApiException as e:
             return self.__handle_api_error(e, local_params)
 
     @staticmethod
-    def __separate_local_params(params):
+    def __pop_local_params(params):
         local_params = {}
         for local_param in OutApiObject.LOCAL_PARAMS:
             if local_param in params:
                 local_params[local_param] = params.pop(local_param)
         return local_params
+
+    @staticmethod
+    def __flat_params(params):
+        for param, value in params.copy().items():
+            if isinstance(value, (ApiObjectList, ApiObject)):
+                value = value.unwrap_api_object()
+                # not saving now as we assume it will also enter the next if
+            if type(value) in (list, dict, tuple):
+                params[param] = json.dumps(value, separators=(',', ':'))
+
+    @staticmethod
+    def __do_api_call(api_func, params):
+        return ApiObject.wrap_api_object(api_func(**params))
 
     @staticmethod
     def __handle_api_error(e, local_params):

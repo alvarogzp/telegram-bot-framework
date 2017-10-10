@@ -1,7 +1,7 @@
 import gettext
 
-from bot.action.chatsettings import ChatSettings
 from bot.action.core.action import IntermediateAction
+from bot.action.standard.chatsettings import ChatSettings
 
 LOCALE_DIR = "locales"
 
