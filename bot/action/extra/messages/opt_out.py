@@ -1,4 +1,4 @@
-from bot.action.chatsettings import ChatSettings
+from bot.action.standard.chatsettings import ChatSettings
 
 
 class OptOutManager:

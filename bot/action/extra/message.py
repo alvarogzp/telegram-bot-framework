@@ -1,9 +1,9 @@
 from bot.action.core.action import Action
 from bot.action.core.command.usagemessage import CommandUsageMessage
-from bot.action.extra.messages.stored_message import StoredMessage
 from bot.action.extra.messages.opt_out import OptOutManager
 from bot.action.extra.messages.storage import MessageStorageHandler
-from bot.action.userinfo import UserStorageHandler
+from bot.action.extra.messages.stored_message import StoredMessage
+from bot.action.standard.userinfo import UserStorageHandler
 from bot.action.util.textformat import FormattedTextFactory
 
 

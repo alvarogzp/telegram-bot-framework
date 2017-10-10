@@ -4,7 +4,7 @@ from bot.action import util
 from bot.action.core.action import Action
 from bot.action.core.command import UnderscoredCommandBuilder
 from bot.action.core.command.usagemessage import CommandUsageMessage
-from bot.action.userinfo import UserStorageHandler
+from bot.action.standard.userinfo import UserStorageHandler
 from bot.action.util.format import UserFormatter, DateFormatter, TimeFormatter, SizeFormatter
 from bot.action.util.textformat import FormattedText
 from bot.api.domain import Message
