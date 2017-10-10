@@ -28,6 +28,9 @@ class ApiObject:
         else:
             return data
 
+    def unwrap_api_object(self):
+        return self.data
+
 
 class ApiObjectList:
     def __init__(self, data_list: list):
@@ -39,6 +42,9 @@ class ApiObjectList:
     def __wrapped_api_objects(self):
         for data in self.data_list:
             yield ApiObject.wrap_api_object(data)
+
+    def unwrap_api_object(self):
+        return self.data_list
 
 
 class OutApiObject(ApiObject):
