@@ -43,6 +43,14 @@ class MessageAction(IntermediateAction):
             self._continue(event)
 
 
+class ChosenInlineResultAction(IntermediateAction):
+    def process(self, event):
+        chosen_inline_result = event.update.chosen_inline_result
+        if chosen_inline_result is not None:
+            event.chosen_result = chosen_inline_result
+            self._continue(event)
+
+
 class InlineQueryAction(IntermediateAction):
     def process(self, event):
         inline_query = event.update.inline_query
