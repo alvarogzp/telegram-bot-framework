@@ -3,6 +3,8 @@ import json
 from bot.api.domain import Message, OutApiObject, Photo, Sticker, Document, Voice, VideoNote, Audio, Video, Location, \
     Contact, ApiObject, ApiObjectList
 from bot.api.telegram import TelegramBotApi, TelegramBotApiException
+from bot.multithreading.scheduler import SchedulerApi
+from bot.multithreading.work import Work
 from bot.storage import State
 
 
@@ -10,6 +12,10 @@ class Api:
     def __init__(self, telegram_api: TelegramBotApi, state: State):
         self.telegram_api = telegram_api
         self.state = state
+        self.async = self
+
+    def enable_async(self, scheduler: SchedulerApi):
+        self.async = AsyncApi(self, scheduler)
 
     def send_message(self, message: Message, **params):
         message_params = message.data.copy()
@@ -113,3 +119,19 @@ class Api:
             return error_callback(e)
         else:
             raise e
+
+
+class AsyncApi:
+    def __init__(self, api: Api, scheduler: SchedulerApi):
+        self.api = api
+        self.scheduler = scheduler
+
+    def __getattr__(self, item):
+        return self.__get_call_hook_for(item)
+
+    def __get_call_hook_for(self, function_name):
+        func = getattr(self.api, function_name)
+        return lambda *args, **kwargs: self.__call_hook(func, args, kwargs)
+
+    def __call_hook(self, func, args, kwargs):
+        self.scheduler.network(Work(lambda: func(*args, **kwargs), "async_api_call"))

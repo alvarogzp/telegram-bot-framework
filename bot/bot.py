@@ -22,6 +22,7 @@ class Bot:
         self.logger = AdminLogger(self.api, self.config.admin_chat_id, debug)
         self.scheduler = SchedulerApi(self.logger.work_error)
         self.scheduler.setup()
+        self.api.enable_async(self.scheduler)
         self.cache.bot_info = self.api.getMe()
         self.action = Action()
 
