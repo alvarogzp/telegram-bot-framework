@@ -1,6 +1,8 @@
 import queue
 import threading
 
+from bot.multithreading.work import Work
+
 
 class Worker:
     def __init__(self, name: str, work_queue: queue.Queue, error_handler: callable):
@@ -35,12 +37,3 @@ class Worker:
 
     def shutdown(self):
         self.end.set()
-
-
-class Work:
-    def __init__(self, func: callable, name: str):
-        self.func = func
-        self.name = name
-
-    def do_work(self):
-        self.func()

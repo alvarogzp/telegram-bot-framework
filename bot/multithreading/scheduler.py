@@ -1,7 +1,8 @@
 import queue
 import threading
 
-from bot.multithreading.worker import Worker, Work
+from bot.multithreading.worker import Worker
+from bot.multithreading.work import Work
 
 
 class SchedulerApi:
