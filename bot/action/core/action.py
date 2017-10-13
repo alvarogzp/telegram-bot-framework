@@ -44,8 +44,8 @@ class ActionGroup(Action):
         self.actions.extend(actions)
 
     def setup(self, *args):
-        self.for_each(lambda action: action.setup(*args))
         super().setup(*args)
+        self.for_each(lambda action: action.setup(*args))
 
     def process(self, event):
         self.for_each(lambda action: action.process(event._copy()))
