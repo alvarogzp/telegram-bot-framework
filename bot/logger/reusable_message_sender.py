@@ -10,7 +10,7 @@ class MessageSender:
 
 
 class ReusableMessageSender(MessageSender):
-    def __init__(self, api: Api, chat_id, separator: str = "\n"):
+    def __init__(self, api: Api, chat_id, separator: str = "\n\n"):
         self.api = api
         self.message = Message.create("", chat_id)
         self.separator = separator
