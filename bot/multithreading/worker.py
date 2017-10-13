@@ -1,5 +1,4 @@
 import queue
-import threading
 
 from bot.multithreading.work import Work
 
@@ -8,17 +7,13 @@ class Worker:
     def __init__(self, name: str, work_queue: queue.Queue, error_handler: callable):
         self.name = name
         self.queue = work_queue
-        # using an event instead of a boolean flag to avoid race conditions between threads
-        self.end = threading.Event()
         self.error_handler = error_handler
 
     def run(self):
-        while self._should_run():
+        while True:
             work = self.queue.get()
             self._work(work)
-
-    def _should_run(self):
-        return not self.end.is_set()
+            self.queue.task_done()
 
     def _work(self, work: Work):
         try:
@@ -36,4 +31,4 @@ class Worker:
         self.queue.put(work)
 
     def shutdown(self):
-        self.end.set()
+        self.queue.join()
