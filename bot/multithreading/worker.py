@@ -21,8 +21,14 @@ class Worker:
     def _work(self, work: Work):
         try:
             work.do_work()
-        except Exception as e:
+        except BaseException as e:
+            self._error(e, work)
+
+    def _error(self, e: BaseException, work: Work):
+        try:
             self.error_handler(e, work, self)
+        except:
+            pass
 
     def post(self, work: Work):
         self.queue.put(work)
