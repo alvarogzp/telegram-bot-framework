@@ -12,10 +12,10 @@ class AttributeObject:
             self._setattr(key, value)
 
     def _getattr(self, item):
-        pass
+        raise NotImplementedError()
 
     def _setattr(self, key, value):
-        pass
+        raise NotImplementedError()
 
 
 class DictionaryObject(AttributeObject):
