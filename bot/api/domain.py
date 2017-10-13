@@ -76,6 +76,12 @@ class Message(OutApiObject):
         self.reply_to_message(message)
         return self
 
+    def new_text(self, text):
+        self.data["text"] = text
+
+    def set_message_id(self, message_id):
+        self.data["message_id"] = message_id
+
     @staticmethod
     def create(text, chat_id=None, **kwargs):
         return Message(_type=Message, text=text, chat_id=chat_id, disable_web_page_preview=True, **kwargs)
