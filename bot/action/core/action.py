@@ -1,4 +1,5 @@
 from bot.api.api import Api
+from bot.multithreading.scheduler import SchedulerApi
 from bot.storage import Config, State, Cache
 from bot.utils.attributeobject import DictionaryObject
 
@@ -21,11 +22,12 @@ class Action:
     def get_name(self):
         return self.__class__.__name__
 
-    def setup(self, api: Api, config: Config, state: State, cache: Cache):
+    def setup(self, api: Api, config: Config, state: State, cache: Cache, scheduler: SchedulerApi):
         self.api = api
         self.config = config
         self.state = state
         self.cache = cache
+        self.scheduler = scheduler
         self.post_setup()
 
     def post_setup(self):

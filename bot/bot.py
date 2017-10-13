@@ -29,7 +29,7 @@ class Bot:
         self.action = Action()
 
     def set_action(self, action: Action):
-        action.setup(self.api, self.config, self.state, self.cache)
+        action.setup(self.api, self.config, self.state, self.cache, self.scheduler)
         self.action = action
 
     def run(self):
