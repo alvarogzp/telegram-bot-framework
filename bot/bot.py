@@ -4,6 +4,8 @@ from bot.action.core.action import Update, Action
 from bot.api.api import Api
 from bot.api.domain import Message
 from bot.api.telegram import TelegramBotApi
+from bot.logger.error_handler import ErrorHandler
+from bot.multithreading.scheduler import SchedulerApi
 from bot.storage import Config, Cache
 from bot.storage import State
 
@@ -17,8 +19,12 @@ class Bot:
         self.config = Config(CONFIG_DIR)
         self.state = State(STATE_DIR)
         self.cache = Cache()
-        telegram_api = TelegramBotApi(self.config.auth_token, self.config.is_debug_enabled())
+        debug = self.config.is_debug_enabled()
+        telegram_api = TelegramBotApi(self.config.auth_token, debug)
         self.api = Api(telegram_api, self.state)
+        self.error_handler = ErrorHandler(self.api, self.config.admin_chat_id, debug)
+        self.scheduler = SchedulerApi(self.error_handler.handle_work_error)
+        self.scheduler.setup()
         self.cache.bot_info = self.api.getMe()
         self.action = Action()
 
@@ -39,7 +45,7 @@ class Bot:
             self.send_to_admin("Fatal error: " + str(e))
             raise e
         finally:
-            self.send_to_admin("Finished")
+            self.shutdown()
 
     def main_loop(self):
         for update in self.api.get_pending_updates():
@@ -54,6 +60,10 @@ class Bot:
         except Exception as e:
             self.send_to_admin("Error while processing update. Action " + self.action.get_name() + " failed with error: " + str(e))
             traceback.print_exc()
+
+    def shutdown(self):
+        self.scheduler.shutdown()
+        self.send_to_admin("Finished")
 
     def send_to_admin(self, message):
         message_to_admin = "[admin] " + message
