@@ -31,7 +31,7 @@ class ReusableMessageSender(MessageSender):
 
     def _send_edit(self, text):
         self.message.new_text(self.message.text + self.separator + text)
-        self.api.editMessageText(self.message.data)
+        self.api.editMessageText(**self.message.data)
 
     def new(self):
         self.message.set_message_id(None)
