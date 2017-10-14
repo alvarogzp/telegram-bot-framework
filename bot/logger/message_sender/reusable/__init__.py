@@ -9,11 +9,10 @@ class ReusableMessageSender(MessageSender):
         self.sender = sender
         self.builder = builder
         self.max_length = max_length
-        self.message_id = None
 
     def send(self, text):
         message = self._get_message_for(text)
-        self._get_send_func()(message)
+        self._send(message)
 
     def _get_message_for(self, text):
         self.builder.add(text)
@@ -26,25 +25,21 @@ class ReusableMessageSender(MessageSender):
             # if length is still greater than max_length, let it fail, otherwise we would enter on infinite loop
             self.builder.add(text)
 
-    def _get_send_func(self):
-        return self.__send_standalone_message if self.message_id is None else self.__send_edited_message
-
-    def __send_standalone_message(self, message: Message):
+    def _send(self, message: Message):
         try:
-            self.message_id = self.sender.send(message)
+            self.sender.send(message)
         finally:
-            if self.message_id is None:
-                # Discard current message, as there has been a problem with the message_id retrieval and we
-                # don't know if it was properly sent or not, so we threat it as corrupt and start a new one.
-                # That way, the next send:
-                #  - Will not fail if the problem was with this message content
-                #  - Won't have repeated content if this message was really sent but the request was interrupted
+            if self.sender.will_send_new_message():
+                # There has been a problem and the sender cannot reuse the message, either because it was the
+                # initial one and the message_id could not be retrieved (by some error or interruption), or
+                # because the message failed to edit (it could have reached its max length).
+                # The best thing we can do here is to start a new message, discarding the current text.
+                # Doing so, we ensure the next send:
+                #  - Will not fail if the problem was with the message content
+                #  - Won't have repeated content if the message was really sent but the request was interrupted
                 #    by some event (like a KeyboardInterrupt)
                 self.new()
 
-    def __send_edited_message(self, message: Message):
-        self.sender.edit(message, self.message_id)
-
     def new(self):
+        self.sender.new()
         self.builder.clear()
-        self.message_id = None
