@@ -1,7 +1,7 @@
 import time
 
 from bot.action.util.textformat import FormattedText
-from bot.logger.reusable_message_sender import MessageSender
+from bot.logger.message_sender import MessageSender
 
 
 class Logger:

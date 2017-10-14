@@ -3,7 +3,8 @@ import traceback
 from bot.action.util.textformat import FormattedText
 from bot.api.api import Api
 from bot.logger.logger import Logger
-from bot.logger.reusable_message_sender import TimedReusableMessageSender, FormattedTextReusableMessageSender
+from bot.logger.message_sender.reusable.timed import TimedReusableMessageSender
+from bot.logger.message_sender.reusable.text.formatted import FormattedTextReusableMessageSender
 from bot.multithreading.work import Work
 from bot.multithreading.worker import Worker
 
