@@ -1,18 +1,6 @@
 from bot.api.api import Api
 from bot.multithreading.scheduler import SchedulerApi
 from bot.storage import Config, State, Cache
-from bot.utils.attributeobject import DictionaryObject
-
-
-class Event(DictionaryObject):
-    pass
-
-
-class Update(Event):
-    def __init__(self, update, is_pending):
-        super().__init__()
-        self.update = update
-        self.is_pending = is_pending
 
 
 class Action:
