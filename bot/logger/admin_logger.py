@@ -2,9 +2,9 @@ import traceback
 
 from bot.action.util.textformat import FormattedText
 from bot.api.api import Api
-from bot.logger.logger import Logger
-from bot.logger.message_sender.reusable.timed import TimedReusableMessageSender
+from bot.logger.logger import FormattedTextLogger
 from bot.logger.message_sender.reusable.text.formatted import FormattedTextReusableMessageSender
+from bot.logger.message_sender.reusable.timed import TimedReusableMessageSender
 from bot.multithreading.work import Work
 from bot.multithreading.worker import Worker
 
@@ -13,7 +13,7 @@ class AdminLogger:
     def __init__(self, api: Api, admin_chat_id: str, debug: bool):
         sender = TimedReusableMessageSender(FormattedTextReusableMessageSender(api, admin_chat_id),
                                             reuse_message_for_seconds=1)
-        self.logger = Logger(sender)
+        self.logger = FormattedTextLogger(sender)
         self.debug = debug
 
     def work_error(self, error: BaseException, work: Work, worker: Worker):
