@@ -5,14 +5,20 @@ from bot.api.api import Api
 from bot.logger.logger import FormattedTextLogger
 from bot.logger.message_sender.reusable.text.formatted import FormattedTextReusableMessageSender
 from bot.logger.message_sender.reusable.timed import TimedReusableMessageSender
+from bot.logger.message_sender.synchronized import SynchronizedMessageSender
 from bot.multithreading.work import Work
 from bot.multithreading.worker import Worker
 
 
 class AdminLogger:
     def __init__(self, api: Api, admin_chat_id: str, debug: bool):
-        sender = TimedReusableMessageSender(FormattedTextReusableMessageSender(api, admin_chat_id),
-                                            reuse_message_for_seconds=1)
+        sender = \
+            SynchronizedMessageSender(
+                TimedReusableMessageSender(
+                    FormattedTextReusableMessageSender(api, admin_chat_id),
+                    reuse_message_for_seconds=1
+                )
+            )
         self.logger = FormattedTextLogger(sender)
         self.debug = debug
 
