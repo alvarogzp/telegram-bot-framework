@@ -47,15 +47,14 @@ class Bot:
             self.shutdown()
 
     def main_loop(self):
-        for update in self.get_updates(self.api.get_pending_updates):
-            self.process_update(update)
+        self.get_and_process_updates(self.api.get_pending_updates)
         while True:
-            for update in self.get_updates(self.api.get_updates):
-                self.process_update(update)
+            self.get_and_process_updates(self.api.get_updates)
 
-    def get_updates(self, get_updates_func):
+    def get_and_process_updates(self, get_updates_func: callable):
         try:
-            return get_updates_func()
+            for update in get_updates_func():
+                self.process_update(update)
         except Exception as e:
             self.logger.error(e, "get_updates")
 
