@@ -1,4 +1,5 @@
-from bot.action.core.action import Update, Action
+from bot.action.core.action import Action
+from bot.action.core.update import Update
 from bot.api.api import Api
 from bot.api.telegram import TelegramBotApi
 from bot.logger.admin_logger import AdminLogger
@@ -47,7 +48,7 @@ class Bot:
 
     def main_loop(self):
         for update in self.get_updates(self.api.get_pending_updates):
-            self.process_update(update, is_pending=True)
+            self.process_update(update)
         while True:
             for update in self.get_updates(self.api.get_updates):
                 self.process_update(update)
@@ -58,9 +59,9 @@ class Bot:
         except Exception as e:
             self.logger.error(e, "get_updates")
 
-    def process_update(self, update, is_pending=False):
+    def process_update(self, update: Update):
         try:
-            self.action.process(Update(update, is_pending))
+            self.action.process(update)
         except Exception as e:
             self.logger.error(e, "process_update")
 
