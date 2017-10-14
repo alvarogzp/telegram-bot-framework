@@ -12,6 +12,10 @@ from bot.multithreading.work import Work
 from bot.multithreading.worker import Worker
 
 
+ERROR_TAG = FormattedText().bold("ERROR")
+INFO_TAG = FormattedText().normal("INFO")
+
+
 class AdminLogger:
     def __init__(self, api: Api, admin_chat_id: str, debug: bool):
         sender = \
@@ -40,7 +44,7 @@ class AdminLogger:
 
     def __error(self, text):
         self.__print_traceback()
-        self.logger.log("ERROR", text)
+        self.logger.log(ERROR_TAG, text)
 
     def __print_traceback(self):
         if self.debug:
@@ -50,4 +54,4 @@ class AdminLogger:
         self.__info(FormattedText().bold(info_text))
 
     def __info(self, text):
-        self.logger.log("INFO", text)
+        self.logger.log(INFO_TAG, text)
