@@ -76,9 +76,6 @@ class Message(OutApiObject):
         self.reply_to_message(message)
         return self
 
-    def new_text(self, text):
-        self.data["text"] = text
-
     def set_message_id(self, message_id):
         self.data["message_id"] = message_id
 
