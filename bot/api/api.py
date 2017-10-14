@@ -1,5 +1,6 @@
 import json
 
+from bot.action.core.update import Update
 from bot.api.domain import Message, OutApiObject, Photo, Sticker, Document, Voice, VideoNote, Audio, Video, Location, \
     Contact, ApiObject, ApiObjectList
 from bot.api.telegram import TelegramBotApi, TelegramBotApiException
@@ -62,13 +63,14 @@ class Api:
             there_are_pending_updates = False
             for update in self.get_updates(timeout=0):
                 there_are_pending_updates = True
+                update.is_pending = True
                 yield update
 
     def get_updates(self, timeout=45):
         updates = self.getUpdates(offset=self.__get_updates_offset(), timeout=timeout)
         for update in updates:
             self.__set_updates_offset(update.update_id)
-            yield update
+            yield Update(update)
 
     def __get_updates_offset(self):
         return self.state.next_update_id
