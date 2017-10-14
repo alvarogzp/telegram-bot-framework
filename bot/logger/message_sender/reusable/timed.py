@@ -1,7 +1,7 @@
 import time
 
 from bot.logger.message_sender import MessageSender
-from bot.logger.message_sender.reusable import ReusableMessageSender
+from bot.logger.message_sender.reusable.reusable import ReusableMessageSender
 
 
 class TimedReusableMessageSender(MessageSender):

@@ -3,7 +3,7 @@ from bot.api.domain import Message
 from bot.logger.message_sender import MessageSender
 
 
-class ApiMessageSender(MessageSender):
+class SameMessageSender(MessageSender):
     def __init__(self, api: Api, chat_id):
         self.api = api
         self.chat_id = chat_id

@@ -3,9 +3,9 @@ import traceback
 from bot.action.util.textformat import FormattedText
 from bot.api.api import Api
 from bot.logger.logger import FormattedTextLogger
-from bot.logger.message_sender.api import ApiMessageSender
 from bot.logger.message_sender.message_builder.formatted import FormattedTextBuilder
-from bot.logger.message_sender.reusable import ReusableMessageSender
+from bot.logger.message_sender.reusable.reusable import ReusableMessageSender
+from bot.logger.message_sender.reusable.same import SameMessageSender
 from bot.logger.message_sender.reusable.timed import TimedReusableMessageSender
 from bot.logger.message_sender.synchronized import SynchronizedMessageSender
 from bot.multithreading.work import Work
@@ -18,7 +18,7 @@ class AdminLogger:
             SynchronizedMessageSender(
                 TimedReusableMessageSender(
                     ReusableMessageSender(
-                        ApiMessageSender(api, admin_chat_id),
+                        SameMessageSender(api, admin_chat_id),
                         FormattedTextBuilder(),
                         max_length=1000
                     ),
