@@ -33,25 +33,32 @@ class AdminLogger:
         self.debug = debug
 
     def work_error(self, error: BaseException, work: Work, worker: Worker):
-        text = FormattedText().normal("Worker: {worker} | Work: {work} | {error}")\
-            .start_format().bold(worker=worker.name, work=work.name, error=str(error)).end_format()
-        self.__error(text)
+        self.__error(
+            FormattedText().normal("Worker: {worker}").start_format().bold(worker=worker.name).end_format(),
+            FormattedText().normal("Work: {work}").start_format().bold(work=work.name).end_format(),
+            FormattedText().bold(str(error))
+        )
 
-    def error(self, error: BaseException, action: str):
-        text = FormattedText().normal("Action: {action} | {error}")\
-            .start_format().bold(action=action, error=str(error)).end_format()
-        self.__error(text)
+    def error(self, error: BaseException, action: str, *additional_info: str):
+        self.__error(
+            FormattedText().normal("Action: {action}").start_format().bold(action=action).end_format(),
+            FormattedText().bold(str(error)),
+            *[FormattedText().normal(info) for info in additional_info]
+        )
 
-    def __error(self, text):
+    def __error(self, *texts: FormattedText):
         self.__print_traceback()
-        self.logger.log(ERROR_TAG, text)
+        self.logger.log(ERROR_TAG, *texts)
 
     def __print_traceback(self):
         if self.debug:
             traceback.print_exc()
 
-    def info(self, info_text: str):
-        self.__info(FormattedText().bold(info_text))
+    def info(self, info_text: str, *additional_info: str):
+        self.__info(
+            FormattedText().bold(info_text),
+            *[FormattedText().normal(info) for info in additional_info]
+        )
 
-    def __info(self, text):
-        self.logger.log(INFO_TAG, text)
+    def __info(self, *texts: FormattedText):
+        self.logger.log(INFO_TAG, *texts)
