@@ -103,4 +103,8 @@ class AsyncApi:
         return lambda *args, **kwargs: self.__call_hook(func, args, kwargs)
 
     def __call_hook(self, func, args, kwargs):
-        self.scheduler.network(Work(lambda: func(*args, **kwargs), "async_api_call"))
+        self.__add_scheduler(kwargs)
+        return func(*args, **kwargs)
+
+    def __add_scheduler(self, args: dict):
+        args[OutApiObject.LOCAL_PARAM_SCHEDULER] = self.scheduler.network
