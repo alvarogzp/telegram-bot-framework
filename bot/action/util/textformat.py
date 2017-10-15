@@ -203,7 +203,7 @@ class TextFormatterFactory:
 
 
 class FormattedTextStringFormat:
-    def __init__(self, formatted_text):
+    def __init__(self, formatted_text: FormattedText):
         self.formatted_text = formatted_text
         self.formatter = formatted_text.formatter
         self.format_args = []
