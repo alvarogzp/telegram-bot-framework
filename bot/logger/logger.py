@@ -9,6 +9,11 @@ TEXT_SEPARATOR = " | "
 
 
 class Logger:
+    def log(self, tag, *texts):
+        raise NotImplementedError()
+
+
+class SenderLogger(Logger):
     def __init__(self, sender: MessageSender):
         self.sender = sender
 
@@ -20,13 +25,13 @@ class Logger:
         raise NotImplementedError()
 
 
-class PlainTextLogger(Logger):
+class PlainTextLogger(SenderLogger):
     def _get_text_to_send(self, tag: str, *texts: str):
         text = TEXT_SEPARATOR.join(texts)
         return LOG_ENTRY_FORMAT.format(time=time.strftime("%X"), tag=tag, text=text)
 
 
-class FormattedTextLogger(Logger):
+class FormattedTextLogger(SenderLogger):
     def _get_text_to_send(self, tag: FormattedText, *texts: FormattedText):
         text = FormattedText().normal(TEXT_SEPARATOR).join(texts)
         return FormattedText().normal(LOG_ENTRY_FORMAT).start_format()\
@@ -34,13 +39,7 @@ class FormattedTextLogger(Logger):
 
 
 class NoLogger(Logger):
-    def __init__(self):
-        super().__init__(None)
-
-    def log(self, tag, *texts):
-        pass
-
-    def _get_text_to_send(self, tag, *texts):
+    def log(self, *args):
         pass
 
 
