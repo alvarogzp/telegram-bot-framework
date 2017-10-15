@@ -1,12 +1,12 @@
 from bot.api.domain import Message
-from bot.logger.message_sender import MessageSender
+from bot.logger.message_sender import IntermediateMessageSender
 from bot.logger.message_sender.message_builder import MessageBuilder
 from bot.logger.message_sender.reusable.same import SameMessageSender
 
 
-class ReusableMessageSender(MessageSender):
+class ReusableMessageSender(IntermediateMessageSender):
     def __init__(self, sender: SameMessageSender, builder: MessageBuilder, max_length: int = 4000):
-        self.sender = sender
+        super().__init__(sender)
         self.builder = builder
         self.max_length = max_length
 

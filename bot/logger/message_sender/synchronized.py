@@ -1,9 +1,9 @@
 import threading
 
-from bot.logger.message_sender import MessageSender
+from bot.logger.message_sender import MessageSender, IntermediateMessageSender
 
 
-class SynchronizedMessageSender(MessageSender):
+class SynchronizedMessageSender(IntermediateMessageSender):
     """
     Thread-safe message sender.
 
@@ -12,7 +12,7 @@ class SynchronizedMessageSender(MessageSender):
     """
 
     def __init__(self, sender: MessageSender):
-        self.sender = sender
+        super().__init__(sender)
         self.lock = threading.Lock()
 
     def send(self, text):

@@ -1,12 +1,12 @@
 import time
 
-from bot.logger.message_sender import MessageSender
+from bot.logger.message_sender import IntermediateMessageSender
 from bot.logger.message_sender.reusable.reusable import ReusableMessageSender
 
 
-class TimedReusableMessageSender(MessageSender):
+class TimedReusableMessageSender(IntermediateMessageSender):
     def __init__(self, sender: ReusableMessageSender, reuse_message_for_seconds: int = 60):
-        self.sender = sender
+        super().__init__(sender)
         self.reuse_message_for_seconds = reuse_message_for_seconds
         self.last_new_message_issued_at = time.time()
 
