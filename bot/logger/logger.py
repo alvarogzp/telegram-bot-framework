@@ -31,3 +31,22 @@ class FormattedTextLogger(Logger):
         text = FormattedText().normal(TEXT_SEPARATOR).join(texts)
         return FormattedText().normal(LOG_ENTRY_FORMAT).start_format()\
             .normal(time=time.strftime("%X")).concat(tag=tag).concat(text=text).end_format()
+
+
+class LoggerFactory:
+    @classmethod
+    def get(cls, logger_type: str, sender: MessageSender):
+        if logger_type == "formatted":
+            return cls.get_formatted(sender)
+        elif logger_type == "plain":
+            return cls.get_plain(sender)
+        else:
+            raise Exception("Unknown Logger requested (" + logger_type + ")")
+
+    @staticmethod
+    def get_formatted(sender: MessageSender):
+        return FormattedTextLogger(sender)
+
+    @staticmethod
+    def get_plain(sender: MessageSender):
+        return PlainTextLogger(sender)
