@@ -13,7 +13,7 @@ class ApiCall:
         api_call = lambda: self.__do_api_call_and_handle_error(params)
         scheduler = params.scheduler
         if scheduler:
-            scheduler(Work(api_call, "async_api_call:" + self.name))
+            scheduler(Work(api_call, "async_api_call " + self.name))
         else:
             return api_call()
 
