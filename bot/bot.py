@@ -22,8 +22,9 @@ class Bot:
         self.api = Api(telegram_api, self.state)
         self.logger = AdminLogger(self.api, self.config.admin_chat_id, debug)
         self.scheduler = SchedulerApi(self.logger.work_error)
-        self.scheduler.setup()
-        self.api.enable_async(self.scheduler)
+        if self.config.enable_async:
+            self.scheduler.setup()
+            self.api.enable_async(self.scheduler)
         self.cache.bot_info = self.api.getMe()
         self.action = Action()
 
@@ -65,5 +66,6 @@ class Bot:
             self.logger.error(e, "process_update")
 
     def shutdown(self):
-        self.scheduler.shutdown()
+        if self.config.enable_async:
+            self.scheduler.shutdown()
         self.logger.info("Finished")
