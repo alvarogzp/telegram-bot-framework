@@ -33,6 +33,17 @@ class FormattedTextLogger(Logger):
             .normal(time=time.strftime("%X")).concat(tag=tag).concat(text=text).end_format()
 
 
+class NoLogger(Logger):
+    def __init__(self):
+        super().__init__(None)
+
+    def log(self, tag, *texts):
+        pass
+
+    def _get_text_to_send(self, tag, *texts):
+        pass
+
+
 class LoggerFactory:
     @classmethod
     def get(cls, logger_type: str, sender: MessageSender):
@@ -40,6 +51,8 @@ class LoggerFactory:
             return cls.get_formatted(sender)
         elif logger_type == "plain":
             return cls.get_plain(sender)
+        elif logger_type == "none":
+            return cls.get_no_logger()
         else:
             raise Exception("Unknown Logger requested (" + logger_type + ")")
 
@@ -50,3 +63,7 @@ class LoggerFactory:
     @staticmethod
     def get_plain(sender: MessageSender):
         return PlainTextLogger(sender)
+
+    @staticmethod
+    def get_no_logger():
+        return NoLogger()
