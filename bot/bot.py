@@ -1,3 +1,5 @@
+import time
+
 from bot.action.core.action import Action
 from bot.action.core.update import Update
 from bot.api.api import Api
@@ -57,7 +59,11 @@ class Bot:
             for update in get_updates_func():
                 self.process_update(update)
         except Exception as e:
-            self.logger.error(e, "get_updates")
+            sleep_seconds = self.config.sleep_seconds_on_get_updates_error
+            self.logger.error(e, "get_updates", "Sleeping for {seconds} seconds".format(seconds=sleep_seconds))
+            # there has been an error while getting updates, sleep a little to give a chance
+            # for the server or the network to recover (if that was the case), and to not to flood the server
+            time.sleep(int(sleep_seconds))
 
     def process_update(self, update: Update):
         try:
