@@ -17,7 +17,7 @@ class Bot:
         self.config = Config(CONFIG_DIR)
         self.state = State(STATE_DIR)
         self.cache = Cache()
-        debug = self.config.is_debug_enabled()
+        debug = self.config.debug
         telegram_api = TelegramBotApi(self.config.auth_token, debug)
         self.api = Api(telegram_api, self.state)
         self.logger = AdminLogger(self.api, self.config.admin_chat_id, debug)

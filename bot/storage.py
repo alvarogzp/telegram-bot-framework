@@ -69,11 +69,33 @@ class Storage(AttributeObject):
 
 
 class Config(Storage):
+    DEFAULT_VALUES = {
+        "debug": "true",
+        "enable_async": "true",
+        "sleep_seconds_on_get_updates_error": "60"
+    }
+
+    TRUE_VALUES = ("true", "yes", "on", "1")
+
     def __init__(self, config_dir):
         super().__init__(config_dir)
 
-    def is_debug_enabled(self):
-        return self.get_value("debug").lower() == "true"
+    @property
+    def debug(self):
+        return self.__is_true(super().debug)
+
+    @property
+    def enable_async(self):
+        return self.__is_true(super().enable_async)
+
+    def __is_true(self, value):
+        return value.lower() in self.TRUE_VALUES
+
+    def _getattr(self, key):
+        return self.get_value(key, self._get_default_value(key))
+
+    def _get_default_value(self, key, default_value=None):
+        return self.DEFAULT_VALUES.get(key, default_value)
 
     def get_value(self, key, default_value=None):
         value = super().get_value(key, default_value)
