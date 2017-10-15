@@ -1,9 +1,11 @@
 from bot.api.api import Api
+from bot.logger.message_sender.asynchronous import AsynchronousMessageSender
 from bot.logger.message_sender.message_builder.factory import MessageBuilderFactory
 from bot.logger.message_sender.reusable.reusable import ReusableMessageSender
 from bot.logger.message_sender.reusable.same import SameMessageSender
 from bot.logger.message_sender.reusable.timed import TimedReusableMessageSender
 from bot.logger.message_sender.synchronized import SynchronizedMessageSender
+from bot.multithreading.worker import Worker
 
 
 class MessageSenderFactory:
@@ -19,6 +21,7 @@ class SynchronizedTimedReusableMessageSenderBuilder:
         self.message_builder_type = None
         self.reuse_max_length = None
         self.reuse_max_time = None
+        self.worker = None
 
     def with_api(self, api: Api):
         self.api = api
@@ -40,10 +43,14 @@ class SynchronizedTimedReusableMessageSenderBuilder:
         self.reuse_max_time = reuse_max_time
         return self
 
+    def with_worker(self, worker: Worker):
+        self.worker = worker
+        return self
+
     def build(self):
         self.__check_not_none(self.api, self.chat_id, self.message_builder_type, self.reuse_max_length,
                               self.reuse_max_time)
-        return \
+        sender = \
             SynchronizedMessageSender(
                 TimedReusableMessageSender(
                     ReusableMessageSender(
@@ -54,6 +61,9 @@ class SynchronizedTimedReusableMessageSenderBuilder:
                     reuse_message_for_seconds=self.reuse_max_time
                 )
             )
+        if self.worker:
+            sender = AsynchronousMessageSender(sender, self.worker)
+        return sender
 
     @staticmethod
     def __check_not_none(*args):
@@ -66,4 +76,5 @@ class SynchronizedTimedReusableMessageSenderBuilder:
             .with_chat_id(self.chat_id)\
             .with_message_builder_type(self.message_builder_type)\
             .with_reuse_max_length(self.reuse_max_length)\
-            .with_reuse_max_time(self.reuse_max_time)
+            .with_reuse_max_time(self.reuse_max_time)\
+            .with_worker(self.worker)
