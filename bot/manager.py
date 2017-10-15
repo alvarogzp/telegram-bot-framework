@@ -33,6 +33,8 @@ class BotManager:
             ActionGroup(
                 GlobalGapDetectorAction().then(
 
+                    # # ALWAYS (or SAVE) ACTIONS # #
+
                     MessageAction().then(
                         SaveUserAction(),
 
@@ -61,6 +63,8 @@ class BotManager:
                             SaveMessageAction()
                         )
                     ),
+
+                    # # INTERACTIVE ACTIONS # #
 
                     NoPendingAction().then(
                         MessageAction().then(
@@ -166,6 +170,8 @@ class BotManager:
                             )
                         )
                     ),
+
+                    # # PENDING ACTIONS # #
 
                     PendingAction().then(
                         MessageAction().then(
