@@ -22,6 +22,8 @@ class LoggerAction(IntermediateAction):
         self.logger = self.new_logger(self.config.log_chat_id)
 
     def new_logger(self, chat_id, logger_type: str = None, reuse_max_length: int = None, reuse_max_time: int = None):
+        if chat_id is None:
+            return LoggerFactory.get_no_logger()
         sender_builder = self.sender_builder.copy().with_chat_id(chat_id)
         if logger_type is not None:
             sender_builder.with_message_builder_type(logger_type)
