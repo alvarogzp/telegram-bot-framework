@@ -2,12 +2,8 @@ import traceback
 
 from bot.action.util.textformat import FormattedText
 from bot.api.api import Api
-from bot.logger.logger import FormattedTextLogger
-from bot.logger.message_sender.message_builder.formatted import FormattedTextBuilder
-from bot.logger.message_sender.reusable.reusable import ReusableMessageSender
-from bot.logger.message_sender.reusable.same import SameMessageSender
-from bot.logger.message_sender.reusable.timed import TimedReusableMessageSender
-from bot.logger.message_sender.synchronized import SynchronizedMessageSender
+from bot.logger.logger import LoggerFactory
+from bot.logger.message_sender.factory import MessageSenderFactory
 from bot.multithreading.work import Work
 from bot.multithreading.worker import Worker
 
@@ -18,18 +14,15 @@ INFO_TAG = FormattedText().normal("INFO")
 
 class AdminLogger:
     def __init__(self, api: Api, admin_chat_id: str, debug: bool):
-        sender = \
-            SynchronizedMessageSender(
-                TimedReusableMessageSender(
-                    ReusableMessageSender(
-                        SameMessageSender(api, admin_chat_id),
-                        FormattedTextBuilder(),
-                        max_length=1000
-                    ),
-                    reuse_message_for_seconds=1
-                )
-            )
-        self.logger = FormattedTextLogger(sender)
+        sender = MessageSenderFactory\
+            .get_synchronized_timed_reusable_builder()\
+            .with_api(api)\
+            .with_chat_id(admin_chat_id)\
+            .with_message_builder_type("formatted")\
+            .with_reuse_max_length(1000)\
+            .with_reuse_max_time(1)\
+            .build()
+        self.logger = LoggerFactory.get("formatted", sender)
         self.debug = debug
 
     def work_error(self, error: BaseException, work: Work, worker: Worker):
