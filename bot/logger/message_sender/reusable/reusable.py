@@ -1,28 +1,35 @@
 from bot.api.domain import Message
 from bot.logger.message_sender import IntermediateMessageSender
 from bot.logger.message_sender.message_builder import MessageBuilder
+from bot.logger.message_sender.reusable.limiter import ReusableMessageLimiter
 from bot.logger.message_sender.reusable.same import SameMessageSender
 
 
 class ReusableMessageSender(IntermediateMessageSender):
-    def __init__(self, sender: SameMessageSender, builder: MessageBuilder, max_length: int = 4000):
+    def __init__(self, sender: SameMessageSender, builder: MessageBuilder, limiter: ReusableMessageLimiter):
         super().__init__(sender)
         self.builder = builder
-        self.max_length = max_length
+        self.limiter = limiter
 
     def send(self, text):
         message = self._get_message_for(text)
         self._send(message)
 
     def _get_message_for(self, text):
+        self.__pre_add_limiter_hook(text)
         self.builder.add(text)
-        self.__check_length(text)
+        self.__post_add_limiter_hook(text)
         return self.builder.get_message()
 
-    def __check_length(self, text):
-        if self.builder.get_length() > self.max_length:
+    def __pre_add_limiter_hook(self, text):
+        if self.limiter.should_issue_new_message_pre_add(text):
             self.new()
-            # if length is still greater than max_length, let it fail, otherwise we would enter on infinite loop
+
+    def __post_add_limiter_hook(self, text):
+        if self.limiter.should_issue_new_message_post_add(self.builder):
+            self.new()
+            # add text again to the new message
+            # no hooks are run this time as we could enter in infinite loop
             self.builder.add(text)
 
     def _send(self, message: Message):
@@ -43,3 +50,4 @@ class ReusableMessageSender(IntermediateMessageSender):
     def new(self):
         self.sender.new()
         self.builder.clear()
+        self.limiter.notify_new_message_issued()
