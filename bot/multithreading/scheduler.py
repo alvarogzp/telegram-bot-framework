@@ -30,7 +30,8 @@ class SchedulerApi:
     @staticmethod
     def _start_worker(worker):
         """Can be safely called multiple times on the same worker to start a new thread for it"""
-        thread = threading.Thread(target=worker.run, name=worker.name, daemon=True)
+        thread = threading.Thread(target=worker.run, name=worker.name)
+        thread.daemon = True
         thread.start()
 
     def network(self, work: Work):
