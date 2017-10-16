@@ -35,7 +35,11 @@ class Bot:
         self.action = action
 
     def run(self):
-        self.logger.info("Started")
+        self.logger.info(
+            "Started",
+            "async: {async}".format(async=self.config.async()),
+            "debug: {debug}".format(debug=self.config.debug())
+        )
         try:
             self.main_loop()
         except KeyboardInterrupt:
