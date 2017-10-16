@@ -61,8 +61,11 @@ class VersionAction(Action):
         self.text.start_format().bold(version=version).normal(releases_url=releases_url).end_format()
 
     @staticmethod
-    def get_version(project_package_name):
-        return pkg_resources.get_distribution(project_package_name).version
+    def get_version(project_package_name: str):
+        try:
+            return pkg_resources.get_distribution(project_package_name).version
+        except:
+            return "<unknown>"
 
     def process(self, event):
         self.api.send_message(self.text.build_message().to_chat_replying(event.message))
