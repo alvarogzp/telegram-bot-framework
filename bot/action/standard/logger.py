@@ -4,7 +4,8 @@ from bot.logger.message_sender.factory import MessageSenderFactory
 
 
 class LoggerAction(IntermediateAction):
-    def __init__(self, logger_type: str = "formatted", reuse_max_length: int = 4000, reuse_max_time: int = 60):
+    def __init__(self, logger_type: str = "formatted", reuse_max_length: int = 4000, reuse_max_time: int = 60,
+                 async: bool = True):
         """
         :param logger_type: Either `formatted` or `plain`. Indicates the type of input that the logger accepts.
             If `formatted`, it accepts FormattedText, and if `plain`, it accepts str.
@@ -15,13 +16,15 @@ class LoggerAction(IntermediateAction):
             .with_message_builder_type(logger_type)\
             .with_reuse_max_length(reuse_max_length)\
             .with_reuse_max_time(reuse_max_time)
+        self.async = async
         self.logger = None
 
     def post_setup(self):
         self.sender_builder.with_api(self.api)
         self.logger = self.new_logger(self.config.log_chat_id)
 
-    def new_logger(self, chat_id, logger_type: str = None, reuse_max_length: int = None, reuse_max_time: int = None):
+    def new_logger(self, chat_id, logger_type: str = None, reuse_max_length: int = None, reuse_max_time: int = None,
+                   async: bool = None):
         if chat_id is None:
             return LoggerFactory.get_no_logger()
         sender_builder = self.sender_builder.copy().with_chat_id(chat_id)
@@ -33,6 +36,10 @@ class LoggerAction(IntermediateAction):
             sender_builder.with_reuse_max_length(reuse_max_length)
         if reuse_max_time is not None:
             sender_builder.with_reuse_max_time(reuse_max_time)
+        if async is None:
+            async = self.async
+        if async:
+            sender_builder.with_worker(self.scheduler.new_worker("logger@" + str(chat_id)))
         return LoggerFactory.get(logger_type, sender_builder.build())
 
     def process(self, event):
