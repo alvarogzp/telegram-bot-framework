@@ -57,3 +57,17 @@ class QueueWorker(AbstractWorker):
 
     def shutdown(self):
         self.queue.join()
+
+
+class ImmediateWorker(AbstractWorker):
+    def __init__(self, error_handler: callable):
+        super().__init__("immediate", error_handler)
+
+    def run(self):
+        pass
+
+    def post(self, work: Work):
+        self._work(work)
+
+    def shutdown(self):
+        pass
