@@ -1,20 +1,22 @@
 from bot.api.api import Api
 from bot.logger.message_sender.asynchronous import AsynchronousMessageSender
 from bot.logger.message_sender.message_builder.factory import MessageBuilderFactory
+from bot.logger.message_sender.reusable.limiter.group import ReusableMessageLimiterGroup
+from bot.logger.message_sender.reusable.limiter.length import LengthReusableMessageLimiter
+from bot.logger.message_sender.reusable.limiter.timed import TimedReusableMessageLimiter
 from bot.logger.message_sender.reusable.reusable import ReusableMessageSender
 from bot.logger.message_sender.reusable.same import SameMessageSender
-from bot.logger.message_sender.reusable.timed import TimedReusableMessageSender
 from bot.logger.message_sender.synchronized import SynchronizedMessageSender
 from bot.multithreading.worker import Worker
 
 
 class MessageSenderFactory:
     @staticmethod
-    def get_synchronized_timed_reusable_builder():
-        return SynchronizedTimedReusableMessageSenderBuilder()
+    def get_synchronized_timed_and_length_limited_reusable_builder():
+        return SynchronizedTimedAndLengthLimitedReusableMessageSenderBuilder()
 
 
-class SynchronizedTimedReusableMessageSenderBuilder:
+class SynchronizedTimedAndLengthLimitedReusableMessageSenderBuilder:
     def __init__(self):
         self.api = None
         self.chat_id = None
@@ -52,13 +54,13 @@ class SynchronizedTimedReusableMessageSenderBuilder:
                               self.reuse_max_time)
         sender = \
             SynchronizedMessageSender(
-                TimedReusableMessageSender(
-                    ReusableMessageSender(
-                        SameMessageSender(self.api, self.chat_id),
-                        MessageBuilderFactory.get(self.message_builder_type),
-                        max_length=self.reuse_max_length
-                    ),
-                    reuse_message_for_seconds=self.reuse_max_time
+                ReusableMessageSender(
+                    SameMessageSender(self.api, self.chat_id),
+                    MessageBuilderFactory.get(self.message_builder_type),
+                    ReusableMessageLimiterGroup(
+                        LengthReusableMessageLimiter(self.reuse_max_length),
+                        TimedReusableMessageLimiter(self.reuse_max_time)
+                    )
                 )
             )
         if self.worker:
