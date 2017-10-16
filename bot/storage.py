@@ -80,15 +80,14 @@ class Config(Storage):
     def __init__(self, config_dir):
         super().__init__(config_dir)
 
-    @property
     def debug(self):
-        return self.__is_true(super().debug)
+        return self.__is_true("debug")
 
-    @property
     def async(self):
-        return self.__is_true(super().enable_async)
+        return self.__is_true("async")
 
-    def __is_true(self, value):
+    def __is_true(self, key):
+        value = self._getattr(key)
         return value.lower() in self.TRUE_VALUES
 
     def _getattr(self, key):
