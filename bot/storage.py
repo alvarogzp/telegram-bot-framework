@@ -105,7 +105,7 @@ class Config(Storage):
 
     def set_value(self, key, value, append=False):
         # do not allow to modify config values
-        pass
+        raise Exception("config values cannot be modified")
 
 
 class State(Storage):
