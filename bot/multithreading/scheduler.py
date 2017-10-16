@@ -1,7 +1,7 @@
 import queue
 import threading
 
-from bot.multithreading.worker import Worker
+from bot.multithreading.worker import Worker, QueueWorker
 from bot.multithreading.work import Work
 
 
@@ -13,7 +13,7 @@ class SchedulerApi:
         self.io_worker = self._new_worker("io")
 
     def _new_worker(self, name: str):
-        worker = Worker(name, queue.Queue(), self.worker_error_handler)
+        worker = QueueWorker(name, queue.Queue(), self.worker_error_handler)
         self.workers.append(worker)
         return worker
 
