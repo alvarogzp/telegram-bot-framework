@@ -1,3 +1,4 @@
+import project_info
 from bot.action.core.action import ActionGroup
 from bot.action.core.command import CommandAction
 from bot.action.core.filter import MessageAction, TextMessageAction, NoPendingAction, EditedMessageAction, \
@@ -9,6 +10,7 @@ from bot.action.extra.message import ShowMessageAction
 from bot.action.extra.messages import SaveMessageAction, ListMessageAction
 from bot.action.extra.pole import SavePoleAction, ListPoleAction, ManagePoleTimezonesAction
 from bot.action.extra.random import RandomChoiceAction
+from bot.action.standard.about import AboutAction, VersionAction
 from bot.action.standard.admin import RestartAction, EvalAction, AdminActionWithErrorMessage, AdminAction, HaltAction, \
     GroupAdminAction
 from bot.action.standard.answer import AnswerAction
@@ -85,6 +87,22 @@ class BotManager:
                                             CommandAction("start").then(
                                                 AnswerAction(
                                                     "Hello! I am " + self.bot.cache.bot_info.first_name + " and I am here to serve you.")
+                                            ),
+
+                                            CommandAction("about").then(
+                                                AboutAction(
+                                                    project_info.name,
+                                                    author_handle=project_info.author_handle,
+                                                    is_open_source=True,
+                                                    source_url=project_info.source_url,
+                                                    license_name=project_info.license_name)
+                                            ),
+
+                                            CommandAction("version").then(
+                                                VersionAction(
+                                                    project_info.name,
+                                                    project_info.source_url + "/releases"
+                                                )
                                             ),
 
                                             CommandAction("ping").then(
