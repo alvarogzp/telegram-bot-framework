@@ -70,6 +70,16 @@ class UserFormatter:
         return cls.retrieve(user_id, user_storage_handler).default_format
 
 
+class ChatFormatter:
+    @staticmethod
+    def format(chat):
+        title = chat.title
+        if title:
+            return title
+        else:
+            return "<" + chat.type + ">"
+
+
 class TimeFormatter:
     @staticmethod
     def format(seconds):

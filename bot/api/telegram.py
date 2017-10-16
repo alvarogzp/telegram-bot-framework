@@ -1,9 +1,9 @@
 import requests
 
-from bot.api.domain import ApiObject
-
 
 class TelegramBotApi:
+    """This is a threading-safe API. Avoid breaking it by adding state."""
+
     def __init__(self, auth_token, debug: bool):
         self.base_url = "https://api.telegram.org/bot" + auth_token + "/"
         self.debug = debug
