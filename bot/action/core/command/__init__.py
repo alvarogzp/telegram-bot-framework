@@ -2,7 +2,12 @@ from bot.action.core.action import IntermediateAction
 from bot.action.core.command.parser import UnderscoredCommandParser, CommandParser
 from bot.action.core.command.throttler import NoThrottler
 from bot.action.core.command.throttler.shortlyrepeatedcommand import ShortlyRepeatedCommandThrottler
+from bot.action.util.format import UserFormatter, ChatFormatter
+from bot.action.util.textformat import FormattedText
 from bot.api.domain import MessageEntityParser
+
+
+LOG_TAG = FormattedText().normal("COMMAND")
 
 
 class CommandAction(IntermediateAction):
@@ -25,6 +30,7 @@ class CommandAction(IntermediateAction):
                     additional_text = parser.get_text_after_entity(entity)
                     event.command_args = self.parser.get_command_args(command_text, additional_text).lstrip(" ")
                     if self.throttler.should_execute(event):
+                        self.__log_command_execution(event)
                         self._continue(event)
 
     @staticmethod
@@ -35,6 +41,18 @@ class CommandAction(IntermediateAction):
     @staticmethod
     def is_valid_command(entity):
         return entity.type == "bot_command" and entity.offset == 0
+
+    @staticmethod
+    def __log_command_execution(event):
+        event.logger.log(
+            LOG_TAG,
+            FormattedText().normal("Chat: {chat}").start_format()
+                .bold(chat=ChatFormatter.format(event.chat)).end_format(),
+            FormattedText().normal("User: {user}").start_format()
+                .bold(user=UserFormatter(event.message.from_).full_format).end_format(),
+            FormattedText().normal("Command: {command} {args}").start_format()
+                .bold(command=event.command, args=event.command_args).end_format()
+        )
 
 
 class UnderscoredCommandBuilder:

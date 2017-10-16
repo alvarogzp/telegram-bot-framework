@@ -69,11 +69,32 @@ class Storage(AttributeObject):
 
 
 class Config(Storage):
+    DEFAULT_VALUES = {
+        "debug": "true",
+        "async": "true",
+        "sleep_seconds_on_get_updates_error": "60"
+    }
+
+    TRUE_VALUES = ("true", "yes", "on", "1")
+
     def __init__(self, config_dir):
         super().__init__(config_dir)
 
-    def is_debug_enabled(self):
-        return self.get_value("debug").lower() == "true"
+    def debug(self):
+        return self.__is_true("debug")
+
+    def async(self):
+        return self.__is_true("async")
+
+    def __is_true(self, key):
+        value = self._getattr(key)
+        return value.lower() in self.TRUE_VALUES
+
+    def _getattr(self, key):
+        return self.get_value(key, self._get_default_value(key))
+
+    def _get_default_value(self, key, default_value=None):
+        return self.DEFAULT_VALUES.get(key, default_value)
 
     def get_value(self, key, default_value=None):
         value = super().get_value(key, default_value)
@@ -83,7 +104,7 @@ class Config(Storage):
 
     def set_value(self, key, value, append=False):
         # do not allow to modify config values
-        pass
+        raise Exception("config values cannot be modified")
 
 
 class State(Storage):

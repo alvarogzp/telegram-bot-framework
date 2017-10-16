@@ -1,17 +1,6 @@
 from bot.api.api import Api
+from bot.multithreading.scheduler import SchedulerApi
 from bot.storage import Config, State, Cache
-from bot.utils.attributeobject import DictionaryObject
-
-
-class Event(DictionaryObject):
-    pass
-
-
-class Update(Event):
-    def __init__(self, update, is_pending):
-        super().__init__()
-        self.update = update
-        self.is_pending = is_pending
 
 
 class Action:
@@ -21,11 +10,12 @@ class Action:
     def get_name(self):
         return self.__class__.__name__
 
-    def setup(self, api: Api, config: Config, state: State, cache: Cache):
+    def setup(self, api: Api, config: Config, state: State, cache: Cache, scheduler: SchedulerApi):
         self.api = api
         self.config = config
         self.state = state
         self.cache = cache
+        self.scheduler = scheduler
         self.post_setup()
 
     def post_setup(self):
@@ -44,8 +34,8 @@ class ActionGroup(Action):
         self.actions.extend(actions)
 
     def setup(self, *args):
-        self.for_each(lambda action: action.setup(*args))
         super().setup(*args)
+        self.for_each(lambda action: action.setup(*args))
 
     def process(self, event):
         self.for_each(lambda action: action.process(event._copy()))

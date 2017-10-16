@@ -1,8 +1,10 @@
-import json
-
+from bot.action.core.update import Update
+from bot.api.call.call import ApiCall
+from bot.api.call.params import ApiCallParams
 from bot.api.domain import Message, OutApiObject, Photo, Sticker, Document, Voice, VideoNote, Audio, Video, Location, \
-    Contact, ApiObject, ApiObjectList
-from bot.api.telegram import TelegramBotApi, TelegramBotApiException
+    Contact
+from bot.api.telegram import TelegramBotApi
+from bot.multithreading.scheduler import SchedulerApi
 from bot.storage import State
 
 
@@ -10,6 +12,10 @@ class Api:
     def __init__(self, telegram_api: TelegramBotApi, state: State):
         self.telegram_api = telegram_api
         self.state = state
+        self.async = self
+
+    def enable_async(self, scheduler: SchedulerApi):
+        self.async = AsyncApi(self, scheduler)
 
     def send_message(self, message: Message, **params):
         message_params = message.data.copy()
@@ -56,13 +62,14 @@ class Api:
             there_are_pending_updates = False
             for update in self.get_updates(timeout=0):
                 there_are_pending_updates = True
+                update.is_pending = True
                 yield update
 
     def get_updates(self, timeout=45):
         updates = self.getUpdates(offset=self.__get_updates_offset(), timeout=timeout)
         for update in updates:
             self.__set_updates_offset(update.update_id)
-            yield update
+            yield Update(update)
 
     def __get_updates_offset(self):
         return self.state.next_update_id
@@ -75,41 +82,29 @@ class Api:
 
     def __get_api_call_hook_for(self, api_call):
         api_func = self.telegram_api.__getattr__(api_call)
-        return lambda **params: self.__api_call_hook(api_func, params)
-
-    def __api_call_hook(self, api_func, params):
-        local_params = self.__pop_local_params(params)
-        self.__flat_params(params)
-        try:
-            return self.__do_api_call(api_func, params)
-        except TelegramBotApiException as e:
-            return self.__handle_api_error(e, local_params)
+        call = ApiCall(api_func, api_call)
+        return lambda **params: self.__api_call_hook(call, params)
 
     @staticmethod
-    def __pop_local_params(params):
-        local_params = {}
-        for local_param in OutApiObject.LOCAL_PARAMS:
-            if local_param in params:
-                local_params[local_param] = params.pop(local_param)
-        return local_params
+    def __api_call_hook(call: ApiCall, params: dict):
+        return call.call(ApiCallParams(params))
 
-    @staticmethod
-    def __flat_params(params):
-        for param, value in params.copy().items():
-            if isinstance(value, (ApiObjectList, ApiObject)):
-                value = value.unwrap_api_object()
-                # not saving now as we assume it will also enter the next if
-            if type(value) in (list, dict, tuple):
-                params[param] = json.dumps(value, separators=(',', ':'))
 
-    @staticmethod
-    def __do_api_call(api_func, params):
-        return ApiObject.wrap_api_object(api_func(**params))
+class AsyncApi:
+    def __init__(self, api: Api, scheduler: SchedulerApi):
+        self.api = api
+        self.scheduler = scheduler
 
-    @staticmethod
-    def __handle_api_error(e, local_params):
-        error_callback = local_params.get(OutApiObject.LOCAL_PARAM_ERROR_CALLBACK)
-        if callable(error_callback):
-            return error_callback(e)
-        else:
-            raise e
+    def __getattr__(self, item):
+        return self.__get_call_hook_for(item)
+
+    def __get_call_hook_for(self, function_name):
+        func = getattr(self.api, function_name)
+        return lambda *args, **kwargs: self.__call_hook(func, args, kwargs)
+
+    def __call_hook(self, func, args, kwargs):
+        self.__add_scheduler(kwargs)
+        return func(*args, **kwargs)
+
+    def __add_scheduler(self, args: dict):
+        args[OutApiObject.LOCAL_PARAM_SCHEDULER] = self.scheduler.network

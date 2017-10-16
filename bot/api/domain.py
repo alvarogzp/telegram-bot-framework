@@ -49,7 +49,22 @@ class ApiObjectList:
 
 class OutApiObject(ApiObject):
     LOCAL_PARAM_ERROR_CALLBACK = "__error_callback"
-    LOCAL_PARAMS = [LOCAL_PARAM_ERROR_CALLBACK]
+    """
+    It must be assigned to a callable object that will be called with a single param of type TelegramBotApiException
+    when the server answers with an error response.
+    The exception won't be raised if this is present and of type callable.
+    """
+
+    LOCAL_PARAM_SCHEDULER = "__scheduler"
+    """
+    It must be assigned to a callable object that accepts a single parameter of type Work.
+    When present, the api call will be posted to the scheduler, so that it will be performed on that
+    scheduler asynchronously.
+    Thus, the api call will return immediately on the current thread and it will return no result.
+    If an error callback is present, it will also be executed on the scheduler if the call fails.
+    """
+
+    LOCAL_PARAMS = [LOCAL_PARAM_ERROR_CALLBACK, LOCAL_PARAM_SCHEDULER]
 
     def with_error_callback(self, func):
         self.data[self.LOCAL_PARAM_ERROR_CALLBACK] = func
@@ -75,6 +90,9 @@ class Message(OutApiObject):
         self.to_chat(message=message)
         self.reply_to_message(message)
         return self
+
+    def set_message_id(self, message_id):
+        self.data["message_id"] = message_id
 
     @staticmethod
     def create(text, chat_id=None, **kwargs):

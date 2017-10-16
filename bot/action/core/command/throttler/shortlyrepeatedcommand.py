@@ -1,11 +1,16 @@
 from bot.action.core.command.throttler import Throttler
 from bot.action.standard import chatsettings
 from bot.action.standard.chatsettings import ChatSettings
+from bot.action.util.format import UserFormatter, ChatFormatter
 from bot.action.util.textformat import FormattedText
+from bot.api.api import Api
+
+
+LOG_TAG = FormattedText().bold("THROTTLER")
 
 
 class ShortlyRepeatedCommandThrottler(Throttler):
-    def __init__(self, api):
+    def __init__(self, api: Api):
         self.api = api
         self.recent_commands = {}
 
@@ -32,11 +37,26 @@ class ShortlyRepeatedCommandThrottler(Throttler):
 
     def __send_throttling_warning(self, event, throttling_state):
         remaining_seconds = throttling_state.remaining_seconds(event.message.date)
+        self.__log_throttling(event, remaining_seconds)
         message = FormattedText().bold("Ignoring repeated command.").normal(" Try again in ")\
             .code_inline(remaining_seconds).normal(" seconds.")\
             .build_message()
         message.to_chat_replying(event.message)
         self.api.send_message(message)
+
+    @staticmethod
+    def __log_throttling(event, remaining_seconds):
+        event.logger.log(
+            LOG_TAG,
+            FormattedText().normal("Chat: {chat}").start_format()
+                .bold(chat=ChatFormatter.format(event.chat)).end_format(),
+            FormattedText().normal("User: {user}").start_format()
+                .bold(user=UserFormatter(event.message.from_).full_format).end_format(),
+            FormattedText().normal("Command: {command} {args}").start_format()
+                .bold(command=event.command, args=event.command_args).end_format(),
+            FormattedText().normal("Throttling for {seconds} seconds.").start_format()
+                .bold(seconds=remaining_seconds).end_format()
+        )
 
 
 class CommandKey:

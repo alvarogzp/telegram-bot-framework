@@ -75,6 +75,12 @@ class FormattedText:
     def start_format(self):
         return FormattedTextStringFormat(self)
 
+    def length(self):
+        return len(self.text)
+
+    def clear(self):
+        self.text = ""
+
 
 class FormattedTextFactory:
     @staticmethod
@@ -197,7 +203,7 @@ class TextFormatterFactory:
 
 
 class FormattedTextStringFormat:
-    def __init__(self, formatted_text):
+    def __init__(self, formatted_text: FormattedText):
         self.formatted_text = formatted_text
         self.formatter = formatted_text.formatter
         self.format_args = []

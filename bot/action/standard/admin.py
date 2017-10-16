@@ -1,6 +1,7 @@
 import sys
 
 from bot.action.core.action import Action, IntermediateAction
+from bot.action.util.textformat import FormattedText
 from bot.api.domain import Message
 
 EXIT_STATUS_TO_HALT_BOT = 55
@@ -16,9 +17,14 @@ class RestartAction(Action):
 class EvalAction(Action):
     def process(self, event):
         code = event.command_args
-        result = eval(code)
-        response_message = "Evaluated. Result: %s" % result
-        self.api.send_message(Message.create_reply(event.message, response_message))
+        response = FormattedText()
+        try:
+            result = eval(code)
+        except Exception as e:
+            response.normal("Error: {error}").start_format().bold(error=str(e)).end_format()
+        else:
+            response.normal("Result: {result}").start_format().bold(result=result).end_format()
+        self.api.send_message(response.build_message().to_chat_replying(event.message))
 
 
 class HaltAction(Action):
