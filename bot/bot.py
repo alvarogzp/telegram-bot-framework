@@ -64,10 +64,18 @@ class Bot:
                 self.process_update(update)
         except Exception as e:
             sleep_seconds = self.config.sleep_seconds_on_get_updates_error
-            self.logger.error(e, "get_updates", "Sleeping for {seconds} seconds".format(seconds=sleep_seconds))
+            # we do not want to let non-fatal (eg. API) errors to escape from here
+            self.__safe_log_error(e, "get_updates", "Sleeping for {seconds} seconds".format(seconds=sleep_seconds))
             # there has been an error while getting updates, sleep a little to give a chance
             # for the server or the network to recover (if that was the case), and to not to flood the server
             time.sleep(int(sleep_seconds))
+
+    def __safe_log_error(self, error: Exception, *info: str):
+        """Log error failing silently on error"""
+        try:
+            self.logger.error(error, *info)
+        except:
+            pass
 
     def process_update(self, update: Update):
         try:
