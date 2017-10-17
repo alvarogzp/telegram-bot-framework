@@ -1,3 +1,5 @@
+import threading
+
 import requests
 
 
@@ -7,6 +9,7 @@ class TelegramBotApi:
     def __init__(self, auth_token, debug: bool):
         self.base_url = "https://api.telegram.org/bot" + auth_token + "/"
         self.debug = debug
+        self.local = threading.local()
 
     def __getattr__(self, item):
         return self.__get_request_from_function_name(item)
@@ -15,13 +18,20 @@ class TelegramBotApi:
         return lambda **params: self.__send_request(function_name, params)
 
     def __send_request(self, command, params):
-        request = requests.get(self.base_url + command, params=params, timeout=60)
+        request = self.__get_session().get(self.base_url + command, params=params, timeout=60)
         self.__log_request(request)
         response = request.json()
         self.__log_response(response)
         if not response["ok"]:
             raise TelegramBotApiException(response["description"])
         return response["result"]
+
+    def __get_session(self):
+        session = self.local.__dict__.get("session")
+        if not session:
+            session = requests.session()
+            self.local.session = session
+        return session
 
     def __log_request(self, request):
         if self.debug:
