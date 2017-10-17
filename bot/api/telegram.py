@@ -20,11 +20,12 @@ class TelegramBotApi:
     def __send_request(self, command, params):
         request = requests.Request("GET", self.base_url + command, params=params).prepare()
         self.__log_request(request)
-        response = self.__get_session().send(request, timeout=60).json()
+        response = self.__get_session().send(request, timeout=60)
         self.__log_response(response)
-        if not response["ok"]:
-            raise TelegramBotApiException(response["description"])
-        return response["result"]
+        json_response = response.json()
+        if not json_response["ok"]:
+            raise TelegramBotApiException(json_response["description"])
+        return json_response["result"]
 
     def __get_session(self):
         session = self.local.__dict__.get("session")
@@ -33,13 +34,13 @@ class TelegramBotApi:
             self.local.session = session
         return session
 
-    def __log_request(self, request):
+    def __log_request(self, request: requests.PreparedRequest):
         if self.debug:
             print(">> " + request.url)
 
-    def __log_response(self, response):
+    def __log_response(self, response: requests.Response):
         if self.debug:
-            print("<< " + str(response))
+            print("<< " + response.text)
 
 
 class TelegramBotApiException(Exception):
