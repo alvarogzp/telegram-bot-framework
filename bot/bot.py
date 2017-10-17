@@ -54,11 +54,16 @@ class Bot:
             self.shutdown()
 
     def main_loop(self):
-        self.get_and_process_updates(self.api.get_pending_updates)
+        while self.get_and_process_updates(self.api.get_pending_updates):
+            pass
         while True:
             self.get_and_process_updates(self.api.get_updates)
 
     def get_and_process_updates(self, get_updates_func: callable):
+        """
+        :return: None if the updates returned by the `get_updates_func` were processed ok,
+            and an Exception object if there was an error while processing them.
+        """
         try:
             for update in get_updates_func():
                 self.process_update(update)
@@ -69,6 +74,8 @@ class Bot:
             # there has been an error while getting updates, sleep a little to give a chance
             # for the server or the network to recover (if that was the case), and to not to flood the server
             time.sleep(int(sleep_seconds))
+            # signal the error to the caller
+            return e
 
     def __safe_log_error(self, error: Exception, *info: str):
         """Log error failing silently on error"""
