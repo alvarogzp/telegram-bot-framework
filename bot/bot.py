@@ -81,6 +81,8 @@ class Bot:
         try:
             self.action.process(update)
         except Exception as e:
+            # As logger errors are probably API failures that the next updates may also get,
+            # let them to be propagated so that no more updates are processed before waiting some time
             self.logger.error(e, "process_update")
 
     def shutdown(self):
