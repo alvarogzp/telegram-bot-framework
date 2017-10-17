@@ -18,9 +18,9 @@ class TelegramBotApi:
         return lambda **params: self.__send_request(function_name, params)
 
     def __send_request(self, command, params):
-        request = self.__get_session().get(self.base_url + command, params=params, timeout=60)
+        request = requests.Request("GET", self.base_url + command, params=params).prepare()
         self.__log_request(request)
-        response = request.json()
+        response = self.__get_session().send(request, timeout=60).json()
         self.__log_response(response)
         if not response["ok"]:
             raise TelegramBotApiException(response["description"])
