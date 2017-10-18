@@ -8,8 +8,9 @@ from urllib3 import Retry
 class TelegramBotApi:
     """This is a threading-safe API. Avoid breaking it by adding state."""
 
-    def __init__(self, auth_token, debug: bool):
+    def __init__(self, auth_token, reuse_connections: bool, debug: bool):
         self.base_url = "https://api.telegram.org/bot" + auth_token + "/"
+        self.reuse_connections = reuse_connections
         self.debug = debug
         self.local = threading.local()
 
@@ -30,6 +31,12 @@ class TelegramBotApi:
         return json_response["result"]
 
     def __get_session(self):
+        if not self.reuse_connections:
+            # Returning a new session every time, as requests does when calling
+            # directly its request() function.
+            # Not calling self.__create_session() to avoid setting a retry policy
+            # that we do not need for one-time sessions.
+            return requests.session()
         session = self.local.__dict__.get("session")
         if not session:
             session = self.__create_session()

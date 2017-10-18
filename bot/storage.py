@@ -72,6 +72,7 @@ class Config(Storage):
     DEFAULT_VALUES = {
         "debug": "true",
         "async": "true",
+        "reuse_connections": "true",
         "sleep_seconds_on_get_updates_error": "60"
     }
 
@@ -85,6 +86,9 @@ class Config(Storage):
 
     def async(self):
         return self.__is_true("async")
+
+    def reuse_connections(self):
+        return self.__is_true("reuse_connections")
 
     def __is_true(self, key):
         value = self._getattr(key)
