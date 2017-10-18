@@ -2,6 +2,7 @@ import traceback
 
 from bot.action.util.textformat import FormattedText
 from bot.api.api import Api
+from bot.logger.formatter.exception import ExceptionFormatter
 from bot.logger.logger import LoggerFactory
 from bot.logger.message_sender.factory import MessageSenderFactory
 from bot.multithreading.work import Work
@@ -29,13 +30,13 @@ class AdminLogger:
         self.__error(
             FormattedText().normal("Worker: {worker}").start_format().bold(worker=worker.name).end_format(),
             FormattedText().normal("Work: {work}").start_format().bold(work=work.name).end_format(),
-            FormattedText().bold(str(error))
+            FormattedText().bold(ExceptionFormatter.format(error))
         )
 
     def error(self, error: BaseException, action: str, *additional_info: str):
         self.__error(
             FormattedText().normal("Action: {action}").start_format().bold(action=action).end_format(),
-            FormattedText().bold(str(error)),
+            FormattedText().bold(ExceptionFormatter.format(error)),
             *[FormattedText().normal(info) for info in additional_info]
         )
 

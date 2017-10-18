@@ -3,6 +3,7 @@ import sys
 from bot.action.core.action import Action, IntermediateAction
 from bot.action.util.textformat import FormattedText
 from bot.api.domain import Message
+from bot.logger.formatter.exception import ExceptionFormatter
 
 EXIT_STATUS_TO_HALT_BOT = 55
 
@@ -21,7 +22,7 @@ class EvalAction(Action):
         try:
             result = eval(code)
         except Exception as e:
-            response.normal("Error: {error}").start_format().bold(error=str(e)).end_format()
+            response.normal("Error: {error}").start_format().bold(error=ExceptionFormatter.format(e)).end_format()
         else:
             response.normal("Result: {result}").start_format().bold(result=result).end_format()
         self.api.send_message(response.build_message().to_chat_replying(event.message))
