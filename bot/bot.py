@@ -38,8 +38,8 @@ class Bot:
         self.logger.info(
             "Started",
             "async: {async}".format(async=self.config.async()),
-            "debug: {debug}".format(debug=self.config.debug()),
             "Reusing connections: {reuse_connections}".format(reuse_connections=self.config.reuse_connections()),
+            "debug: {debug}".format(debug=self.config.debug()),
             "Error tracebacks: {error_tracebacks}".format(error_tracebacks=self.config.send_error_tracebacks())
         )
         try:
