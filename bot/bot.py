@@ -56,7 +56,7 @@ class Bot:
             self.shutdown()
 
     def main_loop(self):
-        while self.get_and_process_updates(self.api.get_pending_updates):
+        while self.get_and_process_updates(self.api.get_pending_updates) is not None:
             pass
         while True:
             self.get_and_process_updates(self.api.get_updates)
@@ -72,7 +72,7 @@ class Bot:
         except Exception as e:
             sleep_seconds = self.config.sleep_seconds_on_get_updates_error
             # we do not want to let non-fatal (eg. API) errors to escape from here
-            self.__safe_log_error(e, "get_updates", "Sleeping for {seconds} seconds".format(seconds=sleep_seconds))
+            self.__safe_log_error(e, "get_updates", "Sleeping for {seconds} seconds.".format(seconds=sleep_seconds))
             # there has been an error while getting updates, sleep a little to give a chance
             # for the server or the network to recover (if that was the case), and to not to flood the server
             time.sleep(int(sleep_seconds))
