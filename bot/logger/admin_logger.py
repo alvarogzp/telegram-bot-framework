@@ -2,6 +2,7 @@ import traceback
 
 from bot.action.util.textformat import FormattedText
 from bot.api.api import Api
+from bot.api.telegram import TelegramBotApiException
 from bot.logger.formatter.exception import ExceptionFormatter
 from bot.logger.logger import LoggerFactory
 from bot.logger.message_sender.factory import MessageSenderFactory
@@ -10,11 +11,13 @@ from bot.multithreading.worker import Worker
 
 
 ERROR_TAG = FormattedText().bold("ERROR")
+TRACEBACK_TAG = FormattedText().code_inline("TRACEBACK")
+
 INFO_TAG = FormattedText().normal("INFO")
 
 
 class AdminLogger:
-    def __init__(self, api: Api, admin_chat_id: str, debug: bool):
+    def __init__(self, api: Api, admin_chat_id: str, print_tracebacks: bool, send_tracebacks: bool):
         sender = MessageSenderFactory\
             .get_synchronized_timed_and_length_limited_reusable_builder()\
             .with_api(api)\
@@ -24,7 +27,8 @@ class AdminLogger:
             .with_reuse_max_time(1)\
             .build()
         self.logger = LoggerFactory.get("formatted", sender)
-        self.debug = debug
+        self.print_tracebacks = print_tracebacks
+        self.send_tracebacks = send_tracebacks
 
     def work_error(self, error: BaseException, work: Work, worker: Worker):
         self.__error(
@@ -41,12 +45,23 @@ class AdminLogger:
         )
 
     def __error(self, *texts: FormattedText):
-        self.__print_traceback()
+        if self.print_tracebacks:
+            self.__print_traceback()
         self.logger.log(ERROR_TAG, *texts)
+        if self.send_tracebacks:
+            self.__send_traceback()
 
-    def __print_traceback(self):
-        if self.debug:
-            traceback.print_exc()
+    @staticmethod
+    def __print_traceback():
+        traceback.print_exc()
+
+    def __send_traceback(self):
+        try:
+            self.logger.log(TRACEBACK_TAG, FormattedText().code_block(traceback.format_exc()))
+        except TelegramBotApiException:
+            # tracebacks can be very long and reach message length limit
+            # retry with a short traceback
+            self.logger.log(TRACEBACK_TAG, FormattedText().code_block(traceback.format_exc(limit=5)))
 
     def info(self, info_text: str, *additional_info: str):
         self.__info(

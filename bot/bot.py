@@ -22,7 +22,7 @@ class Bot:
         debug = self.config.debug()
         telegram_api = TelegramBotApi(self.config.auth_token, self.config.reuse_connections(), debug)
         self.api = Api(telegram_api, self.state)
-        self.logger = AdminLogger(self.api, self.config.admin_chat_id, debug)
+        self.logger = AdminLogger(self.api, self.config.admin_chat_id, debug, self.config.send_error_tracebacks())
         self.scheduler = SchedulerApi(self.logger.work_error)
         if self.config.async():
             self.scheduler.setup()
@@ -39,7 +39,8 @@ class Bot:
             "Started",
             "async: {async}".format(async=self.config.async()),
             "debug: {debug}".format(debug=self.config.debug()),
-            "Reusing connections: {reuse_connections}".format(reuse_connections=self.config.reuse_connections())
+            "Reusing connections: {reuse_connections}".format(reuse_connections=self.config.reuse_connections()),
+            "Error tracebacks: {error_tracebacks}".format(error_tracebacks=self.config.send_error_tracebacks())
         )
         try:
             self.main_loop()

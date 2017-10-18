@@ -29,6 +29,7 @@ A Python 3 interpreter is needed to run it.
    - *Optional* `async`, set it to `true` to enable asynchronous support on the bot, and to `false` to disable it. By default, it is enabled.
    - *Optional* `sleep_seconds_on_get_updates_error`, which indicates the seconds the bot sleeps when there is an error while getting updates, to avoid hitting the server repeatedly when it has problems. By default, the bot sleeps `60` seconds.
    - *Optional* `reuse_connections` can be `true` to enable reusing of network connections to reduce response times by avoiding connection creation overhead, or `false` to disable it. By default it is enabled.
+   - *Optional* `send_error_tracebacks`, can be `true` to send error tracebacks to `admin_chat_id` or `false` to not send them. By default they are sent.
 
 3. Copy the [main.py](main.py) and [bot/manager.py](bot/manager.py) files to your bot directory. Update `main.py` to use your new `BotManager` class instead of the framework one. Launch `main.py`. You now have a working bot with many features out-of-the-box! Configure them (to remove the ones you do not want, and add yours) in the `manager.py` file.
 
