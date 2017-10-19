@@ -29,10 +29,12 @@ class Bot:
             self.api.enable_async(self.scheduler)
         self.cache.bot_info = self.api.getMe()
         self.action = Action()
+        self.update_processor = UpdateProcessor(self.action, self.logger)
 
     def set_action(self, action: Action):
         action.setup(self.api, self.config, self.state, self.cache, self.scheduler)
         self.action = action
+        self.update_processor = UpdateProcessor(self.action, self.logger)
 
     def run(self):
         self.logger.info(
@@ -68,7 +70,7 @@ class Bot:
         """
         try:
             for update in get_updates_func():
-                self.process_update(update)
+                self.update_processor.process_update(update)
         except Exception as e:
             sleep_seconds = self.config.sleep_seconds_on_get_updates_error
             # we do not want to let non-fatal (eg. API) errors to escape from here
@@ -86,6 +88,17 @@ class Bot:
         except:
             pass
 
+    def shutdown(self):
+        if self.config.async():
+            self.scheduler.shutdown()
+        self.logger.info("Finished")
+
+
+class UpdateProcessor:
+    def __init__(self, action: Action, logger: AdminLogger):
+        self.action = action
+        self.logger = logger
+
     def process_update(self, update: Update):
         try:
             self.action.process(update)
@@ -94,7 +107,3 @@ class Bot:
             # let them to be propagated so that no more updates are processed before waiting some time
             self.logger.error(e, "process_update")
 
-    def shutdown(self):
-        if self.config.async():
-            self.scheduler.shutdown()
-        self.logger.info("Finished")
