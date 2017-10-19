@@ -104,11 +104,11 @@ class UpdatesProcessor:
 
     def run(self):
         while self.should_keep_processing_updates():
-            self.get_and_process()
+            self.__get_and_process_handling_errors()
 
-    def get_and_process(self):
+    def __get_and_process_handling_errors(self):
         try:
-            self._get_and_process()
+            self.__get_and_process()
         except Exception as e:
             self.__handle_error(e)
             # notify there has been an error
@@ -117,7 +117,7 @@ class UpdatesProcessor:
             # notify successful processing
             self.processing_successful()
 
-    def _get_and_process(self):
+    def __get_and_process(self):
         for update in self.get_updates_func():
             self.update_processor.process_update(update)
             self.number_of_updates_processed += 1
