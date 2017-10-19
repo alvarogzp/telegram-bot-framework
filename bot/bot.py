@@ -66,7 +66,8 @@ class Bot:
         processor = PendingUpdatesProcessor(self.api.get_pending_updates, self.logger, self.config,
                                             self.update_processor)
         processor.run()
-        self.logger.info("Started", "All pending updates processed.")
+        self.logger.info("Started", "All pending updates processed. There were: {pending_updates_number}"
+                         .format(pending_updates_number=processor.number_of_updates_processed))
 
     def process_normal_updates(self):
         NormalUpdatesProcessor(self.api.get_updates, self.logger, self.config, self.update_processor).run()
@@ -99,6 +100,7 @@ class UpdatesProcessor:
         self.config = config
         self.update_processor = update_processor
         self.last_error = None
+        self.number_of_updates_processed = 0
 
     def run(self):
         while self.should_keep_processing_updates():
@@ -118,6 +120,7 @@ class UpdatesProcessor:
     def _get_and_process(self):
         for update in self.get_updates_func():
             self.update_processor.process_update(update)
+            self.number_of_updates_processed += 1
 
     def __handle_error(self, error: Exception):
         sleep_seconds = self.config.sleep_seconds_on_get_updates_error
