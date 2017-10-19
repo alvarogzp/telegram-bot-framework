@@ -92,6 +92,10 @@ class BenchmarkAction(Action):
             thread_number
         ))
 
+    def __get_process_uptime(self):
+        create_time = psutil.Process().create_time()
+        return self.__get_elapsed_seconds_since(create_time)
+
     @staticmethod
     def __get_process_memory_usage():
         current_process = psutil.Process()
@@ -115,10 +119,6 @@ class BenchmarkAction(Action):
             system_uptime,
             cpu_usage
         ))
-
-    def __get_process_uptime(self):
-        create_time = psutil.Process().create_time()
-        return self.__get_elapsed_seconds_since(create_time)
 
     @staticmethod
     def __get_elapsed_seconds_since(timestamp):
