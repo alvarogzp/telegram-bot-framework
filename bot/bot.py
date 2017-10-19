@@ -38,7 +38,7 @@ class Bot:
 
     def run(self):
         self.logger.info(
-            "Started",
+            "Starting",
             "async: {async}".format(async=self.config.async()),
             "Reusing connections: {reuse_connections}".format(reuse_connections=self.config.reuse_connections()),
             "debug: {debug}".format(debug=self.config.debug()),
@@ -65,6 +65,7 @@ class Bot:
     def process_pending_updates(self):
         while self.get_and_process_updates(self.api.get_pending_updates) is not None:
             pass
+        self.logger.info("Started", "All pending updates processed.")
 
     def process_normal_updates(self):
         while True:
