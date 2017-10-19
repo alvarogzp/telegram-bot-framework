@@ -188,7 +188,7 @@ class PendingUpdatesProcessor(UpdatesProcessor):
         # if there has been an error not all pending updates were processed
         # so try again until it ends without error
         was_error = self.last_error is not None
-        if was_error:
+        if was_error and self.last_error is not True:
             self.safe_log_info("Restarting", "Recovered from error. Continue processing pending updates...")
         return was_error
 
