@@ -132,8 +132,12 @@ class UpdatesProcessor:
 
     def _safe_log_error(self, error: Exception, *info: str):
         """Log error failing silently on error"""
+        self.__do_safe(self.logger.error(error, *info))
+
+    @staticmethod
+    def __do_safe(func: callable):
         try:
-            self.logger.error(error, *info)
+            return func()
         except:
             pass
 
