@@ -14,6 +14,7 @@ from bot.action.standard.about import AboutAction, VersionAction
 from bot.action.standard.admin import RestartAction, EvalAction, AdminActionWithErrorMessage, AdminAction, HaltAction, \
     GroupAdminAction
 from bot.action.standard.answer import AnswerAction
+from bot.action.standard.benchmark import BenchmarkAction
 from bot.action.standard.chatsettings.action import ChatSettingsAction
 from bot.action.standard.config import ConfigAction
 from bot.action.standard.enterexit import GreetAction, LeaveAction
@@ -103,6 +104,10 @@ class BotManager:
                                                     project_info.name,
                                                     project_info.source_url + "/releases"
                                                 )
+                                            ),
+
+                                            CommandAction("benchmark").then(
+                                                BenchmarkAction()
                                             ),
 
                                             CommandAction("ping").then(
