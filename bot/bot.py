@@ -58,8 +58,15 @@ class Bot:
             self.shutdown()
 
     def main_loop(self):
+        while True:
+            self.process_pending_updates()
+            self.process_normal_updates()
+
+    def process_pending_updates(self):
         while self.get_and_process_updates(self.api.get_pending_updates) is not None:
             pass
+
+    def process_normal_updates(self):
         while True:
             self.get_and_process_updates(self.api.get_updates)
 
