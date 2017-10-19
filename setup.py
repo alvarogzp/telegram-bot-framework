@@ -24,7 +24,8 @@ setup(
 
     install_requires=[
         'requests',
-        'pytz'
+        'pytz',
+        'psutil'
     ],
 
     python_requires='>=3',

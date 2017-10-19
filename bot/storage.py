@@ -71,8 +71,11 @@ class Storage(AttributeObject):
 class Config(Storage):
     DEFAULT_VALUES = {
         "debug": "true",
+        "send_error_tracebacks": "true",
         "async": "true",
-        "sleep_seconds_on_get_updates_error": "60"
+        "reuse_connections": "true",
+        "sleep_seconds_on_get_updates_error": "60",
+        "max_error_seconds_allowed_in_normal_mode": "3600"
     }
 
     TRUE_VALUES = ("true", "yes", "on", "1")
@@ -83,8 +86,14 @@ class Config(Storage):
     def debug(self):
         return self.__is_true("debug")
 
+    def send_error_tracebacks(self):
+        return self.__is_true("send_error_tracebacks")
+
     def async(self):
         return self.__is_true("async")
+
+    def reuse_connections(self):
+        return self.__is_true("reuse_connections")
 
     def __is_true(self, key):
         value = self._getattr(key)

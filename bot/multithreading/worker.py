@@ -4,6 +4,9 @@ from bot.multithreading.work import Work
 
 
 class Worker:
+    def __init__(self, name: str):
+        self.name = name
+
     def run(self):
         raise NotImplementedError()
 
@@ -16,7 +19,7 @@ class Worker:
 
 class AbstractWorker(Worker):
     def __init__(self, name: str, error_handler: callable):
-        self.name = name
+        super().__init__(name)
         self.error_handler = error_handler
 
     def _work(self, work: Work):
