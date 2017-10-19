@@ -63,38 +63,13 @@ class Bot:
             self.process_normal_updates()
 
     def process_pending_updates(self):
-        while self.get_and_process_updates(self.api.get_pending_updates) is not None:
-            pass
+        processor = PendingUpdatesProcessor(self.api.get_pending_updates, self.logger, self.config,
+                                            self.update_processor)
+        processor.run()
         self.logger.info("Started", "All pending updates processed.")
 
     def process_normal_updates(self):
-        while True:
-            self.get_and_process_updates(self.api.get_updates)
-
-    def get_and_process_updates(self, get_updates_func: callable):
-        """
-        :return: None if the updates returned by the `get_updates_func` were processed ok,
-            and an Exception object if there was an error while processing them.
-        """
-        try:
-            for update in get_updates_func():
-                self.update_processor.process_update(update)
-        except Exception as e:
-            sleep_seconds = self.config.sleep_seconds_on_get_updates_error
-            # we do not want to let non-fatal (eg. API) errors to escape from here
-            self.__safe_log_error(e, "get_updates", "Sleeping for {seconds} seconds.".format(seconds=sleep_seconds))
-            # there has been an error while getting updates, sleep a little to give a chance
-            # for the server or the network to recover (if that was the case), and to not to flood the server
-            time.sleep(int(sleep_seconds))
-            # signal the error to the caller
-            return e
-
-    def __safe_log_error(self, error: Exception, *info: str):
-        """Log error failing silently on error"""
-        try:
-            self.logger.error(error, *info)
-        except:
-            pass
+        NormalUpdatesProcessor(self.api.get_updates, self.logger, self.config, self.update_processor).run()
 
     def shutdown(self):
         if self.config.async():
@@ -115,3 +90,102 @@ class UpdateProcessor:
             # let them to be propagated so that no more updates are processed before waiting some time
             self.logger.error(e, "process_update")
 
+
+class UpdatesProcessor:
+    def __init__(self, get_updates_func: callable, logger: AdminLogger, config: Config,
+                 update_processor: UpdateProcessor):
+        self.get_updates_func = get_updates_func
+        self.logger = logger
+        self.config = config
+        self.update_processor = update_processor
+        self.last_error = None
+
+    def run(self):
+        while self.should_keep_processing_updates():
+            self.get_and_process()
+
+    def get_and_process(self):
+        try:
+            self._get_and_process()
+        except Exception as e:
+            self.__handle_error(e)
+            # notify there has been an error
+            self.processing_error(e)
+        else:
+            # notify successful processing
+            self.processing_successful()
+
+    def _get_and_process(self):
+        for update in self.get_updates_func():
+            self.update_processor.process_update(update)
+
+    def __handle_error(self, error: Exception):
+        sleep_seconds = self.config.sleep_seconds_on_get_updates_error
+        # we do not want to let non-fatal (eg. API) errors to escape from here
+        self._safe_log_error(error, "get_and_process", "Sleeping for {seconds} seconds.".format(seconds=sleep_seconds))
+        # there has been an error while getting updates, sleep a little to give a chance
+        # for the server or the network to recover (if that was the case), and to not to flood the server
+        time.sleep(int(sleep_seconds))
+
+    def _safe_log_error(self, error: Exception, *info: str):
+        """Log error failing silently on error"""
+        try:
+            self.logger.error(error, *info)
+        except:
+            pass
+
+    def processing_successful(self):
+        self.last_error = None
+
+    def processing_error(self, error: Exception):
+        self.last_error = error
+
+    def should_keep_processing_updates(self):
+        raise NotImplementedError()
+
+
+class PendingUpdatesProcessor(UpdatesProcessor):
+    def __init__(self, get_updates_func: callable, logger: AdminLogger, config: Config,
+                 update_processor: UpdateProcessor):
+        super().__init__(get_updates_func, logger, config, update_processor)
+        # set to some value other than None to let the processing run the first time
+        self.last_error = True
+
+    def should_keep_processing_updates(self):
+        # if there has been an error not all pending updates were processed
+        # so try again until it ends without error
+        return self.last_error is not None
+
+
+class NormalUpdatesProcessor(UpdatesProcessor):
+    def __init__(self, get_updates_func: callable, logger: AdminLogger, config: Config,
+                 update_processor: UpdateProcessor):
+        super().__init__(get_updates_func, logger, config, update_processor)
+        self.last_successful_processing = time.time()
+
+    def processing_successful(self):
+        super().processing_successful()
+        self.last_successful_processing = time.time()
+
+    def should_keep_processing_updates(self):
+        if self.last_error is None:
+            # if last processing ended without error, keep going!
+            return True
+        max_error_seconds_allowed_in_normal_mode = int(self.config.max_error_seconds_allowed_in_normal_mode)
+        if self.last_successful_processing + max_error_seconds_allowed_in_normal_mode < time.time():
+            # it has happened too much time since last successful processing
+            # although it does not mean no update have been processed, we are
+            # having problems and updates are being delayed, so going back to
+            # process pending updates mode
+            self._safe_log_error(
+                MaxErrorSecondsAllowedInNormalModeExceededException(max_error_seconds_allowed_in_normal_mode),
+                "normal_updates_processor",
+                "Exceeded {max_seconds} max seconds with errors, switching to pending updates mode."
+                    .format(max_seconds=max_error_seconds_allowed_in_normal_mode)
+            )
+            return False
+        return True
+
+
+class MaxErrorSecondsAllowedInNormalModeExceededException(Exception):
+    pass
