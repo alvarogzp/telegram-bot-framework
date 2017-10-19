@@ -178,8 +178,9 @@ class NormalUpdatesProcessor(UpdatesProcessor):
         if self.last_error is None:
             # if last processing ended without error, keep going!
             return True
+        error_seconds_in_normal_mode = time.time() - self.last_successful_processing
         max_error_seconds_allowed_in_normal_mode = int(self.config.max_error_seconds_allowed_in_normal_mode)
-        if self.last_successful_processing + max_error_seconds_allowed_in_normal_mode < time.time():
+        if error_seconds_in_normal_mode > max_error_seconds_allowed_in_normal_mode:
             # it has happened too much time since last successful processing
             # although it does not mean no update have been processed, we are
             # having problems and updates are being delayed, so going back to
