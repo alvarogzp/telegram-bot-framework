@@ -72,7 +72,14 @@ is_virtualenv_activated()
 
 build_bot()
 {
+    install_requirements
     generate_locales
+}
+
+install_requirements()
+{
+    debug "Installing requirements"
+    pip install -r requirements.txt
 }
 
 generate_locales()
