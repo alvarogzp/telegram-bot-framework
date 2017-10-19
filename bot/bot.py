@@ -187,7 +187,10 @@ class PendingUpdatesProcessor(UpdatesProcessor):
     def should_keep_processing_updates(self):
         # if there has been an error not all pending updates were processed
         # so try again until it ends without error
-        return self.last_error is not None
+        was_error = self.last_error is not None
+        if was_error:
+            self.safe_log_info("Restarting", "Recovered from error. Continue processing pending updates...")
+        return was_error
 
     def processing_starting(self):
         self.safe_log_info("Pending", "Processing pending updates...")
