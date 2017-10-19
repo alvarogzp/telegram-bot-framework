@@ -134,6 +134,10 @@ class UpdatesProcessor:
         """Log error failing silently on error"""
         self.__do_safe(self.logger.error(error, *info))
 
+    def safe_log_info(self, *info: str):
+        """Log info failing silently on error"""
+        self.__do_safe(lambda: self.logger.info(*info))
+
     @staticmethod
     def __do_safe(func: callable):
         try:
