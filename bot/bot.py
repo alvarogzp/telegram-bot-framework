@@ -63,11 +63,7 @@ class Bot:
             self.process_normal_updates()
 
     def process_pending_updates(self):
-        processor = PendingUpdatesProcessor(self.api.get_pending_updates, self.logger, self.config,
-                                            self.update_processor)
-        processor.run()
-        self.logger.info("Started", "All pending updates processed. There were: {pending_updates_number}"
-                         .format(pending_updates_number=processor.number_of_updates_processed))
+        PendingUpdatesProcessor(self.api.get_pending_updates, self.logger, self.config, self.update_processor).run()
 
     def process_normal_updates(self):
         NormalUpdatesProcessor(self.api.get_updates, self.logger, self.config, self.update_processor).run()
@@ -192,6 +188,12 @@ class PendingUpdatesProcessor(UpdatesProcessor):
         # if there has been an error not all pending updates were processed
         # so try again until it ends without error
         return self.last_error is not None
+
+    def processing_starting(self):
+        self.safe_log_info("Pending", "Processing pending updates...")
+
+    def processing_ended_successfully(self):
+        self.safe_log_info("Continuing", "Pending updates successfully processed.")
 
 
 class NormalUpdatesProcessor(UpdatesProcessor):
