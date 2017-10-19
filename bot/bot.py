@@ -103,6 +103,14 @@ class UpdatesProcessor:
         self.number_of_updates_processed = 0
 
     def run(self):
+        self.processing_starting()
+        try:
+            self.__processing_loop()
+        finally:
+            self.processing_ended()
+        self.processing_ended_successfully()
+
+    def __processing_loop(self):
         while self.should_keep_processing_updates():
             self.__get_and_process_handling_errors()
 
@@ -145,14 +153,32 @@ class UpdatesProcessor:
         except:
             pass
 
+    def should_keep_processing_updates(self):
+        raise NotImplementedError()
+
     def processing_successful(self):
+        """Updates were processed successfully"""
         self.last_error = None
 
     def processing_error(self, error: Exception):
+        """There has been an error while processing the last updates"""
         self.last_error = error
 
-    def should_keep_processing_updates(self):
-        raise NotImplementedError()
+    def processing_starting(self):
+        """Updates are about to start being processed"""
+        pass
+
+    def processing_ended(self):
+        """Processing has ended, we don't know if successfully or caused by an error"""
+        self.safe_log_info(
+            "Ending",
+            "Updates processed: {updates_processed_number}"
+                .format(updates_processed_number=self.number_of_updates_processed)
+        )
+
+    def processing_ended_successfully(self):
+        """Processing has ended successfully"""
+        pass
 
 
 class PendingUpdatesProcessor(UpdatesProcessor):
