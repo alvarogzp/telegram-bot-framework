@@ -217,15 +217,24 @@ class NormalUpdatesProcessor(UpdatesProcessor):
             # although it does not mean no update have been processed, we are
             # having problems and updates are being delayed, so going back to
             # process pending updates mode
-            self.safe_log_error(
-                MaxErrorSecondsAllowedInNormalModeExceededException(max_error_seconds_allowed_in_normal_mode),
-                "normal_updates_processor",
-                "Exceeded {max_seconds} max seconds with errors, switching to pending updates mode."
-                    .format(max_seconds=max_error_seconds_allowed_in_normal_mode)
+            self.safe_log_info(
+                "Restarting",
+                "Exceeded {max_seconds} maximum seconds with errors (current value: {seconds} seconds)"
+                    .format(max_seconds=max_error_seconds_allowed_in_normal_mode,
+                            seconds=int(error_seconds_in_normal_mode)),
+                "Switching to pending updates mode."
             )
             return False
-        return True
+        else:
+            self.safe_log_info(
+                "Restarted",
+                "Recovered from error (current error burst duration is {seconds} seconds of "
+                "{max_seconds} maximum seconds allowed)"
+                    .format(seconds=int(error_seconds_in_normal_mode),
+                            max_seconds=max_error_seconds_allowed_in_normal_mode),
+                "Continuing in normal updates mode."
+            )
+            return True
 
-
-class MaxErrorSecondsAllowedInNormalModeExceededException(Exception):
-    pass
+    def processing_starting(self):
+        self.safe_log_info("Started", "Switched to normal updates mode.")
