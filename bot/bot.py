@@ -125,12 +125,12 @@ class UpdatesProcessor:
     def __handle_error(self, error: Exception):
         sleep_seconds = self.config.sleep_seconds_on_get_updates_error
         # we do not want to let non-fatal (eg. API) errors to escape from here
-        self._safe_log_error(error, "get_and_process", "Sleeping for {seconds} seconds.".format(seconds=sleep_seconds))
+        self.safe_log_error(error, "get_and_process", "Sleeping for {seconds} seconds.".format(seconds=sleep_seconds))
         # there has been an error while getting updates, sleep a little to give a chance
         # for the server or the network to recover (if that was the case), and to not to flood the server
         time.sleep(int(sleep_seconds))
 
-    def _safe_log_error(self, error: Exception, *info: str):
+    def safe_log_error(self, error: Exception, *info: str):
         """Log error failing silently on error"""
         self.__do_safe(self.logger.error(error, *info))
 
@@ -184,7 +184,7 @@ class NormalUpdatesProcessor(UpdatesProcessor):
             # although it does not mean no update have been processed, we are
             # having problems and updates are being delayed, so going back to
             # process pending updates mode
-            self._safe_log_error(
+            self.safe_log_error(
                 MaxErrorSecondsAllowedInNormalModeExceededException(max_error_seconds_allowed_in_normal_mode),
                 "normal_updates_processor",
                 "Exceeded {max_seconds} max seconds with errors, switching to pending updates mode."
