@@ -50,12 +50,12 @@ class CommandAction(IntermediateAction):
     @staticmethod
     def __log_command_execution(event, elapsed_seconds: float = None):
         infos = [
-            FormattedText().normal("Chat: {chat}").start_format()
-                .bold(chat=ChatFormatter.format(event.chat)).end_format(),
+            FormattedText().normal("{command} {args}").start_format()
+                .bold(command=event.command, args=event.command_args).end_format(),
             FormattedText().normal("User: {user}").start_format()
                 .bold(user=UserFormatter(event.message.from_).full_format).end_format(),
-            FormattedText().normal("Command: {command} {args}").start_format()
-                .bold(command=event.command, args=event.command_args).end_format()
+            FormattedText().normal("Chat: {chat}").start_format()
+                .bold(chat=ChatFormatter.format_group_or_type(event.chat)).end_format()
         ]
         if elapsed_seconds is not None:
             infos.append(

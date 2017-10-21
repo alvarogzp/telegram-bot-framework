@@ -17,8 +17,10 @@ from bot.action.standard.answer import AnswerAction
 from bot.action.standard.benchmark import BenchmarkAction
 from bot.action.standard.chatsettings.action import ChatSettingsAction
 from bot.action.standard.config import ConfigAction
+from bot.action.standard.config_status import ConfigStatusAction
 from bot.action.standard.enterexit import GreetAction, LeaveAction
 from bot.action.standard.gapdetector import GlobalGapDetectorAction
+from bot.action.standard.instance import InstanceAction
 from bot.action.standard.internationalization import InternationalizationAction
 from bot.action.standard.logger import LoggerAction
 from bot.action.standard.perchat import PerChatAction
@@ -114,6 +116,8 @@ class BotManager:
                                                 AnswerAction("Up and running, sir!")
                                             ),
 
+                                            # ADMIN ACTIONS #
+
                                             CommandAction("restart").then(
                                                 AdminActionWithErrorMessage().then(
                                                     RestartAction()
@@ -129,11 +133,23 @@ class BotManager:
                                                     EvalAction()
                                                 )
                                             ),
+                                            CommandAction("configstatus").then(
+                                                AdminActionWithErrorMessage().then(
+                                                    ConfigStatusAction()
+                                                )
+                                            ),
+                                            CommandAction("instance").then(
+                                                AdminActionWithErrorMessage().then(
+                                                    InstanceAction()
+                                                )
+                                            ),
                                             CommandAction("config").then(
                                                 AdminActionWithErrorMessage().then(
                                                     ConfigAction()
                                                 )
                                             ),
+
+                                            # FEATURES #
 
                                             CommandAction("settings").then(
                                                 GroupAdminAction().then(

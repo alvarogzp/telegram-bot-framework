@@ -54,10 +54,13 @@ class UserFormatter:
     def full_format(self):
         """
         Returns the full name (first and last parts), and the username between brackets if the user has it.
+        If there is no info about the user, returns the user id between < and >.
         """
         formatted_user = self.full_name
         if self.user.username is not None:
             formatted_user += " [" + self.user.username + "]"
+        if not formatted_user:
+            formatted_user = "<" + str(self.user.id) + ">"
         return formatted_user
 
     @staticmethod
@@ -72,12 +75,28 @@ class UserFormatter:
 
 class ChatFormatter:
     @staticmethod
-    def format(chat):
-        title = chat.title
-        if title:
-            return title
+    def format_group_or_type(chat):
+        if GroupFormatter.is_group(chat):
+            return GroupFormatter.format(chat)
         else:
             return "<" + chat.type + ">"
+
+    @staticmethod
+    def format_group_or_user(chat):
+        if GroupFormatter.is_group(chat):
+            return GroupFormatter.format(chat)
+        else:
+            return UserFormatter(chat).full_format
+
+
+class GroupFormatter:
+    @staticmethod
+    def format(group):
+        return group.title
+
+    @staticmethod
+    def is_group(chat):
+        return bool(chat.title)
 
 
 class TimeFormatter:

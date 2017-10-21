@@ -75,7 +75,8 @@ class Config(Storage):
         "async": "true",
         "reuse_connections": "true",
         "sleep_seconds_on_get_updates_error": "60",
-        "max_error_seconds_allowed_in_normal_mode": "3600"
+        "max_error_seconds_allowed_in_normal_mode": "3600",
+        "instance_name": ""
     }
 
     TRUE_VALUES = ("true", "yes", "on", "1")
