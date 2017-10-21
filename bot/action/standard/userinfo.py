@@ -39,6 +39,7 @@ class UserStorageHandler:
             "first_name": user.first_name,
             "last_name": user.last_name,
             "username": user.username,
+            "title": user.title  # for chats, they use the user storage too
         })
 
     def save(self, user):
