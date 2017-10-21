@@ -2,6 +2,8 @@ import time
 
 from bot.action.core.action import Action
 from bot.action.core.update import Update
+from bot.action.standard.config_status import ConfigStatus
+from bot.action.util.textformat import FormattedText
 from bot.api.api import Api
 from bot.api.telegram import TelegramBotApi
 from bot.logger.admin_logger import AdminLogger
@@ -52,12 +54,9 @@ class Bot:
             self.shutdown()
 
     def starting(self):
-        self.logger.info(
-            "Starting",
-            "async: {async}".format(async=self.config.async()),
-            "Reusing connections: {reuse_connections}".format(reuse_connections=self.config.reuse_connections()),
-            "debug: {debug}".format(debug=self.config.debug()),
-            "Error tracebacks: {error_tracebacks}".format(error_tracebacks=self.config.send_error_tracebacks())
+        self.logger.info_formatted_text(
+            FormattedText().bold("Starting"),
+            *ConfigStatus(self.config, self.state).get_config_status()
         )
 
     def main_loop(self):
