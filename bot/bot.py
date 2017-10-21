@@ -2,6 +2,8 @@ import time
 
 from bot.action.core.action import Action
 from bot.action.core.update import Update
+from bot.action.standard.config_status import ConfigStatus
+from bot.action.util.textformat import FormattedText
 from bot.api.api import Api
 from bot.api.telegram import TelegramBotApi
 from bot.logger.admin_logger import AdminLogger
@@ -37,13 +39,7 @@ class Bot:
         self.update_processor = UpdateProcessor(self.action, self.logger)
 
     def run(self):
-        self.logger.info(
-            "Starting",
-            "async: {async}".format(async=self.config.async()),
-            "Reusing connections: {reuse_connections}".format(reuse_connections=self.config.reuse_connections()),
-            "debug: {debug}".format(debug=self.config.debug()),
-            "Error tracebacks: {error_tracebacks}".format(error_tracebacks=self.config.send_error_tracebacks())
-        )
+        self.starting()
         try:
             self.main_loop()
         except KeyboardInterrupt:
@@ -56,6 +52,12 @@ class Bot:
             raise e
         finally:
             self.shutdown()
+
+    def starting(self):
+        self.logger.info_formatted_text(
+            FormattedText().bold("Starting"),
+            *ConfigStatus(self.config, self.state).get_config_status()
+        )
 
     def main_loop(self):
         while True:
@@ -136,7 +138,7 @@ class UpdatesProcessor:
 
     def safe_log_error(self, error: Exception, *info: str):
         """Log error failing silently on error"""
-        self.__do_safe(self.logger.error(error, *info))
+        self.__do_safe(lambda: self.logger.error(error, *info))
 
     def safe_log_info(self, *info: str):
         """Log info failing silently on error"""
