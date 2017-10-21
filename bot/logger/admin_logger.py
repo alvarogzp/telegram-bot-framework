@@ -32,15 +32,15 @@ class AdminLogger:
 
     def work_error(self, error: BaseException, work: Work, worker: Worker):
         self.__error(
-            FormattedText().normal("Worker: {worker}").start_format().bold(worker=worker.name).end_format(),
+            FormattedText().bold(ExceptionFormatter.format(error)),
             FormattedText().normal("Work: {work}").start_format().bold(work=work.name).end_format(),
-            FormattedText().bold(ExceptionFormatter.format(error))
+            FormattedText().normal("Worker: {worker}").start_format().bold(worker=worker.name).end_format()
         )
 
     def error(self, error: BaseException, action: str, *additional_info: str):
         self.__error(
-            FormattedText().normal("Action: {action}").start_format().bold(action=action).end_format(),
             FormattedText().bold(ExceptionFormatter.format(error)),
+            FormattedText().normal("Action: {action}").start_format().bold(action=action).end_format(),
             *[FormattedText().normal(info) for info in additional_info]
         )
 
