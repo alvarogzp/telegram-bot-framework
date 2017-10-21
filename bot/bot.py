@@ -37,13 +37,7 @@ class Bot:
         self.update_processor = UpdateProcessor(self.action, self.logger)
 
     def run(self):
-        self.logger.info(
-            "Starting",
-            "async: {async}".format(async=self.config.async()),
-            "Reusing connections: {reuse_connections}".format(reuse_connections=self.config.reuse_connections()),
-            "debug: {debug}".format(debug=self.config.debug()),
-            "Error tracebacks: {error_tracebacks}".format(error_tracebacks=self.config.send_error_tracebacks())
-        )
+        self.starting()
         try:
             self.main_loop()
         except KeyboardInterrupt:
@@ -56,6 +50,15 @@ class Bot:
             raise e
         finally:
             self.shutdown()
+
+    def starting(self):
+        self.logger.info(
+            "Starting",
+            "async: {async}".format(async=self.config.async()),
+            "Reusing connections: {reuse_connections}".format(reuse_connections=self.config.reuse_connections()),
+            "debug: {debug}".format(debug=self.config.debug()),
+            "Error tracebacks: {error_tracebacks}".format(error_tracebacks=self.config.send_error_tracebacks())
+        )
 
     def main_loop(self):
         while True:
