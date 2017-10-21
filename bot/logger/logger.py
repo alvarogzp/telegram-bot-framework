@@ -5,7 +5,7 @@ from bot.logger.message_sender import MessageSender
 
 
 LOG_ENTRY_FORMAT = "{time} [{tag}] {text}"
-TEXT_SEPARATOR = " | "
+TEXT_SEPARATOR = "\n"
 
 
 class Logger:
