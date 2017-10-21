@@ -48,12 +48,12 @@ class ShortlyRepeatedCommandThrottler(Throttler):
     def __log_throttling(event, remaining_seconds):
         event.logger.log(
             LOG_TAG,
-            FormattedText().normal("Chat: {chat}").start_format()
-                .bold(chat=ChatFormatter.format_group_or_type(event.chat)).end_format(),
+            FormattedText().normal("{command} {args}").start_format()
+                .bold(command=event.command, args=event.command_args).end_format(),
             FormattedText().normal("User: {user}").start_format()
                 .bold(user=UserFormatter(event.message.from_).full_format).end_format(),
-            FormattedText().normal("Command: {command} {args}").start_format()
-                .bold(command=event.command, args=event.command_args).end_format(),
+            FormattedText().normal("Chat: {chat}").start_format()
+                .bold(chat=ChatFormatter.format_group_or_type(event.chat)).end_format(),
             FormattedText().normal("Throttling for {seconds} seconds.").start_format()
                 .bold(seconds=remaining_seconds).end_format()
         )
