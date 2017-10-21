@@ -75,12 +75,21 @@ class UserFormatter:
 
 class ChatFormatter:
     @staticmethod
-    def format(chat):
-        title = chat.title
-        if title:
-            return title
+    def format_group_or_type(chat):
+        if GroupFormatter.is_group(chat):
+            return GroupFormatter.format(chat)
         else:
             return "<" + chat.type + ">"
+
+
+class GroupFormatter:
+    @staticmethod
+    def format(group):
+        return group.title
+
+    @staticmethod
+    def is_group(chat):
+        return bool(chat.title)
 
 
 class TimeFormatter:
