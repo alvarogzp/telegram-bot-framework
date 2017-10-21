@@ -8,6 +8,10 @@ from bot.storage import State, Config
 class ConfigStatusAction(Action):
     def process(self, event):
         response = FormattedText().newline().join(ConfigStatus(self.config, self.state).get_config_status())
+        response.newline().newline()\
+            .italic("These are the current values read from storage.").newline()\
+            .italic("But please, note that most of them are being cached at startup and "
+                    "changing them will not modify bot behavior until it is restarted.")
         self.api.send_message(response.build_message().to_chat_replying(event.message))
 
 
