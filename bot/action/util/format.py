@@ -81,6 +81,13 @@ class ChatFormatter:
         else:
             return "<" + chat.type + ">"
 
+    @staticmethod
+    def format_group_or_user(chat):
+        if GroupFormatter.is_group(chat):
+            return GroupFormatter.format(chat)
+        else:
+            return UserFormatter(chat).full_format
+
 
 class GroupFormatter:
     @staticmethod
