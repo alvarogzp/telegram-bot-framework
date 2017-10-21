@@ -116,6 +116,8 @@ class BotManager:
                                                 AnswerAction("Up and running, sir!")
                                             ),
 
+                                            # ADMIN ACTIONS #
+
                                             CommandAction("restart").then(
                                                 AdminActionWithErrorMessage().then(
                                                     RestartAction()
@@ -146,6 +148,8 @@ class BotManager:
                                                     ConfigAction()
                                                 )
                                             ),
+
+                                            # FEATURES #
 
                                             CommandAction("settings").then(
                                                 GroupAdminAction().then(
