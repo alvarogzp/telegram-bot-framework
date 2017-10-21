@@ -69,5 +69,8 @@ class AdminLogger:
             *[FormattedText().normal(info) for info in additional_info]
         )
 
+    def info_formatted_text(self, *info_texts: FormattedText):
+        self.__info(*info_texts)
+
     def __info(self, *texts: FormattedText):
         self.logger.log(INFO_TAG, *texts)
