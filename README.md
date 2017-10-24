@@ -38,3 +38,14 @@ A Python 3 interpreter is needed to run it.
    - You can also copy [run.sh](run.sh) and use it as the launcher script for your bot. It performs some initialization tasks before running the bot, re-executes it if it crashes, and updates your VCS before running.
 
 4. *Optional* To enable i18n support, copy the [locales](locales) dir to your bot base directory, and run its `generate_mo.sh` script (the `run.sh` script will do it for you if you are using it). Use the `locales/` dir as the base dir for your translations. You can use and modify the helper script `update_po.sh` to extract `.po` files from your code.
+
+
+# Authors
+
+- Developed by
+  - Alvaro Gutierrez Perez
+    - alvarogzp@gmail.com
+    - https://linkedin.com/in/alvarogzp
+
+- i18n support and visual improvements
+  - [@KouteiCheke](https://github.com/KouteiCheke)
