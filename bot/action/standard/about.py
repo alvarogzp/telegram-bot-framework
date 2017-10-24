@@ -1,6 +1,6 @@
 import pkg_resources
 
-import project_info
+from bot import project_info
 from bot.action.core.action import Action
 from bot.action.util.textformat import FormattedText
 

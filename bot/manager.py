@@ -1,4 +1,4 @@
-import project_info
+from bot import project_info
 from bot.action.core.action import ActionGroup
 from bot.action.core.command import CommandAction
 from bot.action.core.filter import MessageAction, TextMessageAction, NoPendingAction, EditedMessageAction, \
