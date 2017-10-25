@@ -14,6 +14,7 @@ from bot.action.standard.about import AboutAction, VersionAction
 from bot.action.standard.admin import RestartAction, EvalAction, AdminActionWithErrorMessage, AdminAction, HaltAction, \
     GroupAdminAction
 from bot.action.standard.answer import AnswerAction
+from bot.action.standard.asynchronous import AsynchronousAction
 from bot.action.standard.benchmark import BenchmarkAction, WorkersAction
 from bot.action.standard.chatsettings.action import ChatSettingsAction
 from bot.action.standard.config import ConfigAction
@@ -109,7 +110,14 @@ class BotManager:
                                             ),
 
                                             CommandAction("benchmark").then(
-                                                BenchmarkAction()
+                                                AsynchronousAction(
+                                                    "benchmark",
+                                                    min_workers=0,
+                                                    max_workers=4,
+                                                    max_seconds_idle=60
+                                                ).then(
+                                                    BenchmarkAction()
+                                                ),
                                             ),
 
                                             CommandAction("ping").then(
