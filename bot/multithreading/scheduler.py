@@ -17,6 +17,7 @@ class SchedulerApi:
         self.immediate_worker = ImmediateWorker(worker_error_handler)
         self.network_worker = self._new_worker("network")
         self.io_worker = self._new_worker("io")
+        self.background_worker = self._new_worker("background")
 
     def _new_worker(self, name: str):
         worker = QueueWorker(name, queue.Queue(), self.worker_error_handler)
@@ -54,6 +55,9 @@ class SchedulerApi:
 
     def io(self, work: Work):
         self._get_worker(self.io_worker).post(work)
+
+    def background(self, work: Work):
+        self._get_worker(self.background_worker).post(work)
 
     def _get_worker(self, worker: Worker):
         if not self.running:
