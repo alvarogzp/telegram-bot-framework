@@ -11,9 +11,14 @@ from bot.multithreading.worker.pool.workers.main import QueueWorkerPool
 class SchedulerApi:
     def __init__(self, worker_error_handler: callable, worker_start_callback: callable, worker_end_callback: callable):
         self.worker_error_handler = worker_error_handler
-        self.workers = []
         self.worker_start_callback = worker_start_callback
         self.worker_end_callback = worker_end_callback
+        # This list is modified by multiple threads, and although lists shouldn't go corrupt
+        # (https://stackoverflow.com/questions/6319207/are-lists-thread-safe)
+        # we are going to play safe by protecting all access and modifications to it with a lock.
+        self.running_workers = []
+        self.running_workers_lock = threading.Lock()
+        # Worker pools should only be launched from main thread, so no locking is needed here.
         self.worker_pools = []
         self.running = False
         self.immediate_worker = ImmediateWorker(worker_error_handler)
@@ -22,27 +27,26 @@ class SchedulerApi:
         self.background_worker = self._new_worker("background")
 
     def _new_worker(self, name: str):
-        worker = QueueWorker(name, queue.Queue(), self.worker_error_handler)
-        self.workers.append(worker)
-        return worker
+        return QueueWorker(name, queue.Queue(), self.worker_error_handler)
 
     def _new_worker_pool(self, name: str, min_workers: int, max_workers: int, max_seconds_idle: int):
         return QueueWorkerPool(name, queue.Queue(), self.worker_error_handler, self._start_worker,
                                min_workers, max_workers, max_seconds_idle)
 
     def setup(self):
-        self._start_workers()
+        self._start_worker(self.network_worker)
+        self._start_worker(self.io_worker)
+        self._start_worker(self.background_worker)
         self.running = True
-
-    def _start_workers(self):
-        for worker in self.workers:
-            self._start_worker(worker)
 
     def _start_worker(self, worker: Worker):
         """
         Can be safely called multiple times on the same worker (for workers that support it)
         to start a new thread for it.
         """
+        # This function is called from main thread and from worker pools threads to start their children threads
+        with self.running_workers_lock:
+            self.running_workers.append(worker)
         thread = SchedulerThread(worker, self._worker_ended)
         thread.start()
         # schedule start callback in background thread
@@ -53,6 +57,9 @@ class SchedulerApi:
         worker.start()
 
     def _worker_ended(self, worker: Worker):
+        # This function is called from worker threads
+        with self.running_workers_lock:
+            self.running_workers.remove(worker)
         # schedule end callback in background thread
         self.background(Work(lambda: self.worker_end_callback(worker), "worker_end_callback:" + worker.name))
 
@@ -89,10 +96,18 @@ class SchedulerApi:
         self._start_worker_pool(worker)
         return worker
 
+    def get_running_workers(self):
+        with self.running_workers_lock:
+            # return a copy to avoid concurrent modifications problems by other threads modifications to the list
+            return self.running_workers[:]
+
+    def get_worker_pools(self):
+        return self.worker_pools
+
     def shutdown(self):
-        for worker in self.worker_pools:
+        for worker in self.get_worker_pools():
             worker.shutdown()
-        for worker in self.workers:
+        for worker in self.get_running_workers():
             worker.shutdown()
 
 
