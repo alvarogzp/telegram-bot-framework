@@ -111,8 +111,8 @@ class WorkerSpawner:
         )
 
     def _start_worker(self, worker: Worker):
-        self.worker_starter(worker)
         self.number_of_running_workers += 1
+        self.worker_starter(worker)
 
     def _get_worker_name(self, is_temporal: bool = False):
         return self.name_generator.get_name(self.number_of_running_workers+1, is_temporal)
