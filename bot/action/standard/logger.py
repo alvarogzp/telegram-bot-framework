@@ -1,6 +1,7 @@
 from bot.action.core.action import IntermediateAction
 from bot.logger.logger import LoggerFactory
 from bot.logger.message_sender.factory import MessageSenderFactory
+from bot.logger.worker_logger import WorkerStartStopLogger
 
 
 class LoggerAction(IntermediateAction):
@@ -22,6 +23,12 @@ class LoggerAction(IntermediateAction):
     def post_setup(self):
         self.sender_builder.with_api(self.api)
         self.logger = self.new_logger(self.config.log_chat_id)
+        self.__update_scheduler_callbacks()
+
+    def __update_scheduler_callbacks(self):
+        # update scheduler callbacks to use this logger instead of the admin one
+        worker_logger = WorkerStartStopLogger(self.logger)
+        self.scheduler.set_callbacks(worker_logger.worker_start, worker_logger.worker_stop)
 
     def new_logger(self, chat_id, logger_type: str = None, reuse_max_length: int = None, reuse_max_time: int = None,
                    async: bool = None):
