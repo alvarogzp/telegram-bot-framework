@@ -80,16 +80,21 @@ class BenchmarkAction(Action):
             .bold(memory_usage=process_memory_usage_formatted_value)\
             .normal(memory_usage_attribute_name=process_memory_usage_attribute_name).end_format()
 
-        thread_number_value = threading.active_count()
-        thread_number = FormattedText()\
-            .normal("Active threads: {thread_number}").start_format()\
-            .bold(thread_number=thread_number_value).end_format()
+        thread_number = WorkersAction.get_active_threads_number()
+
+        workers_value = self.scheduler.get_running_workers()
+        workers_number = WorkersAction.get_running_workers_number(workers_value)
+
+        worker_pools_value = self.scheduler.get_worker_pools()
+        worker_pools_number = WorkersAction.get_worker_pools_number(worker_pools_value)
 
         return FormattedText().newline().join((
             FormattedText().bold("Bot status"),
             process_uptime,
             process_memory_usage,
-            thread_number
+            thread_number,
+            workers_number,
+            worker_pools_number
         ))
 
     def __get_process_uptime(self):
