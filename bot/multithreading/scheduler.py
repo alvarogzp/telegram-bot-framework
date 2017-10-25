@@ -9,9 +9,11 @@ from bot.multithreading.worker.pool.workers.main import QueueWorkerPool
 
 
 class SchedulerApi:
-    def __init__(self, worker_error_handler: callable):
+    def __init__(self, worker_error_handler: callable, worker_start_callback: callable, worker_end_callback: callable):
         self.worker_error_handler = worker_error_handler
         self.workers = []
+        self.worker_start_callback = worker_start_callback
+        self.worker_end_callback = worker_end_callback
         self.worker_pools = []
         self.running = False
         self.immediate_worker = ImmediateWorker(worker_error_handler)
@@ -36,18 +38,23 @@ class SchedulerApi:
         for worker in self.workers:
             self._start_worker(worker)
 
-    @staticmethod
-    def _start_worker(worker):
+    def _start_worker(self, worker: Worker):
         """
         Can be safely called multiple times on the same worker (for workers that support it)
         to start a new thread for it.
         """
-        thread = SchedulerThread(worker)
+        thread = SchedulerThread(worker, self._worker_ended)
         thread.start()
+        # schedule start callback in background thread
+        self.background(Work(lambda: self.worker_start_callback(worker), "worker_start_callback:" + worker.name))
 
     def _start_worker_pool(self, worker: QueueWorkerPool):
         self.worker_pools.append(worker)
         worker.start()
+
+    def _worker_ended(self, worker: Worker):
+        # schedule end callback in background thread
+        self.background(Work(lambda: self.worker_end_callback(worker), "worker_end_callback:" + worker.name))
 
     def network(self, work: Work):
         self._get_worker(self.network_worker).post(work)
@@ -90,8 +97,9 @@ class SchedulerApi:
 
 
 class SchedulerThread:
-    def __init__(self, worker: Worker):
+    def __init__(self, worker: Worker, end_callback: callable):
         self.worker = worker
+        self.end_callback = end_callback
 
     def start(self):
         thread = threading.Thread(name=self.worker.name, target=self.run)
@@ -99,4 +107,7 @@ class SchedulerThread:
         thread.start()
 
     def run(self):
-        self.worker.run()
+        try:
+            self.worker.run()
+        finally:
+            self.end_callback(self.worker)
