@@ -24,9 +24,12 @@ class AbstractWorker(Worker):
 
     def _work(self, work: Work):
         try:
-            work.do_work()
+            self._do_work(work)
         except BaseException as e:
             self._error(e, work)
+
+    def _do_work(self, work: Work):
+        work.do_work()
 
     def _error(self, e: BaseException, work: Work):
         try:
