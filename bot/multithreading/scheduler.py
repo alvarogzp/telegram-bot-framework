@@ -1,11 +1,18 @@
 import queue
 import threading
+from typing import Union
 
 from bot.multithreading.worker import Worker
 from bot.multithreading.worker.immediate import ImmediateWorker
 from bot.multithreading.worker.queue import QueueWorker
 from bot.multithreading.work import Work
 from bot.multithreading.worker.pool.workers.main import QueueWorkerPool
+
+
+# Default max_seconds_idle value for temporal workers in worker pools.
+# Set to 900 because that is the maximum idle time that a connection
+# is maintained currently by Telegram servers.
+DEFAULT_WORKER_POOL_MAX_SECONDS_IDLE = 900
 
 
 class SchedulerApi:
@@ -22,21 +29,25 @@ class SchedulerApi:
         self.worker_pools = []
         self.running = False
         self.immediate_worker = ImmediateWorker(worker_error_handler)
-        self.network_worker = self._new_worker("network")
-        self.io_worker = self._new_worker("io")
-        self.background_worker = self._new_worker("background")
+        self.network_worker = self._new_worker_pool(
+            "network", min_workers=0, max_workers=2, max_seconds_idle=DEFAULT_WORKER_POOL_MAX_SECONDS_IDLE
+        )
+        self.io_worker = self._new_worker_pool("io", min_workers=0, max_workers=1, max_seconds_idle=None)
+        self.background_worker = self._new_worker_pool(
+            "background", min_workers=0, max_workers=1, max_seconds_idle=DEFAULT_WORKER_POOL_MAX_SECONDS_IDLE
+        )
 
     def _new_worker(self, name: str):
         return QueueWorker(name, queue.Queue(), self.worker_error_handler)
 
-    def _new_worker_pool(self, name: str, min_workers: int, max_workers: int, max_seconds_idle: int):
+    def _new_worker_pool(self, name: str, min_workers: int, max_workers: int, max_seconds_idle: Union[int, None]):
         return QueueWorkerPool(name, queue.Queue(), self.worker_error_handler, self._start_worker,
                                min_workers, max_workers, max_seconds_idle)
 
     def setup(self):
-        self._start_worker(self.network_worker)
-        self._start_worker(self.io_worker)
-        self._start_worker(self.background_worker)
+        self._start_worker_pool(self.network_worker)
+        self._start_worker_pool(self.io_worker)
+        self._start_worker_pool(self.background_worker)
         self.running = True
 
     def _start_worker(self, worker: Worker):
@@ -85,7 +96,8 @@ class SchedulerApi:
         self._start_worker(worker)
         return worker
 
-    def new_worker_pool(self, name: str, min_workers: int, max_workers: int, max_seconds_idle: int):
+    def new_worker_pool(self, name: str, min_workers: int = 0, max_workers: int = 1,
+                        max_seconds_idle: int = DEFAULT_WORKER_POOL_MAX_SECONDS_IDLE):
         """
         Creates a new worker pool and starts it.
         Returns the Worker that schedules works to the pool.

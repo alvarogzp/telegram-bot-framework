@@ -39,7 +39,8 @@ class LoggerAction(IntermediateAction):
         if async is None:
             async = self.async
         if async:
-            sender_builder.with_worker(self.scheduler.new_worker("logger@" + str(chat_id)))
+            worker = self.scheduler.new_worker_pool("logger@" + str(chat_id))
+            sender_builder.with_worker(worker)
         return LoggerFactory.get(logger_type, sender_builder.build())
 
     def process(self, event):
