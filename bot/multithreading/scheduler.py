@@ -1,7 +1,9 @@
 import queue
 import threading
 
-from bot.multithreading.worker import Worker, ImmediateWorker, QueueWorker
+from bot.multithreading.worker import Worker
+from bot.multithreading.worker.immediate import ImmediateWorker
+from bot.multithreading.worker.queue import QueueWorker
 from bot.multithreading.work import Work
 
 
