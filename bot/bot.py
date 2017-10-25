@@ -24,12 +24,13 @@ class Bot:
         debug = self.config.debug()
         telegram_api = TelegramBotApi(self.config.auth_token, self.config.reuse_connections(), debug)
         self.api = Api(telegram_api, self.state)
+        self.cache.bot_info = self.api.getMe()
         self.logger = AdminLogger(self.api, self.config.admin_chat_id, debug, self.config.send_error_tracebacks())
         self.scheduler = SchedulerApi(self.logger.work_error, self.logger.worker_start, self.logger.worker_end)
+        self.starting()
         if self.config.async():
             self.scheduler.setup()
             self.api.enable_async(self.scheduler)
-        self.cache.bot_info = self.api.getMe()
         self.action = Action()
         self.update_processor = UpdateProcessor(self.action, self.logger)
 
@@ -39,7 +40,6 @@ class Bot:
         self.update_processor = UpdateProcessor(self.action, self.logger)
 
     def run(self):
-        self.starting()
         try:
             self.main_loop()
         except KeyboardInterrupt:
