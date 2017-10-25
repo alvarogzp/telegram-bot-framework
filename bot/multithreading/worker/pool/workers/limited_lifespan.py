@@ -1,6 +1,6 @@
 import queue
 
-from bot.multithreading.worker import QueueWorker
+from bot.multithreading.worker.queue import QueueWorker
 
 
 class LimitedLifespanQueueWorker(QueueWorker):

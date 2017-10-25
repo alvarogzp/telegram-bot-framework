@@ -1,7 +1,7 @@
 import queue
 
 from bot.multithreading.work import Work
-from bot.multithreading.worker import QueueWorker
+from bot.multithreading.worker.queue import QueueWorker
 from bot.multithreading.worker.pool.name_generator import WorkerPoolNameGenerator
 from bot.multithreading.worker.pool.spawner import WorkerSpawner
 

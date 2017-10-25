@@ -1,7 +1,8 @@
 import queue
 import threading
 
-from bot.multithreading.worker import QueueWorker, Worker
+from bot.multithreading.worker import Worker
+from bot.multithreading.worker.queue import QueueWorker
 from bot.multithreading.worker.pool.name_generator import WorkerPoolNameGenerator
 from bot.multithreading.worker.pool.workers.limited_lifespan import LimitedLifespanQueueWorker
 
