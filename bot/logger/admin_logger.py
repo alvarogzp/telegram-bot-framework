@@ -15,8 +15,6 @@ TRACEBACK_TAG = FormattedText().code_inline("TRACEBACK")
 
 INFO_TAG = FormattedText().normal("INFO")
 
-WORKER_TAG = FormattedText().normal("WORKER")
-
 
 class AdminLogger:
     def __init__(self, api: Api, admin_chat_id: str, print_tracebacks: bool, send_tracebacks: bool):
@@ -76,16 +74,3 @@ class AdminLogger:
 
     def __info(self, *texts: FormattedText):
         self.logger.log(INFO_TAG, *texts)
-
-    def worker_start(self, worker: Worker):
-        self.__worker(worker, "started ✅")
-
-    def worker_end(self, worker: Worker):
-        self.__worker(worker, "stopped ◾️")
-
-    def __worker(self, worker: Worker, action: str):
-        self.logger.log(
-            WORKER_TAG,
-            FormattedText().bold(worker.name),
-            FormattedText().normal("Worker {action}").start_format().bold(action=action).end_format()
-        )

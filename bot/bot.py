@@ -7,6 +7,7 @@ from bot.action.util.textformat import FormattedText
 from bot.api.api import Api
 from bot.api.telegram import TelegramBotApi
 from bot.logger.admin_logger import AdminLogger
+from bot.logger.worker_logger import WorkerStartStopLogger
 from bot.multithreading.scheduler import SchedulerApi
 from bot.storage import Config, Cache
 from bot.storage import State
@@ -26,7 +27,8 @@ class Bot:
         self.api = Api(telegram_api, self.state)
         self.cache.bot_info = self.api.getMe()
         self.logger = AdminLogger(self.api, self.config.admin_chat_id, debug, self.config.send_error_tracebacks())
-        self.scheduler = SchedulerApi(self.logger.work_error, self.logger.worker_start, self.logger.worker_end)
+        worker_logger = WorkerStartStopLogger(self.logger.logger)
+        self.scheduler = SchedulerApi(self.logger.work_error, worker_logger.worker_start, worker_logger.worker_stop)
         self.starting()
         if self.config.async():
             self.scheduler.setup()
