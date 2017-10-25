@@ -37,6 +37,10 @@ class SchedulerApi:
             "background", min_workers=0, max_workers=1, max_seconds_idle=DEFAULT_WORKER_POOL_MAX_SECONDS_IDLE
         )
 
+    def set_callbacks(self, worker_start_callback: callable, worker_end_callback: callable):
+        self.worker_start_callback = worker_start_callback
+        self.worker_end_callback = worker_end_callback
+
     def _new_worker(self, name: str):
         return QueueWorker(name, queue.Queue(), self.worker_error_handler)
 
