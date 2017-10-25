@@ -42,8 +42,7 @@ class SchedulerApi:
         Can be safely called multiple times on the same worker (for workers that support it)
         to start a new thread for it.
         """
-        thread = threading.Thread(target=worker.run, name=worker.name)
-        thread.daemon = True
+        thread = SchedulerThread(worker)
         thread.start()
 
     def _start_worker_pool(self, worker: QueueWorkerPool):
@@ -88,3 +87,16 @@ class SchedulerApi:
             worker.shutdown()
         for worker in self.workers:
             worker.shutdown()
+
+
+class SchedulerThread:
+    def __init__(self, worker: Worker):
+        self.worker = worker
+
+    def start(self):
+        thread = threading.Thread(name=self.worker.name, target=self.run)
+        thread.daemon = True
+        thread.start()
+
+    def run(self):
+        self.worker.run()
