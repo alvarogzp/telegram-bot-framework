@@ -33,9 +33,7 @@ class SchedulerApi:
             "network", min_workers=0, max_workers=2, max_seconds_idle=DEFAULT_WORKER_POOL_MAX_SECONDS_IDLE
         )
         self.io_worker = self._new_worker_pool("io", min_workers=0, max_workers=1, max_seconds_idle=None)
-        self.background_worker = self._new_worker_pool(
-            "background", min_workers=0, max_workers=1, max_seconds_idle=DEFAULT_WORKER_POOL_MAX_SECONDS_IDLE
-        )
+        self.background_worker = self._new_worker("background")
 
     def set_callbacks(self, worker_start_callback: callable, worker_end_callback: callable):
         self.worker_start_callback = worker_start_callback
@@ -51,7 +49,7 @@ class SchedulerApi:
     def setup(self):
         self._start_worker_pool(self.network_worker)
         self._start_worker_pool(self.io_worker)
-        self._start_worker_pool(self.background_worker)
+        self._start_worker(self.background_worker)
         self.running = True
 
     def _start_worker(self, worker: Worker):
