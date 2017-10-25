@@ -9,7 +9,7 @@ from bot.action.util.textformat import FormattedText
 from bot.api.domain import Message
 
 
-CPU_USAGE_SAMPLE_INTERVAL_SECONDS = 1
+CPU_USAGE_SAMPLE_INTERVAL_SECONDS = 5
 
 
 class BenchmarkAction(Action):
@@ -22,7 +22,7 @@ class BenchmarkAction(Action):
             .bold(benchmark_time=benchmark_execution_value).end_format()
         response.newline().newline().concat(benchmark_time)
 
-        self.api.send_message(response.build_message().to_chat_replying(message))
+        self.api.async.send_message(response.build_message().to_chat_replying(message))
 
     def _do_benchmark(self, event):
         message, benchmark_result = self._get_benchmark_result(event)
