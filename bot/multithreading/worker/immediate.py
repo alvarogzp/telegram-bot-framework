@@ -1,5 +1,5 @@
 from bot.multithreading.work import Work
-from bot.multithreading.worker import AbstractWorker
+from bot.multithreading.worker.abstract import AbstractWorker
 
 
 class ImmediateWorker(AbstractWorker):
