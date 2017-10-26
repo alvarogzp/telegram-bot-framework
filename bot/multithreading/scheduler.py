@@ -18,11 +18,13 @@ DEFAULT_WORKER_POOL_MAX_SECONDS_IDLE = 900
 class SchedulerApi:
     def __init__(self, worker_error_handler: callable, worker_start_callback: callable, worker_end_callback: callable):
         self.worker_error_handler = worker_error_handler
+
         # Defining here to avoid IDE from complaining about defining variables outside __init__
         self.worker_start_callback = worker_start_callback
         self.worker_end_callback = worker_end_callback
         # Set the real callbacks
         self.set_callbacks(worker_start_callback, worker_end_callback)
+
         # This list is modified by multiple threads, and although lists shouldn't go corrupt
         # (https://stackoverflow.com/questions/6319207/are-lists-thread-safe)
         # we are going to play safe by protecting all access and modifications to it with a lock.
@@ -30,7 +32,9 @@ class SchedulerApi:
         self.running_workers_lock = threading.Lock()
         # Worker pools should only be launched from main thread, so no locking is needed here.
         self.worker_pools = []
+
         self.running = False
+
         self.immediate_worker = ImmediateWorker(worker_error_handler)
         self.network_worker = self._new_worker_pool(
             "network", min_workers=0, max_workers=2, max_seconds_idle=DEFAULT_WORKER_POOL_MAX_SECONDS_IDLE
