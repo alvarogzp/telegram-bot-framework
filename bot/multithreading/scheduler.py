@@ -18,8 +18,11 @@ DEFAULT_WORKER_POOL_MAX_SECONDS_IDLE = 900
 class SchedulerApi:
     def __init__(self, worker_error_handler: callable, worker_start_callback: callable, worker_end_callback: callable):
         self.worker_error_handler = worker_error_handler
+        # Defining here to avoid IDE from complaining about defining variables outside __init__
         self.worker_start_callback = worker_start_callback
         self.worker_end_callback = worker_end_callback
+        # Set the real callbacks
+        self.set_callbacks(worker_start_callback, worker_end_callback)
         # This list is modified by multiple threads, and although lists shouldn't go corrupt
         # (https://stackoverflow.com/questions/6319207/are-lists-thread-safe)
         # we are going to play safe by protecting all access and modifications to it with a lock.
@@ -35,9 +38,28 @@ class SchedulerApi:
         self.io_worker = self._new_worker_pool("io", min_workers=0, max_workers=1, max_seconds_idle=None)
         self.background_worker = self._new_worker("background")
 
-    def set_callbacks(self, worker_start_callback: callable, worker_end_callback: callable):
-        self.worker_start_callback = worker_start_callback
-        self.worker_end_callback = worker_end_callback
+    def set_callbacks(self, worker_start_callback: callable, worker_end_callback: callable, are_async: bool = False):
+        """
+        :param are_async: True if the callbacks execute asynchronously, posting any heavy work to another thread.
+        """
+        # We are setting self.worker_start_callback and self.worker_end_callback
+        # to lambdas instead of saving them in private vars and moving the lambda logic
+        # to a member function for, among other reasons, making callback updates atomic,
+        # ie. once a callback has been posted, it will be executed as it was in that
+        # moment, any call to set_callbacks will only affect callbacks posted since they
+        # were updated, but not to any pending callback.
+
+        # If callback is async, execute the start callback in the calling thread
+        scheduler = self.immediate if are_async else self.background
+        self.worker_start_callback = lambda worker: scheduler(Work(
+            lambda: worker_start_callback(worker), "worker_start_callback:" + worker.name
+        ))
+
+        # As the end callback is called *just* before the thread dies,
+        # there is no problem running it on the thread
+        self.worker_end_callback = lambda worker: self.immediate(Work(
+            lambda: worker_end_callback(worker), "worker_end_callback:" + worker.name
+        ))
 
     def _new_worker(self, name: str):
         return QueueWorker(name, queue.Queue(), self.worker_error_handler)
@@ -62,8 +84,8 @@ class SchedulerApi:
             self.running_workers.append(worker)
         thread = SchedulerThread(worker, self._worker_ended)
         thread.start()
-        # schedule start callback in background thread
-        self.background(Work(lambda: self.worker_start_callback(worker), "worker_start_callback:" + worker.name))
+        # This may or may not be posted to a background thread (see set_callbacks)
+        self.worker_start_callback(worker)
 
     def _start_worker_pool(self, worker: QueueWorkerPool):
         self.worker_pools.append(worker)
@@ -73,8 +95,8 @@ class SchedulerApi:
         # This function is called from worker threads
         with self.running_workers_lock:
             self.running_workers.remove(worker)
-        # schedule end callback in background thread
-        self.background(Work(lambda: self.worker_end_callback(worker), "worker_end_callback:" + worker.name))
+        # This is executed on the same thread (see set_callbacks)
+        self.worker_end_callback(worker)
 
     def network(self, work: Work):
         self._get_worker(self.network_worker).post(work)
