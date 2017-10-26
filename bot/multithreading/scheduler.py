@@ -10,9 +10,9 @@ from bot.multithreading.worker.pool.workers.main import QueueWorkerPool
 
 
 # Default max_seconds_idle value for temporal workers in worker pools.
-# Set to 900 because that is the maximum idle time that a connection
-# is maintained currently by Telegram servers.
-DEFAULT_WORKER_POOL_MAX_SECONDS_IDLE = 900
+# The value is based on the 900 seconds that Telegram bot API servers
+# currently maintain idle connections.
+DEFAULT_WORKER_POOL_MAX_SECONDS_IDLE = 850
 
 # Value to indicate that temporal spawned workers on a worker pool
 # should be kept alive forever, ie. once a worker is spawned, it
