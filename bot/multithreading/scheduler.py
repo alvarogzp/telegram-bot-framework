@@ -107,6 +107,9 @@ class SchedulerApi:
     def background(self, work: Work):
         self._get_worker(self.background_worker).post(work)
 
+    def immediate(self, work: Work):
+        self.immediate_worker.post(work)
+
     def _get_worker(self, worker: Worker):
         if not self.running:
             return self.immediate_worker
