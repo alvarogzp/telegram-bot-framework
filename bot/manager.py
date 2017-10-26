@@ -1,4 +1,4 @@
-import project_info
+from bot import project_info
 from bot.action.core.action import ActionGroup
 from bot.action.core.command import CommandAction
 from bot.action.core.filter import MessageAction, TextMessageAction, NoPendingAction, EditedMessageAction, \
@@ -14,7 +14,8 @@ from bot.action.standard.about import AboutAction, VersionAction
 from bot.action.standard.admin import RestartAction, EvalAction, AdminActionWithErrorMessage, AdminAction, HaltAction, \
     GroupAdminAction
 from bot.action.standard.answer import AnswerAction
-from bot.action.standard.benchmark import BenchmarkAction
+from bot.action.standard.asynchronous import AsynchronousAction
+from bot.action.standard.benchmark import BenchmarkAction, WorkersAction
 from bot.action.standard.chatsettings.action import ChatSettingsAction
 from bot.action.standard.config import ConfigAction
 from bot.action.standard.config_status import ConfigStatusAction
@@ -109,7 +110,9 @@ class BotManager:
                                             ),
 
                                             CommandAction("benchmark").then(
-                                                BenchmarkAction()
+                                                AsynchronousAction("benchmark").then(
+                                                    BenchmarkAction()
+                                                ),
                                             ),
 
                                             CommandAction("ping").then(
@@ -133,6 +136,11 @@ class BotManager:
                                                     EvalAction()
                                                 )
                                             ),
+                                            CommandAction("config").then(
+                                                AdminActionWithErrorMessage().then(
+                                                    ConfigAction()
+                                                )
+                                            ),
                                             CommandAction("configstatus").then(
                                                 AdminActionWithErrorMessage().then(
                                                     ConfigStatusAction()
@@ -143,9 +151,9 @@ class BotManager:
                                                     InstanceAction()
                                                 )
                                             ),
-                                            CommandAction("config").then(
+                                            CommandAction("workers").then(
                                                 AdminActionWithErrorMessage().then(
-                                                    ConfigAction()
+                                                    WorkersAction()
                                                 )
                                             ),
 

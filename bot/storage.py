@@ -74,6 +74,7 @@ class Config(Storage):
         "send_error_tracebacks": "true",
         "async": "true",
         "reuse_connections": "true",
+        "scheduler_events_on_log_chat": "true",
         "sleep_seconds_on_get_updates_error": "60",
         "max_error_seconds_allowed_in_normal_mode": "3600",
         "instance_name": ""
@@ -95,6 +96,9 @@ class Config(Storage):
 
     def reuse_connections(self):
         return self.__is_true("reuse_connections")
+
+    def scheduler_events_on_log_chat(self):
+        return self.__is_true("scheduler_events_on_log_chat")
 
     def __is_true(self, key):
         value = self._getattr(key)

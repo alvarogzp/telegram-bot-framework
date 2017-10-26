@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-import project_info
+from bot import project_info
 
 setup(
     name=project_info.name,

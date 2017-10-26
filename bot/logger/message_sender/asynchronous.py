@@ -9,4 +9,4 @@ class AsynchronousMessageSender(IntermediateMessageSender):
         self.worker = worker
 
     def send(self, text):
-        self.worker.post(Work(lambda: self.sender.send(text), "async_message_send"))
+        self.worker.post(Work(lambda: self.sender.send(text), "asynchronous_message_sender:send"))

@@ -7,6 +7,7 @@ from bot.action.util.textformat import FormattedText
 from bot.api.api import Api
 from bot.api.telegram import TelegramBotApi
 from bot.logger.admin_logger import AdminLogger
+from bot.logger.worker_logger import WorkerStartStopLogger
 from bot.multithreading.scheduler import SchedulerApi
 from bot.storage import Config, Cache
 from bot.storage import State
@@ -24,12 +25,14 @@ class Bot:
         debug = self.config.debug()
         telegram_api = TelegramBotApi(self.config.auth_token, self.config.reuse_connections(), debug)
         self.api = Api(telegram_api, self.state)
+        self.cache.bot_info = self.api.getMe()
         self.logger = AdminLogger(self.api, self.config.admin_chat_id, debug, self.config.send_error_tracebacks())
-        self.scheduler = SchedulerApi(self.logger.work_error)
+        worker_logger = WorkerStartStopLogger(self.logger.logger)
+        self.scheduler = SchedulerApi(self.logger.work_error, worker_logger.worker_start, worker_logger.worker_stop)
+        self.starting()
         if self.config.async():
             self.scheduler.setup()
             self.api.enable_async(self.scheduler)
-        self.cache.bot_info = self.api.getMe()
         self.action = Action()
         self.update_processor = UpdateProcessor(self.action, self.logger)
 
@@ -39,7 +42,6 @@ class Bot:
         self.update_processor = UpdateProcessor(self.action, self.logger)
 
     def run(self):
-        self.starting()
         try:
             self.main_loop()
         except KeyboardInterrupt:
@@ -71,8 +73,7 @@ class Bot:
         NormalUpdatesProcessor(self.api.get_updates, self.logger, self.config, self.update_processor).run()
 
     def shutdown(self):
-        if self.config.async():
-            self.scheduler.shutdown()
+        self.scheduler.shutdown()
         self.logger.info("Finished")
 
 

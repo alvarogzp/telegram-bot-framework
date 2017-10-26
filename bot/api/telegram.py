@@ -59,9 +59,19 @@ class TelegramBotApi:
         # and retrying a request already processed by the server, repeating some
         # action (eg. a duplicate message).
         # But, during a year of production use we never had any read error of this kind.
-        retry = Retry(total=1, connect=0, read=1, status=0, respect_retry_after_header=False)
+        #
+        # Update:
+        # Due to a duplicate message case during a telegram bot api partial failure,
+        # we are disabling the retry policy.
+        # That way, if the edge described above happens a message won't be sent but
+        # we will get an error. With the retry policy, a duplicate message could be
+        # sent silently on poor network conditions.
+        # So, it is preferable a message lost with the error being logged than a
+        # duplicate message without noticing it.
+
+        # retry = Retry(total=1, connect=0, read=1, status=0, respect_retry_after_header=False)
         # passing prefix lowered to work-around https://github.com/requests/requests/pull/4349
-        session.mount(self.base_url.lower(), HTTPAdapter(max_retries=retry))
+        # session.mount(self.base_url.lower(), HTTPAdapter(max_retries=retry))
         return session
 
     def __log_request(self, request: requests.PreparedRequest):

@@ -9,7 +9,7 @@ from bot.action.util.textformat import FormattedText
 from bot.api.domain import Message
 
 
-CPU_USAGE_SAMPLE_INTERVAL_SECONDS = 1
+CPU_USAGE_SAMPLE_INTERVAL_SECONDS = 5
 
 
 class BenchmarkAction(Action):
@@ -22,7 +22,7 @@ class BenchmarkAction(Action):
             .bold(benchmark_time=benchmark_execution_value).end_format()
         response.newline().newline().concat(benchmark_time)
 
-        self.api.send_message(response.build_message().to_chat_replying(message))
+        self.api.async.send_message(response.build_message().to_chat_replying(message))
 
     def _do_benchmark(self, event):
         message, benchmark_result = self._get_benchmark_result(event)
@@ -80,16 +80,21 @@ class BenchmarkAction(Action):
             .bold(memory_usage=process_memory_usage_formatted_value)\
             .normal(memory_usage_attribute_name=process_memory_usage_attribute_name).end_format()
 
-        thread_number_value = threading.active_count()
-        thread_number = FormattedText()\
-            .normal("Active threads: {thread_number}").start_format()\
-            .bold(thread_number=thread_number_value).end_format()
+        thread_number = WorkersAction.get_active_threads_number()
+
+        workers_value = self.scheduler.get_running_workers()
+        workers_number = WorkersAction.get_running_workers_number(workers_value)
+
+        worker_pools_value = self.scheduler.get_worker_pools()
+        worker_pools_number = WorkersAction.get_worker_pools_number(worker_pools_value)
 
         return FormattedText().newline().join((
             FormattedText().bold("Bot status"),
             process_uptime,
             process_memory_usage,
-            thread_number
+            thread_number,
+            workers_number,
+            worker_pools_number
         ))
 
     def __get_process_uptime(self):
@@ -129,3 +134,79 @@ class BenchmarkAction(Action):
         start_time = time.time()
         return_value = func()
         return return_value, time.time() - start_time
+
+
+class WorkersAction(Action):
+    def process(self, event):
+        response = FormattedText().newline().newline().join((
+            self.get_active_threads(),
+            self.get_running_workers(),
+            self.get_worker_pools()
+        ))
+        self.api.send_message(response.build_message().to_chat_replying(event.message))
+
+    def get_active_threads(self):
+        return FormattedText()\
+            .concat(self.get_active_threads_number())\
+            .concat(self._get_active_threads_names())
+
+    @staticmethod
+    def get_active_threads_number():
+        active_threads_number = threading.active_count()
+        return FormattedText().normal("Active threads: {number}")\
+            .start_format().bold(number=active_threads_number).end_format()
+
+    @staticmethod
+    def _get_active_threads_names():
+        """May contain sensitive info (like user ids). Use with care."""
+        active_threads = threading.enumerate()
+        return FormattedText().join(
+            [
+                FormattedText().newline().normal(" - {name}").start_format().bold(name=thread.name).end_format()
+                for thread in active_threads
+            ]
+        )
+
+    def get_running_workers(self):
+        running_workers = self.scheduler.get_running_workers()
+        return FormattedText()\
+            .concat(self.get_running_workers_number(running_workers))\
+            .concat(self._get_running_workers_names(running_workers))
+
+    @staticmethod
+    def get_running_workers_number(running_workers: list):
+        running_workers_number = len(running_workers)
+        return FormattedText().normal("Running workers: {number}")\
+            .start_format().bold(number=running_workers_number).end_format()
+
+    @staticmethod
+    def _get_running_workers_names(running_workers: list):
+        """May contain sensitive info (like user ids). Use with care."""
+        return FormattedText().join(
+            [
+                FormattedText().newline().normal(" - {name}").start_format().bold(name=worker.name).end_format()
+                for worker in running_workers
+            ]
+        )
+
+    def get_worker_pools(self):
+        worker_pools = self.scheduler.get_worker_pools()
+        return FormattedText()\
+            .concat(self.get_worker_pools_number(worker_pools))\
+            .concat(self._get_worker_pools_names(worker_pools))
+
+    @staticmethod
+    def get_worker_pools_number(worker_pools: list):
+        worker_pools_number = len(worker_pools)
+        return FormattedText().normal("Worker pools: {number}")\
+            .start_format().bold(number=worker_pools_number).end_format()
+
+    @staticmethod
+    def _get_worker_pools_names(worker_pools: list):
+        """May contain sensitive info (like user ids). Use with care."""
+        return FormattedText().join(
+            [
+                FormattedText().newline().normal(" - {name}").start_format().bold(name=worker.name).end_format()
+                for worker in worker_pools
+            ]
+        )
