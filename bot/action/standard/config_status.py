@@ -38,6 +38,9 @@ class ConfigStatus:
             .bold(bool=self.config.debug()).end_format()
         error_tracebacks = FormattedText().normal("Send traceback on error: {bool}").start_format()\
             .bold(bool=self.config.send_error_tracebacks()).end_format()
+        scheduler_events_on_log_chat = FormattedText()\
+            .normal("Scheduler events on log chat: {bool}").start_format()\
+            .bold(bool=self.config.scheduler_events_on_log_chat()).end_format()
         sleep_time_on_get_updates_error = FormattedText()\
             .normal("Sleep on get_updates error: {seconds} seconds").start_format()\
             .bold(seconds=self.config.sleep_seconds_on_get_updates_error).end_format()
@@ -54,6 +57,7 @@ class ConfigStatus:
             reuse_connections,
             debug,
             error_tracebacks,
+            scheduler_events_on_log_chat,
             sleep_time_on_get_updates_error,
             max_error_time_in_normal_mode,
             instance_name
