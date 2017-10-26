@@ -22,8 +22,14 @@ class LoggerAction(IntermediateAction):
 
     def post_setup(self):
         self.sender_builder.with_api(self.api)
-        self.logger = self.new_logger(self.config.log_chat_id)
         should_use_this_logger_for_scheduler_events = self.config.scheduler_events_on_log_chat()
+        # If this logger is going to be used for scheduler events it cannot
+        # run on a worker pool with 0 min_workers because when the logger
+        # worker dies it will send a log message that will make it wake up,
+        # leading to infinite sleep-wakeup loops.
+        # So, using a normal worker for the logger in that case.
+        use_worker_pool = not should_use_this_logger_for_scheduler_events
+        self.logger = self.new_logger(self.config.log_chat_id, use_worker_pool=use_worker_pool)
         if should_use_this_logger_for_scheduler_events:
             self.__update_scheduler_callbacks()
 
