@@ -23,7 +23,9 @@ class LoggerAction(IntermediateAction):
     def post_setup(self):
         self.sender_builder.with_api(self.api)
         self.logger = self.new_logger(self.config.log_chat_id)
-        self.__update_scheduler_callbacks()
+        should_use_this_logger_for_scheduler_events = self.config.scheduler_events_on_log_chat()
+        if should_use_this_logger_for_scheduler_events:
+            self.__update_scheduler_callbacks()
 
     def __update_scheduler_callbacks(self):
         # update scheduler callbacks to use this logger instead of the admin one
