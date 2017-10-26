@@ -110,12 +110,7 @@ class BotManager:
                                             ),
 
                                             CommandAction("benchmark").then(
-                                                AsynchronousAction(
-                                                    "benchmark",
-                                                    min_workers=0,
-                                                    max_workers=4,
-                                                    max_seconds_idle=60
-                                                ).then(
+                                                AsynchronousAction("benchmark").then(
                                                     BenchmarkAction()
                                                 ),
                                             ),
