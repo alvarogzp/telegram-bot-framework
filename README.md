@@ -29,6 +29,7 @@ A Python 3 interpreter is needed to run it.
    - *Optional* `send_error_tracebacks`, can be `true` to send error tracebacks to `admin_chat_id` or `false` to not send them. By default they are sent.
    - *Optional* `async`, set it to `true` to enable asynchronous support on the bot, and to `false` to disable it. By default, it is enabled.
    - *Optional* `reuse_connections`, can be `true` to enable reusing of network connections to reduce response times by avoiding connection creation overhead, or `false` to disable it. By default it is enabled.
+   - *Optional* `scheduler_events_on_log_chat`, with a value of `true` to send scheduler event messages to log chat, and `false` to send them to admin chat. Note that initial scheduler events happening before logger is set-up are sent to admin chat regardless of this setting. By default, it is true.
    - *Optional* `sleep_seconds_on_get_updates_error`, which indicates the number of seconds the bot sleeps when there is an error while getting updates, to avoid hitting the server repeatedly when it has problems. By default, the bot sleeps `60` seconds.
    - *Optional* `max_error_seconds_allowed_in_normal_mode`, with the number of seconds the bot can be in normal mode while getting errors that avoid processing updates correctly. If this value is exceeded, the bot switches to process updates in pending mode, not answering to interactive actions (those under `NoPendingAction` in `BotManager`). The default is one hour.
    - *Optional* `instance_name`, can be any string value to identify the bot instance at runtime.
@@ -38,3 +39,14 @@ A Python 3 interpreter is needed to run it.
    - You can also copy [run.sh](run.sh) and use it as the launcher script for your bot. It performs some initialization tasks before running the bot, re-executes it if it crashes, and updates your VCS before running.
 
 4. *Optional* To enable i18n support, copy the [locales](locales) dir to your bot base directory, and run its `generate_mo.sh` script (the `run.sh` script will do it for you if you are using it). Use the `locales/` dir as the base dir for your translations. You can use and modify the helper script `update_po.sh` to extract `.po` files from your code.
+
+
+# Authors
+
+- Developed by
+  - Alvaro Gutierrez Perez
+    - alvarogzp@gmail.com
+    - https://linkedin.com/in/alvarogzp
+
+- i18n support and visual improvements
+  - [@KouteiCheke](https://github.com/KouteiCheke)

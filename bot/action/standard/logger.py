@@ -1,6 +1,7 @@
 from bot.action.core.action import IntermediateAction
 from bot.logger.logger import LoggerFactory
 from bot.logger.message_sender.factory import MessageSenderFactory
+from bot.logger.worker_logger import WorkerStartStopLogger
 
 
 class LoggerAction(IntermediateAction):
@@ -21,10 +22,24 @@ class LoggerAction(IntermediateAction):
 
     def post_setup(self):
         self.sender_builder.with_api(self.api)
-        self.logger = self.new_logger(self.config.log_chat_id)
+        should_use_this_logger_for_scheduler_events = self.config.scheduler_events_on_log_chat()
+        # If this logger is going to be used for scheduler events it cannot
+        # run on a worker pool with 0 min_workers because when the logger
+        # worker dies it will send a log message that will make it wake up,
+        # leading to infinite sleep-wakeup loops.
+        # So, using a normal worker for the logger in that case.
+        use_worker_pool = not should_use_this_logger_for_scheduler_events
+        self.logger = self.new_logger(self.config.log_chat_id, use_worker_pool=use_worker_pool)
+        if should_use_this_logger_for_scheduler_events:
+            self.__update_scheduler_callbacks()
+
+    def __update_scheduler_callbacks(self):
+        # update scheduler callbacks to use this logger instead of the admin one
+        worker_logger = WorkerStartStopLogger(self.logger)
+        self.scheduler.set_callbacks(worker_logger.worker_start, worker_logger.worker_stop, are_async=self.async)
 
     def new_logger(self, chat_id, logger_type: str = None, reuse_max_length: int = None, reuse_max_time: int = None,
-                   async: bool = None):
+                   async: bool = None, use_worker_pool: bool = True):
         if chat_id is None:
             return LoggerFactory.get_no_logger()
         sender_builder = self.sender_builder.copy().with_chat_id(chat_id)
@@ -39,7 +54,9 @@ class LoggerAction(IntermediateAction):
         if async is None:
             async = self.async
         if async:
-            sender_builder.with_worker(self.scheduler.new_worker("logger@" + str(chat_id)))
+            new_worker_func = self.scheduler.new_worker_pool if use_worker_pool else self.scheduler.new_worker
+            worker = new_worker_func("logger@" + str(chat_id))
+            sender_builder.with_worker(worker)
         return LoggerFactory.get(logger_type, sender_builder.build())
 
     def process(self, event):
