@@ -3,7 +3,7 @@ from bot.multithreading.work import Work
 
 
 class AsynchronousAction(IntermediateAction):
-    def __init__(self, name: str, min_workers: int = 1, max_workers: int = 4, max_seconds_idle: int = 15):
+    def __init__(self, name: str, min_workers: int = 0, max_workers: int = 4, max_seconds_idle: int = 60):
         super().__init__()
         self.name = name
         self.min_workers = min_workers
