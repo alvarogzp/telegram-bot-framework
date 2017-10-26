@@ -14,6 +14,12 @@ from bot.multithreading.worker.pool.workers.main import QueueWorkerPool
 # is maintained currently by Telegram servers.
 DEFAULT_WORKER_POOL_MAX_SECONDS_IDLE = 900
 
+# Value to indicate that temporal spawned workers on a worker pool
+# should be kept alive forever, ie. once a worker is spawned, it
+# will never end.
+# Use it to get lazy spawning of perpetual workers.
+WORKER_POOL_KEEP_WORKERS_FOREVER = None
+
 
 class SchedulerApi:
     def __init__(self, worker_error_handler: callable, worker_start_callback: callable, worker_end_callback: callable):
@@ -39,7 +45,9 @@ class SchedulerApi:
         self.network_worker = self._new_worker_pool(
             "network", min_workers=0, max_workers=2, max_seconds_idle=DEFAULT_WORKER_POOL_MAX_SECONDS_IDLE
         )
-        self.io_worker = self._new_worker_pool("io", min_workers=0, max_workers=1, max_seconds_idle=None)
+        self.io_worker = self._new_worker_pool(
+            "io", min_workers=0, max_workers=1, max_seconds_idle=WORKER_POOL_KEEP_WORKERS_FOREVER
+        )
         self.background_worker = self._new_worker_pool(
             "background", min_workers=0, max_workers=1, max_seconds_idle=DEFAULT_WORKER_POOL_MAX_SECONDS_IDLE
         )
