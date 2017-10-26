@@ -31,7 +31,7 @@ class LoggerAction(IntermediateAction):
         self.scheduler.set_callbacks(worker_logger.worker_start, worker_logger.worker_stop, are_async=self.async)
 
     def new_logger(self, chat_id, logger_type: str = None, reuse_max_length: int = None, reuse_max_time: int = None,
-                   async: bool = None):
+                   async: bool = None, use_worker_pool: bool = True):
         if chat_id is None:
             return LoggerFactory.get_no_logger()
         sender_builder = self.sender_builder.copy().with_chat_id(chat_id)
@@ -46,7 +46,8 @@ class LoggerAction(IntermediateAction):
         if async is None:
             async = self.async
         if async:
-            worker = self.scheduler.new_worker_pool("logger@" + str(chat_id))
+            new_worker_func = self.scheduler.new_worker_pool if use_worker_pool else self.scheduler.new_worker
+            worker = new_worker_func("logger@" + str(chat_id))
             sender_builder.with_worker(worker)
         return LoggerFactory.get(logger_type, sender_builder.build())
 
