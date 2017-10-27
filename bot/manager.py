@@ -89,8 +89,7 @@ class BotManager:
                                         TextMessageAction().then(
 
                                             CommandAction("start").then(
-                                                AnswerAction(
-                                                    "Hello! I am " + self.bot.cache.bot_info.first_name + " and I am here to serve you.")
+                                                AnswerAction("Hello! I am " + self.bot.cache.bot_info.first_name + " and I am here to serve you.")
                                             ),
 
                                             CommandAction("about").then(
@@ -112,7 +111,7 @@ class BotManager:
                                             CommandAction("benchmark").then(
                                                 AsynchronousAction("benchmark").then(
                                                     BenchmarkAction()
-                                                ),
+                                                )
                                             ),
 
                                             CommandAction("ping").then(

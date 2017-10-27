@@ -32,6 +32,8 @@ class LoggerAction(IntermediateAction):
         self.logger = self.new_logger(self.config.log_chat_id, use_worker_pool=use_worker_pool)
         if should_use_this_logger_for_scheduler_events:
             self.__update_scheduler_callbacks()
+        # store logger in cache to allow other actions to access it outside of process()
+        self.cache.logger = self.logger
 
     def __update_scheduler_callbacks(self):
         # update scheduler callbacks to use this logger instead of the admin one

@@ -159,8 +159,13 @@ class SchedulerApi:
         return self.worker_pools
 
     def shutdown(self):
+        # first wait for all worker pools to be idle
         for worker in self.get_worker_pools():
             worker.shutdown()
+        # now wait for all active workers to be idle
+        # first, because there may be workers not running on a worker pool
+        # and second, in case any pending work in a worker pool posted a
+        # new work on another worker (pool), that way we wait for it to end too
         for worker in self.get_running_workers():
             worker.shutdown()
 

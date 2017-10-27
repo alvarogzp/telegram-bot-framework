@@ -5,9 +5,6 @@ from bot.action.core.action import Action
 from bot.action.util.textformat import FormattedText
 
 
-FRAMEWORK_TEXT = FormattedText().url(project_info.name, project_info.source_url)
-
-
 class AboutAction(Action):
     def __init__(self, project_package_name: str, author_handle: str = None, is_open_source: bool = False,
                  source_url: str = None, license_name: str = None):
@@ -21,7 +18,7 @@ class AboutAction(Action):
 
     def post_setup(self):
         bot_name = self.cache.bot_info.first_name
-        self.text = self.__build_message_text(bot_name, self.version, self.author_handle, FRAMEWORK_TEXT,
+        self.text = self.__build_message_text(bot_name, self.version, self.author_handle, self.__get_framework(),
                                               self.is_open_source, self.license_name, self.source_url)
 
     @staticmethod
@@ -45,6 +42,17 @@ class AboutAction(Action):
             .bold(bot_name=bot_name, version=version, license=license_name)\
             .normal(author=author, source_url=source_url)\
             .concat(framework=framework)\
+            .end_format()
+
+    @staticmethod
+    def __get_framework():
+        framework_name = project_info.name
+        framework_url = project_info.source_url
+        framework_version = VersionAction.get_version(framework_name)
+        return FormattedText()\
+            .normal("{url} ({version})").start_format()\
+            .url(framework_name, framework_url, name="url")\
+            .normal(version=framework_version)\
             .end_format()
 
     def process(self, event):
