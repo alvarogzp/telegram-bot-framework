@@ -10,7 +10,6 @@ from bot.api.domain import MessageEntityParser
 
 
 COMMAND_LOG_TAG = FormattedText().normal("COMMAND")
-COMMAND_END_LOG_TAG = FormattedText().normal("PROFILE")
 
 
 class CommandAction(IntermediateAction):
@@ -33,10 +32,11 @@ class CommandAction(IntermediateAction):
                     additional_text = parser.get_text_after_entity(entity)
                     event.command_args = self.parser.get_command_args(command_text, additional_text).lstrip(" ")
                     if self.throttler.should_execute(event):
-                        self.__log_command_execution(event)
                         start_time = time.time()
-                        self._continue(event)
-                        self.__log_command_execution(event, time.time() - start_time)
+                        try:
+                            self._continue(event)
+                        finally:
+                            self.__log_command_execution(event, time.time() - start_time)
 
     @staticmethod
     def get_entities(event):
@@ -48,23 +48,17 @@ class CommandAction(IntermediateAction):
         return entity.type == "bot_command" and entity.offset == 0
 
     @staticmethod
-    def __log_command_execution(event, elapsed_seconds: float = None):
-        infos = [
+    def __log_command_execution(event, elapsed_seconds: float):
+        event.logger.log(
+            COMMAND_LOG_TAG,
             FormattedText().normal("{command} {args}").start_format()
                 .bold(command=event.command, args=event.command_args).end_format(),
             FormattedText().normal("User: {user}").start_format()
                 .bold(user=UserFormatter(event.message.from_).full_format).end_format(),
             FormattedText().normal("Chat: {chat}").start_format()
-                .bold(chat=ChatFormatter.format_group_or_type(event.chat)).end_format()
-        ]
-        if elapsed_seconds is not None:
-            infos.append(
-                FormattedText().normal("Executed. Took: {elapsed}").start_format()
-                    .bold(elapsed=TimeFormatter.format(elapsed_seconds)).end_format()
-            )
-        event.logger.log(
-            COMMAND_LOG_TAG if elapsed_seconds is None else COMMAND_END_LOG_TAG,
-            *infos
+                .bold(chat=ChatFormatter.format_group_or_type(event.chat)).end_format(),
+            FormattedText().normal("Execution time: {time}").start_format()
+                .bold(time=TimeFormatter.format(elapsed_seconds)).end_format()
         )
 
 
