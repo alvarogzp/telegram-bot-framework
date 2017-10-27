@@ -112,7 +112,7 @@ class BotManager:
                                             CommandAction("benchmark").then(
                                                 AsynchronousAction("benchmark").then(
                                                     BenchmarkAction()
-                                                ),
+                                                )
                                             ),
 
                                             CommandAction("ping").then(
