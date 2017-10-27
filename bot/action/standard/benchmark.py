@@ -9,10 +9,14 @@ from bot.action.util.textformat import FormattedText
 from bot.api.domain import Message
 
 
-CPU_USAGE_SAMPLE_INTERVAL_SECONDS = 5
+CPU_USAGE_SAMPLE_SECONDS = 5
 
 
 class BenchmarkAction(Action):
+    def __init__(self, cpu_usage_sample_seconds: float = CPU_USAGE_SAMPLE_SECONDS):
+        super().__init__()
+        self.cpu_usage_sample_seconds = cpu_usage_sample_seconds
+
     def process(self, event):
         (message, response), benchmark_execution_time = self.__benchmark(lambda: self._do_benchmark(event))
 
@@ -114,10 +118,10 @@ class BenchmarkAction(Action):
         system_uptime = FormattedText()\
             .normal("Uptime: {system_uptime}").start_format().bold(system_uptime=system_uptime_value).end_format()
 
-        cpu_usage_value = str(psutil.cpu_percent(interval=CPU_USAGE_SAMPLE_INTERVAL_SECONDS)) + " %"
+        cpu_usage_value = str(psutil.cpu_percent(interval=self.cpu_usage_sample_seconds)) + " %"
         cpu_usage = FormattedText()\
             .normal("CPU usage: {cpu_usage} ({sample_interval} sec. sample)").start_format()\
-            .bold(cpu_usage=cpu_usage_value).normal(sample_interval=CPU_USAGE_SAMPLE_INTERVAL_SECONDS).end_format()
+            .bold(cpu_usage=cpu_usage_value).normal(sample_interval=self.cpu_usage_sample_seconds).end_format()
 
         return FormattedText().newline().join((
             FormattedText().bold("System status"),
