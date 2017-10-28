@@ -3,7 +3,7 @@ from bot.action.core.command.usagemessage import CommandUsageMessage
 from bot.action.util.textformat import FormattedText
 
 
-class ConfigAction(Action):
+class StateAction(Action):
     def process(self, event):
         action, key, new_value = self.parse_args(event.command_args.split(" "))
         if key is not None:
@@ -51,7 +51,7 @@ class ConfigAction(Action):
         previous_value = self.__get_current_value(state, key)
         state.set_value(key, new_value)
         current_value = self.__get_current_value(state, key)
-        return FormattedText().bold("Config updated!").newline().newline()\
+        return FormattedText().bold("State updated!").newline().newline()\
             .bold("Key").normal(":").newline().code_block(key_to_display).newline().newline()\
             .bold("Previous value").normal(":").newline().concat(previous_value).newline().newline()\
             .bold("Current value").normal(":").newline().concat(current_value).build_message()
