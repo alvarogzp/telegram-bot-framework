@@ -13,11 +13,11 @@ from bot.action.extra.random import RandomChoiceAction
 from bot.action.standard.about import AboutAction, VersionAction
 from bot.action.standard.admin import RestartAction, EvalAction, AdminActionWithErrorMessage, AdminAction, HaltAction, \
     GroupAdminAction
+from bot.action.standard.admin.state import StateAction
 from bot.action.standard.answer import AnswerAction
 from bot.action.standard.asynchronous import AsynchronousAction
 from bot.action.standard.benchmark import BenchmarkAction, WorkersAction
 from bot.action.standard.chatsettings.action import ChatSettingsAction
-from bot.action.standard.config import ConfigAction
 from bot.action.standard.config_status import ConfigStatusAction
 from bot.action.standard.enterexit import GreetAction, LeaveAction
 from bot.action.standard.gapdetector import GlobalGapDetectorAction
@@ -135,9 +135,9 @@ class BotManager:
                                                     EvalAction()
                                                 )
                                             ),
-                                            CommandAction("config").then(
+                                            CommandAction("state").then(
                                                 AdminActionWithErrorMessage().then(
-                                                    ConfigAction()
+                                                    StateAction()
                                                 )
                                             ),
                                             CommandAction("configstatus").then(
