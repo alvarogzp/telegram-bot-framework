@@ -1,4 +1,4 @@
-import time
+from datetime import datetime
 
 from bot.action.util.textformat import FormattedText
 from bot.logger.message_sender import MessageSender
@@ -24,18 +24,23 @@ class SenderLogger(Logger):
     def _get_text_to_send(self, tag, *texts):
         raise NotImplementedError()
 
+    @staticmethod
+    def _get_time():
+        now = datetime.now()
+        return now.strftime("%X") + now.strftime(".%f")[:-3]
+
 
 class PlainTextLogger(SenderLogger):
     def _get_text_to_send(self, tag: str, *texts: str):
         text = TEXT_SEPARATOR.join(texts)
-        return LOG_ENTRY_FORMAT.format(time=time.strftime("%X"), tag=tag, text=text)
+        return LOG_ENTRY_FORMAT.format(time=self._get_time(), tag=tag, text=text)
 
 
 class FormattedTextLogger(SenderLogger):
     def _get_text_to_send(self, tag: FormattedText, *texts: FormattedText):
         text = FormattedText().normal(TEXT_SEPARATOR).join(texts)
         return FormattedText().normal(LOG_ENTRY_FORMAT).start_format()\
-            .normal(time=time.strftime("%X")).concat(tag=tag).concat(text=text).end_format()
+            .normal(time=self._get_time()).concat(tag=tag).concat(text=text).end_format()
 
 
 class NoLogger(Logger):
