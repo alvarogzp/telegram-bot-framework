@@ -11,8 +11,7 @@ from bot.action.extra.messages import SaveMessageAction, ListMessageAction
 from bot.action.extra.pole import SavePoleAction, ListPoleAction, ManagePoleTimezonesAction
 from bot.action.extra.random import RandomChoiceAction
 from bot.action.standard.about import AboutAction, VersionAction
-from bot.action.standard.admin import RestartAction, EvalAction, AdminActionWithErrorMessage, AdminAction, HaltAction, \
-    GroupAdminAction
+from bot.action.standard.admin import RestartAction, EvalAction, AdminActionWithErrorMessage, AdminAction, HaltAction
 from bot.action.standard.admin.config_status import ConfigStatusAction
 from bot.action.standard.admin.instance import InstanceAction
 from bot.action.standard.admin.state import StateAction
@@ -22,6 +21,7 @@ from bot.action.standard.benchmark import BenchmarkAction, WorkersAction
 from bot.action.standard.chatsettings.action import ChatSettingsAction
 from bot.action.standard.enterexit import GreetAction, LeaveAction
 from bot.action.standard.gapdetector import GlobalGapDetectorAction
+from bot.action.standard.group_admin import GroupAdminAction
 from bot.action.standard.internationalization import InternationalizationAction
 from bot.action.standard.logger import LoggerAction
 from bot.action.standard.perchat import PerChatAction
