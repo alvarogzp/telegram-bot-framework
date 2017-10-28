@@ -140,7 +140,7 @@ class BotManager:
                                                     StateAction()
                                                 )
                                             ),
-                                            CommandAction("configstatus").then(
+                                            CommandAction("config").then(
                                                 AdminActionWithErrorMessage().then(
                                                     ConfigStatusAction()
                                                 )
