@@ -2,7 +2,7 @@ import time
 
 from bot.action.core.action import Action
 from bot.action.core.update import Update
-from bot.action.standard.config_status import ConfigStatus
+from bot.action.standard.admin.config_status import ConfigStatus
 from bot.action.util.textformat import FormattedText
 from bot.api.api import Api
 from bot.api.telegram import TelegramBotApi
