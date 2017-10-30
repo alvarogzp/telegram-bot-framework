@@ -1,7 +1,11 @@
 from bot.action.core.action import IntermediateAction
+from bot.action.util.textformat import FormattedText
 from bot.logger.logger import LoggerFactory
 from bot.logger.message_sender.factory import MessageSenderFactory
 from bot.logger.worker_logger import WorkerStartStopLogger
+
+
+LOG_TAG = FormattedText().bold("LOGGER")
 
 
 class LoggerAction(IntermediateAction):
@@ -34,6 +38,7 @@ class LoggerAction(IntermediateAction):
             self.__update_scheduler_callbacks()
         # store logger in cache to allow other actions to access it outside of process()
         self.cache.logger = self.logger
+        self.logger.log(LOG_TAG, FormattedText().bold("Started"))
 
     def __update_scheduler_callbacks(self):
         # update scheduler callbacks to use this logger instead of the admin one
