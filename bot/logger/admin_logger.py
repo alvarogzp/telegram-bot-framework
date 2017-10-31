@@ -2,7 +2,7 @@ import traceback
 
 from bot.action.util.textformat import FormattedText
 from bot.api.api import Api
-from bot.api.telegram import TelegramBotApiException
+from bot.api.exceptions import ApiException
 from bot.logger.formatter.exception import ExceptionFormatter
 from bot.logger.logger import LoggerFactory
 from bot.logger.message_sender.factory import MessageSenderFactory
@@ -59,7 +59,7 @@ class AdminLogger:
     def __send_traceback(self):
         try:
             self.logger.log(TRACEBACK_TAG, FormattedText().code_block(traceback.format_exc()))
-        except TelegramBotApiException:
+        except ApiException:
             # tracebacks can be very long and reach message length limit
             # retry with a short traceback
             self.logger.log(TRACEBACK_TAG, FormattedText().code_block(traceback.format_exc(limit=5)))
