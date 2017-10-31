@@ -10,3 +10,6 @@ class ReusableMessageLimiter:
 
     def notify_new_message_issued(self):
         pass
+
+    def notify_about_to_send_message(self):
+        pass
