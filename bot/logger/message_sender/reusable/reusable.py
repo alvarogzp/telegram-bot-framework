@@ -13,6 +13,7 @@ class ReusableMessageSender(IntermediateMessageSender):
 
     def send(self, text):
         message = self._get_message_for(text)
+        self.limiter.notify_about_to_send_message()
         self._send(message)
 
     def _get_message_for(self, text):
