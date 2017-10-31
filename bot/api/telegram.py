@@ -1,4 +1,5 @@
 import threading
+from typing import Union
 
 import requests
 from requests.adapters import HTTPAdapter
@@ -26,9 +27,13 @@ class TelegramBotApi:
         response = self.__get_session().send(request, timeout=60)
         self.__log_response(response)
         json_response = response.json()
-        if not json_response["ok"]:
-            raise TelegramBotApiException(json_response["description"])
-        return json_response["result"]
+        return self.__get_result(json_response)
+
+    @staticmethod
+    def __get_result(response: dict):
+        if not response["ok"]:
+            raise TelegramBotApiException(response["error_code"], response["description"], response.get("parameters"))
+        return response["result"]
 
     def __get_session(self):
         if not self.reuse_connections:
@@ -84,4 +89,7 @@ class TelegramBotApi:
 
 
 class TelegramBotApiException(Exception):
-    pass
+    def __init__(self, error_code: int, description: str, parameters: Union[dict, None]):
+        self.error_code = error_code
+        self.description = description
+        self.parameters = parameters
