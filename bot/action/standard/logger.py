@@ -10,7 +10,7 @@ LOG_TAG = FormattedText().bold("LOGGER")
 
 class LoggerAction(IntermediateAction):
     def __init__(self, logger_type: str = "formatted", reuse_max_length: int = 4000, reuse_max_time: int = 60,
-                 async: bool = True):
+                 reuse_max_number: int = 1, async: bool = True):
         """
         :param logger_type: Either `formatted` or `plain`. Indicates the type of input that the logger accepts.
             If `formatted`, it accepts FormattedText, and if `plain`, it accepts str.
@@ -20,7 +20,8 @@ class LoggerAction(IntermediateAction):
         self.sender_builder = MessageSenderFactory.get_builder()\
             .with_message_builder_type(logger_type)\
             .with_reuse_max_length(reuse_max_length)\
-            .with_reuse_max_time(reuse_max_time)
+            .with_reuse_max_time(reuse_max_time)\
+            .with_reuse_max_number(reuse_max_number)
         self.async = async
         self.logger = None
 
@@ -46,7 +47,7 @@ class LoggerAction(IntermediateAction):
         self.scheduler.set_callbacks(worker_logger.worker_start, worker_logger.worker_stop, are_async=self.async)
 
     def new_logger(self, chat_id, logger_type: str = None, reuse_max_length: int = None, reuse_max_time: int = None,
-                   async: bool = None, use_worker_pool: bool = True):
+                   reuse_max_number: int = None, async: bool = None, use_worker_pool: bool = True):
         if chat_id is None:
             return LoggerFactory.get_no_logger()
         sender_builder = self.sender_builder.copy().with_chat_id(chat_id)
@@ -58,6 +59,8 @@ class LoggerAction(IntermediateAction):
             sender_builder.with_reuse_max_length(reuse_max_length)
         if reuse_max_time is not None:
             sender_builder.with_reuse_max_time(reuse_max_time)
+        if reuse_max_number is not None:
+            sender_builder.with_reuse_max_number(reuse_max_number)
         if async is None:
             async = self.async
         if async:
