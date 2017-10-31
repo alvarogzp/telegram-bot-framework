@@ -1,10 +1,8 @@
 from bot.action.core.update import Update
-from bot.api.async import AsyncApi
 from bot.api.call.call import ApiCall
 from bot.api.call.params import ApiCallParams
 from bot.api.domain import Message, Photo, Sticker, Document, Voice, VideoNote, Audio, Video, Location, Contact
 from bot.api.telegram import TelegramBotApi
-from bot.multithreading.scheduler import SchedulerApi
 from bot.storage import State
 
 
@@ -14,8 +12,8 @@ class Api:
         self.state = state
         self.async = self
 
-    def enable_async(self, scheduler: SchedulerApi):
-        self.async = AsyncApi(self, scheduler)
+    def enable_async(self, async_api):
+        self.async = async_api
 
     def send_message(self, message: Message, **params):
         message_params = message.data.copy()

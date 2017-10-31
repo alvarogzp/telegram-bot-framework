@@ -5,6 +5,7 @@ from bot.action.core.update import Update
 from bot.action.standard.admin.config_status import ConfigStatus
 from bot.action.util.textformat import FormattedText
 from bot.api.api import Api
+from bot.api.async import AsyncApi
 from bot.api.telegram import TelegramBotApi
 from bot.logger.admin_logger import AdminLogger
 from bot.logger.worker_logger import WorkerStartStopLogger
@@ -32,7 +33,7 @@ class Bot:
         self.starting()
         if self.config.async():
             self.scheduler.setup()
-            self.api.enable_async(self.scheduler)
+            self.api.enable_async(AsyncApi(self.api, self.scheduler))
         self.action = Action()
         self.update_processor = UpdateProcessor(self.action, self.logger)
 
