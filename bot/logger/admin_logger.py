@@ -25,6 +25,7 @@ class AdminLogger:
             .with_message_builder_type("formatted")\
             .with_reuse_max_length(1000)\
             .with_reuse_max_time(1)\
+            .with_reuse_max_number(10)\
             .build()
         self.logger = LoggerFactory.get("formatted", sender)
         self.print_tracebacks = print_tracebacks
