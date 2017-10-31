@@ -2,7 +2,7 @@ import traceback
 
 from bot.action.util.textformat import FormattedText
 from bot.api.api import Api
-from bot.api.exceptions import ApiException
+from bot.api.exception import ApiException
 from bot.logger.formatter.exception import ExceptionFormatter
 from bot.logger.logger import LoggerFactory
 from bot.logger.message_sender.factory import MessageSenderFactory

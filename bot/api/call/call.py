@@ -1,6 +1,6 @@
 from bot.api.call.params import ApiCallParams
 from bot.api.domain import ApiObject
-from bot.api.exceptions import ApiExceptionFactory
+from bot.api.exception import ApiExceptionFactory
 from bot.api.telegram import TelegramBotApiException
 from bot.multithreading.work import Work
 
