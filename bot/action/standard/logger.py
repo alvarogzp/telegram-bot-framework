@@ -74,3 +74,6 @@ class LoggerAction(IntermediateAction):
         event.logger = self.logger
         event.new_logger = self.new_logger
         self._continue(event)
+
+    def pre_shutdown(self):
+        self.logger.log(LOG_TAG, FormattedText().bold("Ended"))
