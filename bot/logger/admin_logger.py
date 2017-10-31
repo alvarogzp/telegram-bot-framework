@@ -2,7 +2,7 @@ import traceback
 
 from bot.action.util.textformat import FormattedText
 from bot.api.api import Api
-from bot.api.telegram import TelegramBotApiException
+from bot.api.exception import ApiException
 from bot.logger.formatter.exception import ExceptionFormatter
 from bot.logger.logger import LoggerFactory
 from bot.logger.message_sender.factory import MessageSenderFactory
@@ -19,12 +19,13 @@ INFO_TAG = FormattedText().normal("INFO")
 class AdminLogger:
     def __init__(self, api: Api, admin_chat_id: str, print_tracebacks: bool, send_tracebacks: bool):
         sender = MessageSenderFactory\
-            .get_synchronized_timed_and_length_limited_reusable_builder()\
+            .get_builder()\
             .with_api(api)\
             .with_chat_id(admin_chat_id)\
             .with_message_builder_type("formatted")\
             .with_reuse_max_length(1000)\
             .with_reuse_max_time(1)\
+            .with_reuse_max_number(10)\
             .build()
         self.logger = LoggerFactory.get("formatted", sender)
         self.print_tracebacks = print_tracebacks
@@ -58,7 +59,7 @@ class AdminLogger:
     def __send_traceback(self):
         try:
             self.logger.log(TRACEBACK_TAG, FormattedText().code_block(traceback.format_exc()))
-        except TelegramBotApiException:
+        except ApiException:
             # tracebacks can be very long and reach message length limit
             # retry with a short traceback
             self.logger.log(TRACEBACK_TAG, FormattedText().code_block(traceback.format_exc(limit=5)))

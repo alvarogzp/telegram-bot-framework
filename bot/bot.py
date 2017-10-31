@@ -5,6 +5,7 @@ from bot.action.core.update import Update
 from bot.action.standard.admin.config_status import ConfigStatus
 from bot.action.util.textformat import FormattedText
 from bot.api.api import Api
+from bot.api.async import AsyncApi
 from bot.api.telegram import TelegramBotApi
 from bot.logger.admin_logger import AdminLogger
 from bot.logger.worker_logger import WorkerStartStopLogger
@@ -32,7 +33,7 @@ class Bot:
         self.starting()
         if self.config.async():
             self.scheduler.setup()
-            self.api.enable_async(self.scheduler)
+            self.api.enable_async(AsyncApi(self.api, self.scheduler))
         self.action = Action()
         self.update_processor = UpdateProcessor(self.action, self.logger)
 
@@ -73,6 +74,7 @@ class Bot:
         NormalUpdatesProcessor(self.api.get_updates, self.logger, self.config, self.update_processor).run()
 
     def shutdown(self):
+        self.action.shutdown()
         self.scheduler.shutdown()
         self.logger.info("Finished")
 
@@ -149,7 +151,7 @@ class UpdatesProcessor:
     def __do_safe(func: callable):
         try:
             return func()
-        except:
+        except Exception:
             pass
 
     def should_keep_processing_updates(self):

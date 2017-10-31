@@ -1,5 +1,6 @@
 from bot.api.call.params import ApiCallParams
 from bot.api.domain import ApiObject
+from bot.api.exception import ApiExceptionFactory
 from bot.api.telegram import TelegramBotApiException
 from bot.multithreading.work import Work
 
@@ -21,7 +22,8 @@ class ApiCall:
         try:
             return self.__do_api_call(params)
         except TelegramBotApiException as e:
-            return self.__handle_api_error(e, params)
+            exception = ApiExceptionFactory.from_telegram_bot_api_exception(e)
+            return self.__handle_api_error(exception, params)
 
     def __do_api_call(self, params: ApiCallParams):
         return ApiObject.wrap_api_object(self.api_func(**params.send))

@@ -1,10 +1,8 @@
 from bot.action.core.update import Update
 from bot.api.call.call import ApiCall
 from bot.api.call.params import ApiCallParams
-from bot.api.domain import Message, OutApiObject, Photo, Sticker, Document, Voice, VideoNote, Audio, Video, Location, \
-    Contact
+from bot.api.domain import Message, Photo, Sticker, Document, Voice, VideoNote, Audio, Video, Location, Contact
 from bot.api.telegram import TelegramBotApi
-from bot.multithreading.scheduler import SchedulerApi
 from bot.storage import State
 
 
@@ -14,8 +12,8 @@ class Api:
         self.state = state
         self.async = self
 
-    def enable_async(self, scheduler: SchedulerApi):
-        self.async = AsyncApi(self, scheduler)
+    def enable_async(self, async_api):
+        self.async = async_api
 
     def send_message(self, message: Message, **params):
         message_params = message.data.copy()
@@ -88,23 +86,3 @@ class Api:
     @staticmethod
     def __api_call_hook(call: ApiCall, params: dict):
         return call.call(ApiCallParams(params))
-
-
-class AsyncApi:
-    def __init__(self, api: Api, scheduler: SchedulerApi):
-        self.api = api
-        self.scheduler = scheduler
-
-    def __getattr__(self, item):
-        return self.__get_call_hook_for(item)
-
-    def __get_call_hook_for(self, function_name):
-        func = getattr(self.api, function_name)
-        return lambda *args, **kwargs: self.__call_hook(func, args, kwargs)
-
-    def __call_hook(self, func, args, kwargs):
-        self.__add_scheduler(kwargs)
-        return func(*args, **kwargs)
-
-    def __add_scheduler(self, args: dict):
-        args[OutApiObject.LOCAL_PARAM_SCHEDULER] = self.scheduler.network

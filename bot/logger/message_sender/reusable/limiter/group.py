@@ -18,3 +18,7 @@ class ReusableMessageLimiterGroup(ReusableMessageLimiter):
     def notify_new_message_issued(self):
         for limiter in self.limiters:
             limiter.notify_new_message_issued()
+
+    def notify_about_to_send_message(self):
+        for limiter in self.limiters:
+            limiter.notify_about_to_send_message()

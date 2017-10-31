@@ -24,6 +24,12 @@ class Action:
     def process(self, event):
         pass
 
+    def pre_shutdown(self):
+        pass
+
+    def shutdown(self):
+        self.pre_shutdown()
+
 
 class ActionGroup(Action):
     def __init__(self, *actions):
@@ -39,6 +45,10 @@ class ActionGroup(Action):
 
     def process(self, event):
         self.for_each(lambda action: action.process(event._copy()))
+
+    def shutdown(self):
+        self.for_each(lambda action: action.shutdown())
+        super().shutdown()
 
     def for_each(self, func):
         for action in self.actions:
