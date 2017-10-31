@@ -150,7 +150,7 @@ class UpdatesProcessor:
     def __do_safe(func: callable):
         try:
             return func()
-        except:
+        except Exception:
             pass
 
     def should_keep_processing_updates(self):
