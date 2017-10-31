@@ -50,7 +50,7 @@ class ApiObjectList:
 class OutApiObject(ApiObject):
     LOCAL_PARAM_ERROR_CALLBACK = "__error_callback"
     """
-    It must be assigned to a callable object that will be called with a single param of type TelegramBotApiException
+    It must be assigned to a callable object that will be called with a single param of type ApiException
     when the server answers with an error response.
     The exception won't be raised if this is present and of type callable.
     """
