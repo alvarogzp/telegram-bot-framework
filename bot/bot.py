@@ -74,6 +74,7 @@ class Bot:
         NormalUpdatesProcessor(self.api.get_updates, self.logger, self.config, self.update_processor).run()
 
     def shutdown(self):
+        self.action.shutdown()
         self.scheduler.shutdown()
         self.logger.info("Finished")
 
