@@ -19,7 +19,7 @@ INFO_TAG = FormattedText().normal("INFO")
 class AdminLogger:
     def __init__(self, api: Api, admin_chat_id: str, print_tracebacks: bool, send_tracebacks: bool):
         sender = MessageSenderFactory\
-            .get_synchronized_timed_and_length_limited_reusable_builder()\
+            .get_builder()\
             .with_api(api)\
             .with_chat_id(admin_chat_id)\
             .with_message_builder_type("formatted")\

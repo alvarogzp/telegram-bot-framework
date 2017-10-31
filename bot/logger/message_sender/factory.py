@@ -11,6 +11,10 @@ from bot.multithreading.worker import Worker
 
 
 class MessageSenderFactory:
+    @classmethod
+    def get_builder(cls):
+        return cls.get_synchronized_timed_and_length_limited_reusable_builder()
+
     @staticmethod
     def get_synchronized_timed_and_length_limited_reusable_builder():
         return SynchronizedTimedAndLengthLimitedReusableMessageSenderBuilder()
