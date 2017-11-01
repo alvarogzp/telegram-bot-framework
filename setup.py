@@ -8,6 +8,7 @@ setup(
     use_scm_version=True,
 
     description=project_info.description,
+    long_description=project_info.description,
 
     url=project_info.source_url,
 
@@ -29,4 +30,24 @@ setup(
     ],
 
     python_requires='>=3',
+
+    # for pypi:
+
+    keywords='telegram bot api framework',
+
+    classifiers=[
+        'Development Status :: 5 - Production/Stable',
+
+        'Intended Audience :: Developers',
+        'Topic :: Software Development :: Libraries :: Application Frameworks',
+
+        'License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)',
+
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3 :: Only',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+    ],
 )
