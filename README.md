@@ -54,6 +54,12 @@ The following keys are also recognised by the framework, but they are *OPTIONAL*
    - `instance_name`, can be any string value to identify the bot instance at runtime.
 
 
+## Known bots based on this framework
+
+- [World Times](https://github.com/alvarogzp/clock-bot)
+- [XtremBot](https://github.com/alvarogzp/xtrem-bot)
+
+
 # Authors
 
 - Developed by
