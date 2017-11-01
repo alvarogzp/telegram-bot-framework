@@ -27,7 +27,7 @@ class AboutAction(Action):
         text = FormattedText()\
             .normal("{bot_name}, version {version}.").newline()\
             .newline()\
-            .normal("Created by {author} using {framework} framework.")
+            .normal("Created by {author} using {framework}.")
         if is_open_source:
             text.newline().newline()\
                 .normal("This bot is Open Source.").newline()\
