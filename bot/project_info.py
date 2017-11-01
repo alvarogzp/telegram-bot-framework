@@ -1,10 +1,10 @@
 # Shared project info
 
-name = 'telegram-bot'
+name = 'telegram-bot-framework'
 
 description = 'Python Telegram bot API framework'
 
-source_url = 'https://github.com/alvarogzp/telegram-bot'
+source_url = 'https://github.com/alvarogzp/telegram-bot-framework'
 
 author_name = 'Alvaro Gutierrez Perez'
 author_email = 'alvarogzp@gmail.com'
