@@ -14,15 +14,14 @@ clean()
 
 build()
 {
-    python setup.py sdist
-    python setup.py bdist_wheel
+    python setup.py sdist bdist_wheel
 }
 
 sign()
 {
     for file in dist/*
     do
-        gpg --detach-sign "$file"
+        gpg --detach-sign --armor "$file"
     done
 }
 
