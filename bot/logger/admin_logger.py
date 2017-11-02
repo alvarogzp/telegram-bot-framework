@@ -61,8 +61,8 @@ class AdminLogger:
             self.logger.log(TRACEBACK_TAG, FormattedText().code_block(traceback.format_exc()))
         except ApiException:
             # tracebacks can be very long and reach message length limit
-            # retry with a short traceback
-            self.logger.log(TRACEBACK_TAG, FormattedText().code_block(traceback.format_exc(limit=5)))
+            # retry with a shorter traceback
+            self.logger.log(TRACEBACK_TAG, FormattedText().code_block(traceback.format_exc(limit=1)))
 
     def info(self, info_text: str, *additional_info: str):
         self.__info(
