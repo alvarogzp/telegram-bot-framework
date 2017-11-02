@@ -14,11 +14,9 @@ There are no plans to support Python 2, which will be [retired soon](https://pyt
 
 1. Install `telegram-bot-framework` with pip
 
-       pip install https://github.com/alvarogzp/telegram-bot-framework.git@master
+       pip install telegram-bot-framework
 
-   or add it as a dependency to your `requirements.txt`
-
-       https://github.com/alvarogzp/telegram-bot-framework.git@master#egg=telegram-bot-framework
+   or add `telegram-bot-framework` to `install_requires` in your `setup.py`, or to your `requirements.txt` file.
 
 2. Create a `config/` dir in the base directory of your bot and add the configuration options specified in the [configuration section](#configuration) to it.
 
