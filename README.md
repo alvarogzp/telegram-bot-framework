@@ -14,11 +14,9 @@ There are no plans to support Python 2, which will be [retired soon](https://pyt
 
 1. Install `telegram-bot-framework` with pip
 
-       pip install https://github.com/alvarogzp/telegram-bot-framework.git@master
+       pip install telegram-bot-framework
 
-   or add it as a dependency to your `requirements.txt`
-
-       https://github.com/alvarogzp/telegram-bot-framework.git@master#egg=telegram-bot-framework
+   or add `telegram-bot-framework` to `install_requires` in your `setup.py`, or to your `requirements.txt` file.
 
 2. Create a `config/` dir in the base directory of your bot and add the configuration options specified in the [configuration section](#configuration) to it.
 
@@ -27,6 +25,9 @@ There are no plans to support Python 2, which will be [retired soon](https://pyt
    - You can also copy [run.sh](run.sh) and use it as the launcher script for your bot. It performs some initialization tasks before running the bot, creates a virtual environment to install the dependencies and run the bot on it, re-executes the bot if it crashes, and updates your VCS before running.
 
 4. *OPTIONAL* To enable i18n support, copy the [locales](locales) dir to your bot base directory, and run its `generate_mo.sh` script (the `run.sh` script will do it for you if you are using it). Use the `locales/` dir as the base dir for your translations. You can use and modify the helper script `update_po.sh` to extract `.po` files from your code.
+
+You can use [XtremBot](https://github.com/alvarogzp/xtrem-bot) as an example of a simple bot using this framework.
+Take a look at [World Times](https://github.com/alvarogzp/clock-bot) for a more elaborated bot.
 
 
 ## Configuration
