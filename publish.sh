@@ -1,6 +1,9 @@
 #!/bin/sh
 
 
+TWINE_REPOSITORY="${1:-pypi}"
+
+
 cd_to_current_script_location()
 {
     current_script_location="$(dirname "$0")"
@@ -14,21 +17,21 @@ clean()
 
 build()
 {
-    python setup.py sdist
-    python setup.py bdist_wheel
+    python setup.py sdist bdist_wheel
 }
 
 sign()
 {
     for file in dist/*
     do
-        gpg --detach-sign "$file"
+        gpg --detach-sign --armor "$file"
     done
 }
 
 publish()
 {
-    twine upload dist/*
+    echo ">> Uploading to: $TWINE_REPOSITORY"
+    twine upload --repository "$TWINE_REPOSITORY" dist/*
 }
 
 
