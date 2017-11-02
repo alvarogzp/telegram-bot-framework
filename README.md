@@ -26,6 +26,9 @@ There are no plans to support Python 2, which will be [retired soon](https://pyt
 
 4. *OPTIONAL* To enable i18n support, copy the [locales](locales) dir to your bot base directory, and run its `generate_mo.sh` script (the `run.sh` script will do it for you if you are using it). Use the `locales/` dir as the base dir for your translations. You can use and modify the helper script `update_po.sh` to extract `.po` files from your code.
 
+You can use [XtremBot](https://github.com/alvarogzp/xtrem-bot) as an example of a simple bot using this framework.
+Take a look at [World Times](https://github.com/alvarogzp/clock-bot) for a more elaborated bot.
+
 
 ## Configuration
 
