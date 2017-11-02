@@ -1,6 +1,9 @@
 #!/bin/sh
 
 
+TWINE_REPOSITORY="${1:-pypi}"
+
+
 cd_to_current_script_location()
 {
     current_script_location="$(dirname "$0")"
@@ -27,7 +30,8 @@ sign()
 
 publish()
 {
-    twine upload dist/*
+    echo ">> Uploading to: $TWINE_REPOSITORY"
+    twine upload --repository "$TWINE_REPOSITORY" dist/*
 }
 
 
