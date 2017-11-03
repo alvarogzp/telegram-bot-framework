@@ -94,6 +94,14 @@ class Message(OutApiObject):
     def set_message_id(self, message_id):
         self.data["message_id"] = message_id
 
+    def with_reply_markup(self, reply_markup: dict):
+        self.data["reply_markup"] = reply_markup
+        return self
+
+    def copy(self):
+        # we rely on ** unpacking to avoid having to copy the dict
+        return Message(_type=Message, **self.data)
+
     @staticmethod
     def create(text, chat_id=None, **kwargs):
         return Message(_type=Message, text=text, chat_id=chat_id, disable_web_page_preview=True, **kwargs)
