@@ -54,6 +54,9 @@ class ConfigStatus:
         max_error_time_in_normal_mode = FormattedText()\
             .normal("Max error time in normal mode: {seconds} seconds").start_format()\
             .bold(seconds=self.config.max_error_seconds_allowed_in_normal_mode).end_format()
+        max_network_workers = FormattedText()\
+            .normal("Max network workers: {number}").start_format()\
+            .bold(number=self.config.max_network_workers).end_format()
         instance_name = FormattedText()\
             .normal("Instance name: {name}").start_format()\
             .bold(name=self.config.instance_name).end_format()
@@ -68,6 +71,7 @@ class ConfigStatus:
             scheduler_events_on_log_chat,
             sleep_time_on_get_updates_error,
             max_error_time_in_normal_mode,
+            max_network_workers,
             instance_name
         )
 

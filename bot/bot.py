@@ -28,14 +28,20 @@ class Bot:
         self.api = Api(telegram_api, self.state)
         self.cache.bot_info = self.api.getMe()
         self.logger = AdminLogger(self.api, self.config.admin_chat_id, debug, self.config.send_error_tracebacks())
-        worker_logger = WorkerStartStopLogger(self.logger.logger)
-        self.scheduler = SchedulerApi(self.logger.work_error, worker_logger.worker_start, worker_logger.worker_stop)
+        self.scheduler = self._create_scheduler()
         self.starting()
         if self.config.async():
             self.scheduler.setup()
             self.api.enable_async(AsyncApi(self.api, self.scheduler))
         self.action = Action()
         self.update_processor = UpdateProcessor(self.action, self.logger)
+
+    def _create_scheduler(self):
+        max_network_workers = int(self.config.max_network_workers)
+        worker_logger = WorkerStartStopLogger(self.logger.logger)
+        return SchedulerApi(
+            max_network_workers, self.logger.work_error, worker_logger.worker_start, worker_logger.worker_stop
+        )
 
     def set_action(self, action: Action):
         action.setup(self.api, self.config, self.state, self.cache, self.scheduler)

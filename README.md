@@ -52,6 +52,7 @@ The following keys are also recognised by the framework, but they are *OPTIONAL*
    - `scheduler_events_on_log_chat`, with a value of `true` to send scheduler event messages to log chat, and `false` to send them to admin chat. Note that initial scheduler events happening before logger is set-up are sent to admin chat regardless of this setting. By default, it is true.
    - `sleep_seconds_on_get_updates_error`, which indicates the number of seconds the bot sleeps when there is an error while getting updates, to avoid hitting the server repeatedly when it has problems. By default, the bot sleeps `60` seconds.
    - `max_error_seconds_allowed_in_normal_mode`, with the number of seconds the bot can be in normal mode while getting errors that avoid processing updates correctly. If this value is exceeded, the bot switches to process updates in pending mode, not answering to interactive actions (those under `NoPendingAction` in `BotManager`). The default is one hour.
+   - `max_network_workers`, with the maximum number of workers (ie. threads) that can be running for network operations at the same time. By default, a maximum of 4 network workers are allowed.
    - `instance_name`, can be any string value to identify the bot instance at runtime.
 
 
