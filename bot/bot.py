@@ -28,8 +28,9 @@ class Bot:
         self.api = Api(telegram_api, self.state)
         self.cache.bot_info = self.api.getMe()
         self.logger = AdminLogger(self.api, self.config.admin_chat_id, debug, self.config.send_error_tracebacks())
+        max_network_workers = int(self.config.max_network_workers)
         worker_logger = WorkerStartStopLogger(self.logger.logger)
-        self.scheduler = SchedulerApi(self.logger.work_error, worker_logger.worker_start, worker_logger.worker_stop)
+        self.scheduler = SchedulerApi(max_network_workers, self.logger.work_error, worker_logger.worker_start, worker_logger.worker_stop)
         self.starting()
         if self.config.async():
             self.scheduler.setup()
