@@ -23,7 +23,7 @@ WORKER_POOL_KEEP_WORKERS_FOREVER = None
 
 
 class SchedulerApi:
-    def __init__(self, worker_error_handler: callable, worker_start_callback: callable, worker_end_callback: callable):
+    def __init__(self, max_network_workers: int, worker_error_handler: callable, worker_start_callback: callable, worker_end_callback: callable):
         self.worker_error_handler = worker_error_handler
 
         # Defining here to avoid IDE from complaining about defining variables outside __init__
@@ -44,7 +44,10 @@ class SchedulerApi:
 
         self.immediate_worker = ImmediateWorker(worker_error_handler)
         self.network_worker = self._new_worker_pool(
-            "network", min_workers=0, max_workers=2, max_seconds_idle=DEFAULT_WORKER_POOL_MAX_SECONDS_IDLE
+            "network",
+            min_workers=0,
+            max_workers=max_network_workers,
+            max_seconds_idle=DEFAULT_WORKER_POOL_MAX_SECONDS_IDLE
         )
         self.io_worker = self._new_worker_pool(
             "io", min_workers=0, max_workers=1, max_seconds_idle=WORKER_POOL_KEEP_WORKERS_FOREVER

@@ -77,6 +77,7 @@ class Config(Storage):
         "scheduler_events_on_log_chat": "true",
         "sleep_seconds_on_get_updates_error": "60",
         "max_error_seconds_allowed_in_normal_mode": "3600",
+        "max_network_workers": "4",
         "instance_name": ""
     }
 
