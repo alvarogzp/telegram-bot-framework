@@ -72,7 +72,7 @@ class UserFormatter:
         if self.user.username is not None:
             formatted_user += " [" + self.user.username + "]"
         if not formatted_user:
-            formatted_user = "<" + str(self.user.id) + ">"
+            formatted_user = self._id()
         return formatted_user
 
     @property
