@@ -104,7 +104,7 @@ class Message(OutApiObject):
 
     @staticmethod
     def create(text, chat_id=None, **kwargs):
-        return Message(_type=Message, text=text, chat_id=chat_id, disable_web_page_preview=True, **kwargs)
+        return Message(_type=Message, text=text, chat_id=chat_id, disable_web_page_preview="true", **kwargs)
 
     @staticmethod
     def create_reply(message, reply_text):
