@@ -75,6 +75,37 @@ class UserFormatter:
             formatted_user = "<" + str(self.user.id) + ">"
         return formatted_user
 
+    @property
+    def full_data(self):
+        """
+        Returns all the info available for the user in the following format:
+            name [username] <id> (locale) bot_or_user
+        If any data is not available, it is not added.
+        """
+        data = [
+            self.full_name,
+            self._username(),
+            self._id(),
+            self._language_code(),
+            self._is_bot()
+        ]
+        return " ".join(filter(None, data))
+
+    def _username(self):
+        if self.user.username:
+            return "[{username}]".format(username=self.user.username)
+
+    def _id(self):
+        return "<{id}>".format(id=self.user.id)
+
+    def _language_code(self):
+        if self.user.language_code:
+            return "({language_code})".format(language_code=self.user.language_code)
+
+    def _is_bot(self):
+        if self.user.is_bot is not None:
+            return "🤖" if self.user.is_bot else "👤"
+
     @staticmethod
     def retrieve(user_id, user_storage_handler: UserStorageHandler):
         user = user_storage_handler.get(user_id)
