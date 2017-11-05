@@ -54,7 +54,7 @@ class CommandAction(IntermediateAction):
             FormattedText().normal("{command} {args}").start_format()
                 .bold(command=event.command, args=event.command_args).end_format(),
             FormattedText().normal("User: {user}").start_format()
-                .bold(user=UserFormatter(event.message.from_).full_format).end_format(),
+                .bold(user=UserFormatter(event.message.from_).full_data).end_format(),
             FormattedText().normal("Chat: {chat}").start_format()
                 .bold(chat=ChatFormatter.format_group_or_type(event.chat)).end_format(),
             FormattedText().normal("Execution time: {time}").start_format()
