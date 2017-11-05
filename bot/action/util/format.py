@@ -29,6 +29,11 @@ class UserFormatter:
 
     @property
     def default_format(self):
+        """
+        Returns full name (first and last) if name is available.
+        If not, returns username if available.
+        If not available too, returns the user id as a string.
+        """
         user = self.user
         if user.first_name is not None:
             return self.full_name
@@ -39,6 +44,9 @@ class UserFormatter:
 
     @property
     def full_name(self):
+        """
+        Returns the first and last name of the user separated by a space.
+        """
         formatted_user = []
         if self.user.first_name is not None:
             formatted_user.append(self.user.first_name)
@@ -48,6 +56,10 @@ class UserFormatter:
 
     @property
     def username(self):
+        """
+        Returns the username of the user without the '@' (thus, not mentioning them).
+        If the username is not available, returns an empty string.
+        """
         return self.user.username if self.user.username is not None else ""
 
     @property
