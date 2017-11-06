@@ -29,6 +29,11 @@ class UserFormatter:
 
     @property
     def default_format(self):
+        """
+        Returns full name (first and last) if name is available.
+        If not, returns username if available.
+        If not available too, returns the user id as a string.
+        """
         user = self.user
         if user.first_name is not None:
             return self.full_name
@@ -39,6 +44,9 @@ class UserFormatter:
 
     @property
     def full_name(self):
+        """
+        Returns the first and last name of the user separated by a space.
+        """
         formatted_user = []
         if self.user.first_name is not None:
             formatted_user.append(self.user.first_name)
@@ -48,6 +56,10 @@ class UserFormatter:
 
     @property
     def username(self):
+        """
+        Returns the username of the user without the '@' (thus, not mentioning them).
+        If the username is not available, returns an empty string.
+        """
         return self.user.username if self.user.username is not None else ""
 
     @property
@@ -60,8 +72,39 @@ class UserFormatter:
         if self.user.username is not None:
             formatted_user += " [" + self.user.username + "]"
         if not formatted_user:
-            formatted_user = "<" + str(self.user.id) + ">"
+            formatted_user = self._id()
         return formatted_user
+
+    @property
+    def full_data(self):
+        """
+        Returns all the info available for the user in the following format:
+            name [username] <id> (locale) bot_or_user
+        If any data is not available, it is not added.
+        """
+        data = [
+            self.full_name,
+            self._username(),
+            self._id(),
+            self._language_code(),
+            self._is_bot()
+        ]
+        return " ".join(filter(None, data))
+
+    def _username(self):
+        if self.user.username:
+            return "[{username}]".format(username=self.user.username)
+
+    def _id(self):
+        return "<{id}>".format(id=self.user.id)
+
+    def _language_code(self):
+        if self.user.language_code:
+            return "({language_code})".format(language_code=self.user.language_code)
+
+    def _is_bot(self):
+        if self.user.is_bot is not None:
+            return "🤖" if self.user.is_bot else "👤"
 
     @staticmethod
     def retrieve(user_id, user_storage_handler: UserStorageHandler):
