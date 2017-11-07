@@ -43,16 +43,16 @@ class SchedulerApi:
         self.running = False
 
         self.immediate_worker = ImmediateWorker(worker_error_handler)
-        self.network_worker = self._new_worker_pool(
+        self._network_worker = self._new_worker_pool(
             "network",
             min_workers=0,
             max_workers=max_network_workers,
             max_seconds_idle=DEFAULT_WORKER_POOL_MAX_SECONDS_IDLE
         )
-        self.io_worker = self._new_worker_pool(
+        self._io_worker = self._new_worker_pool(
             "io", min_workers=0, max_workers=1, max_seconds_idle=WORKER_POOL_KEEP_WORKERS_FOREVER
         )
-        self.background_worker = self._new_worker_pool(
+        self._background_worker = self._new_worker_pool(
             "background", min_workers=0, max_workers=1, max_seconds_idle=DEFAULT_WORKER_POOL_MAX_SECONDS_IDLE
         )
 
@@ -87,9 +87,9 @@ class SchedulerApi:
                                min_workers, max_workers, max_seconds_idle)
 
     def setup(self):
-        self._start_worker_pool(self.network_worker)
-        self._start_worker_pool(self.io_worker)
-        self._start_worker_pool(self.background_worker)
+        self._start_worker_pool(self._network_worker)
+        self._start_worker_pool(self._io_worker)
+        self._start_worker_pool(self._background_worker)
         self.running = True
 
     def _start_worker(self, worker: Worker):
@@ -117,16 +117,28 @@ class SchedulerApi:
         self.worker_end_callback(worker)
 
     def network(self, work: Work):
-        self._get_worker(self.network_worker).post(work)
+        self.network_worker.post(work)
 
     def io(self, work: Work):
-        self._get_worker(self.io_worker).post(work)
+        self.io_worker.post(work)
 
     def background(self, work: Work):
-        self._get_worker(self.background_worker).post(work)
+        self.background_worker.post(work)
 
     def immediate(self, work: Work):
         self.immediate_worker.post(work)
+
+    @property
+    def network_worker(self):
+        return self._get_worker(self._network_worker)
+
+    @property
+    def io_worker(self):
+        return self._get_worker(self._io_worker)
+
+    @property
+    def background_worker(self):
+        return self._get_worker(self._background_worker)
 
     def _get_worker(self, worker: Worker):
         if not self.running:
