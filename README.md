@@ -1,6 +1,6 @@
 # Telegram bot framework
 
-This repository contains a Python framework to build bots against the [Telegram Bot API](https://core.telegram.org/bots), and a sample bot.
+This repository contains a Python framework to build bots against the [Telegram Bot API](https://core.telegram.org/bots).
 
 The framework is event-based where you can configure what actions to perform when certain events occur (eg. someone enters a group, a command is sent to the bot, etc.).
 
@@ -56,11 +56,11 @@ The following keys are also recognised by the framework, but they are *OPTIONAL*
    - `instance_name`, can be any string value to identify the bot instance at runtime.
 
 
-## Known bots based on this framework
+## Some bots using this framework
 
 - [World Times](https://github.com/alvarogzp/clock-bot)
 - [XtremBot](https://github.com/alvarogzp/xtrem-bot)
-
+- Send a pull request adding yours!
 
 # Authors
 
