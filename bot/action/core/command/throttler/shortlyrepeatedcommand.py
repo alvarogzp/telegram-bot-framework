@@ -53,7 +53,7 @@ class ShortlyRepeatedCommandThrottler(Throttler):
             FormattedText().normal("User: {user}").start_format()
                 .bold(user=UserFormatter(event.message.from_).full_data).end_format(),
             FormattedText().normal("Chat: {chat}").start_format()
-                .bold(chat=ChatFormatter.format_group_or_type(event.chat)).end_format(),
+                .bold(chat=ChatFormatter(event.chat).full_data).end_format(),
             FormattedText().normal("Throttling for {seconds} seconds.").start_format()
                 .bold(seconds=remaining_seconds).end_format()
         )
