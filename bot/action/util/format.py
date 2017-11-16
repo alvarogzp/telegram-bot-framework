@@ -117,6 +117,35 @@ class UserFormatter:
 
 
 class ChatFormatter:
+    def __init__(self, chat):
+        self.chat = chat
+
+    @property
+    def full_data(self):
+        """
+        Returns all the info available for the chat in the following format:
+            title [username] (type) <id>
+        If any data is not available, it is not added.
+        """
+        data = [
+            self.chat.title,
+            self._username(),
+            self._type(),
+            self._id()
+        ]
+        return " ".join(filter(None, data))
+
+    def _id(self):
+        return "<{id}>".format(id=self.chat.id)
+
+    def _type(self):
+        return "({type})".format(type=self.chat.type)
+
+    def _username(self):
+        username = self.chat.username
+        if username:
+            return "[{username}]".format(username=username)
+
     @staticmethod
     def format_group_or_type(chat):
         if GroupFormatter.is_group(chat):
