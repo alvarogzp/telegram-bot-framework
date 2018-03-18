@@ -34,7 +34,7 @@ class UserInfoFormatter(ApiObjectInfoFormatter):
         if status in (MEMBER_STATUS_RESTRICTED, MEMBER_STATUS_KICKED):
             until = self._date(member.until_date, "Not set")
             self._add_info("Until", until)
-        if status in (MEMBER_STATUS_ADMINISTRATOR, MEMBER_STATUS_CREATOR):
+        if status == MEMBER_STATUS_ADMINISTRATOR:
             can_change_info = self._yes_no(member.can_change_info)
             can_post_messages = self._yes_no(member.can_post_messages)
             can_edit_messages = self._yes_no(member.can_edit_messages)
