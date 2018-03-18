@@ -29,7 +29,7 @@ class UserInfoFormatter(ApiObjectInfoFormatter):
     def __format_member(self, user: ApiObject):
         member = self.api.getChatMember(chat_id=self.chat.id, user_id=user.id)
         status = member.status
-        self._add_title("Chat member info")
+        self._add_title("Member info")
         self._add_info("Status", status)
         if status in (MEMBER_STATUS_RESTRICTED, MEMBER_STATUS_KICKED):
             until = self._date(member.until_date, "Not set")
