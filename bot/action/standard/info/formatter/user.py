@@ -4,10 +4,10 @@ from bot.api.api import Api
 from bot.api.domain import ApiObject
 
 
-CHAT_MEMBER_STATUS_CREATOR = "creator"
-CHAT_MEMBER_STATUS_ADMINISTRATOR = "administrator"
-CHAT_MEMBER_STATUS_KICKED = "kicked"
-CHAT_MEMBER_STATUS_RESTRICTED = "restricted"
+MEMBER_STATUS_CREATOR = "creator"
+MEMBER_STATUS_ADMINISTRATOR = "administrator"
+MEMBER_STATUS_KICKED = "kicked"
+MEMBER_STATUS_RESTRICTED = "restricted"
 
 
 class UserInfoFormatter(ApiObjectInfoFormatter):
@@ -31,10 +31,10 @@ class UserInfoFormatter(ApiObjectInfoFormatter):
         status = member.status
         self._add_title("Chat member info")
         self._add_info("Status", status)
-        if status in (CHAT_MEMBER_STATUS_RESTRICTED, CHAT_MEMBER_STATUS_KICKED):
+        if status in (MEMBER_STATUS_RESTRICTED, MEMBER_STATUS_KICKED):
             until = self._date(member.until_date, "Not set")
             self._add_info("Until", until)
-        if status in (CHAT_MEMBER_STATUS_ADMINISTRATOR, CHAT_MEMBER_STATUS_CREATOR):
+        if status in (MEMBER_STATUS_ADMINISTRATOR, MEMBER_STATUS_CREATOR):
             can_change_info = self._yes_no(member.can_change_info)
             can_post_messages = self._yes_no(member.can_post_messages)
             can_edit_messages = self._yes_no(member.can_edit_messages)
@@ -51,7 +51,7 @@ class UserInfoFormatter(ApiObjectInfoFormatter):
             self._add_info("Can remove and restrict members", can_restrict_members)
             self._add_info("Can pin messages", can_pin_messages)
             self._add_info("Can designate new admins", can_promote_members)
-        if status == CHAT_MEMBER_STATUS_RESTRICTED:
+        if status == MEMBER_STATUS_RESTRICTED:
             can_send_messages = self._yes_no(member.can_send_messages)
             can_send_media_messages = self._yes_no(member.can_send_media_messages)
             can_send_other_messages = self._yes_no(member.can_send_other_messages)
