@@ -4,6 +4,9 @@ from bot.api.api import Api
 from bot.api.domain import ApiObject
 
 
+CHAT_TYPE_PRIVATE = "private"
+
+
 class ChatInfoFormatter(ApiObjectInfoFormatter):
     def __init__(self, api: Api, chat: ApiObject, bot_user: ApiObject, user: ApiObject):
         super().__init__(api, chat)
@@ -28,7 +31,7 @@ class ChatInfoFormatter(ApiObjectInfoFormatter):
         pinned_message = self._pinned_message(chat.pinned_message)
         sticker_set_name = self._group_sticker_set(chat.sticker_set_name)
         member_count = self.api.getChatMembersCount(chat_id=chat.id)
-        admins = self.api.getChatAdministrators(chat_id=chat.id)
+        admins = self._get_admins(chat)
         admin_count = len(admins)
         me_admin = self._yes_no(self._is_admin(self.bot_user, admins))
         you_admin = self._yes_no(self._is_admin(self.user, admins))
@@ -41,6 +44,11 @@ class ChatInfoFormatter(ApiObjectInfoFormatter):
         self._add_info("Admins", admin_count, "(not counting other bots)")
         self._add_info("Am I admin", me_admin)
         self._add_info("Are you admin", you_admin)
+
+    def _get_admins(self, chat: ApiObject):
+        if chat.type == CHAT_TYPE_PRIVATE:
+            return []
+        return self.api.getChatAdministrators(chat_id=chat.id)
 
     def __format_simple(self, chat: ApiObject):
         full_data = ChatFormatter(chat).full_data
