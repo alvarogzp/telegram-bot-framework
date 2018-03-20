@@ -41,6 +41,10 @@ class ApiObjectInfoFormatter:
         self.info_items.append(text)
 
     @staticmethod
+    def _text(text: str):
+        return text if text is not None else ""
+
+    @staticmethod
     def _yes_no(data, yes_emoji: str = "✅", no_emoji: str = "❌", unknown_emoji: str = "❓"):
         if data:
             return "Yes " + yes_emoji
