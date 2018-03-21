@@ -26,7 +26,7 @@ class ChatInfoFormatter(ApiObjectInfoFormatter):
 
     def __format_full(self, chat: ApiObject):
         chat = self.api.getChat(chat_id=chat.id)
-        description = chat.description
+        description = self._text(chat.description)
         invite_link = self._invite_link(chat.invite_link)
         pinned_message = self._pinned_message(chat.pinned_message)
         sticker_set_name = self._group_sticker_set(chat.sticker_set_name)
@@ -52,7 +52,7 @@ class ChatInfoFormatter(ApiObjectInfoFormatter):
 
     def __format_simple(self, chat: ApiObject):
         full_data = ChatFormatter(chat).full_data
-        title = chat.title
+        title = self._text(chat.title)
         username = self._username(chat.username)
         _type = chat.type
         _id = chat.id
