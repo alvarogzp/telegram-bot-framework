@@ -47,7 +47,7 @@ class ChatInfoFormatter(ApiObjectInfoFormatter):
 
     def _get_admins(self, chat: ApiObject):
         if chat.type == CHAT_TYPE_PRIVATE:
-            return []
+            return ()
         return list(self.api.getChatAdministrators(chat_id=chat.id))
 
     def __format_simple(self, chat: ApiObject):
