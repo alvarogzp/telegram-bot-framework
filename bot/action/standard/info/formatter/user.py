@@ -68,7 +68,7 @@ class UserInfoFormatter(ApiObjectInfoFormatter):
         username = self._username(user.username)
         _id = user.id
         language_code = self._text(user.language_code)
-        is_bot = self._yes_no(user.is_bot, yes_emoji="🤖", no_emoji="👤")
+        is_bot = self._yes_no(user.is_bot, yes_emoji="(🤖)", no_emoji="(👤)")
         self._add_title(full_data)
         self._add_empty()
         self._add_info("First name", first_name)
