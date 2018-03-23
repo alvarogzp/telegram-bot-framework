@@ -5,6 +5,7 @@ from bot.api.domain import ApiObject
 
 
 CHAT_TYPE_PRIVATE = "private"
+CHAT_TYPE_GROUP = "group"
 
 
 class ChatInfoFormatter(ApiObjectInfoFormatter):
@@ -56,11 +57,12 @@ class ChatInfoFormatter(ApiObjectInfoFormatter):
         username = self._username(chat.username)
         _type = chat.type
         _id = chat.id
-        all_members_are_admins = self._yes_no(chat.all_members_are_administrators)
         self._add_title(full_data)
         self._add_empty()
         self._add_info("Title", title)
         self._add_info("Username", username)
         self._add_info("Type", _type)
         self._add_info("Id", _id)
-        self._add_info("All members are admins", all_members_are_admins)
+        if chat.type == CHAT_TYPE_GROUP or chat.all_members_are_administrators is not None:
+            all_members_are_admins = self._yes_no(chat.all_members_are_administrators)
+            self._add_info("All members are admins", all_members_are_admins)
