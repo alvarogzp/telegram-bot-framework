@@ -23,11 +23,12 @@ class ApiObjectInfoFormatter:
             FormattedText().bold(title)
         )
 
-    def _add_info(self, label: str, value, additional_text: str = ""):
+    def _add_info(self, label: str, value, separator: str = ":", additional_text: str = ""):
         info = FormattedText()\
-            .normal("{label}: {value}")\
+            .normal("{label}{separator} {value}")\
             .start_format()\
             .normal(label=label)\
+            .normal(separator=separator)
             .bold(value=value)\
             .end_format()
         if additional_text:
