@@ -42,9 +42,9 @@ class ChatInfoFormatter(ApiObjectInfoFormatter):
         self._add_info("Pinned message", pinned_message)
         self._add_info("Group sticker set", sticker_set_name)
         self._add_info("Members", member_count)
-        self._add_info("Admins", admin_count, "(not counting other bots)")
-        self._add_info("Am I admin", me_admin)
-        self._add_info("Are you admin", you_admin)
+        self._add_info("Admins", admin_count, additional_text="(not counting other bots)")
+        self._add_info("Am I admin", me_admin, separator="?")
+        self._add_info("Are you admin", you_admin, separator="?")
 
     def _get_admins(self, chat: ApiObject):
         if chat.type == CHAT_TYPE_PRIVATE:
@@ -65,4 +65,4 @@ class ChatInfoFormatter(ApiObjectInfoFormatter):
         self._add_info("Id", _id)
         if chat.type == CHAT_TYPE_GROUP or chat.all_members_are_administrators is not None:
             all_members_are_admins = self._yes_no(chat.all_members_are_administrators)
-            self._add_info("All members are admins", all_members_are_admins)
+            self._add_info("All members are admins", all_members_are_admins, separator="?")
