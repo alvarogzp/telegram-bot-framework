@@ -43,23 +43,25 @@ class UserInfoFormatter(ApiObjectInfoFormatter):
             can_restrict_members = self._yes_no(member.can_restrict_members)
             can_pin_messages = self._yes_no(member.can_pin_messages)
             can_promote_members = self._yes_no(member.can_promote_members)
-            self._add_info("Can change chat info (title, photo, etc.)", can_change_info)
-            self._add_info("Can send messages (for channels only)", can_post_messages)
-            self._add_info("Can edit messages of other users (for channels only)", can_edit_messages)
-            self._add_info("Can delete messages of other users", can_delete_messages)
-            self._add_info("Can invite new users", can_invite_users)
-            self._add_info("Can remove and restrict members", can_restrict_members)
-            self._add_info("Can pin messages", can_pin_messages)
-            self._add_info("Can designate new admins", can_promote_members)
+            self._add_info("Can change chat info (title, photo, etc.)", can_change_info, separator="?")
+            self._add_info("Can send messages (for channels only)", can_post_messages, separator="?")
+            self._add_info("Can edit messages of other users (for channels only)", can_edit_messages, separator="?")
+            self._add_info("Can delete messages of other users", can_delete_messages, separator="?")
+            self._add_info("Can invite new users", can_invite_users, separator="?")
+            self._add_info("Can remove and restrict members", can_restrict_members, separator="?")
+            self._add_info("Can pin messages", can_pin_messages, separator="?")
+            self._add_info("Can designate new admins", can_promote_members, separator="?")
         if status == MEMBER_STATUS_RESTRICTED:
             can_send_messages = self._yes_no(member.can_send_messages)
             can_send_media_messages = self._yes_no(member.can_send_media_messages)
             can_send_other_messages = self._yes_no(member.can_send_other_messages)
             can_add_web_page_previews = self._yes_no(member.can_add_web_page_previews)
-            self._add_info("Can send messages", can_send_messages)
-            self._add_info("Can send media messages (audio, photo & video)", can_send_media_messages)
-            self._add_info("Can send other messages (stickers, gifs, games, inline bots)", can_send_other_messages)
-            self._add_info("Can add web page previews", can_add_web_page_previews)
+            self._add_info("Can send messages", can_send_messages, separator="?")
+            self._add_info("Can send media messages (audio, photo & video)", can_send_media_messages, separator="?")
+            self._add_info(
+                "Can send other messages (stickers, gifs, games, inline bots)", can_send_other_messages, separator="?"
+            )
+            self._add_info("Can add web page previews", can_add_web_page_previews, separator="?")
 
     def __format_user(self, user: ApiObject):
         full_data = UserFormatter(user).full_data
@@ -76,4 +78,4 @@ class UserInfoFormatter(ApiObjectInfoFormatter):
         self._add_info("Username", username)
         self._add_info("Id", _id)
         self._add_info("Language code", language_code)
-        self._add_info("Is bot", is_bot)
+        self._add_info("Is bot", is_bot, separator="?")
