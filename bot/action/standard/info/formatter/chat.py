@@ -51,6 +51,13 @@ class ChatInfoFormatter(ApiObjectInfoFormatter):
             return ()
         return list(self.api.getChatAdministrators(chat_id=chat.id))
 
+    @staticmethod
+    def _is_admin(user: ApiObject, admin_chat_member_list: List[ApiObject]):
+        for admin_chat_member in admin_chat_member_list:
+            if admin_chat_member.user.id == user.id:
+                return True
+        return False
+
     def __format_simple(self, chat: ApiObject):
         full_data = ChatFormatter(chat).full_data
         title = self._text(chat.title)

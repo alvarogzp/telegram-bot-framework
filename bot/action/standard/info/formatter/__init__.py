@@ -73,10 +73,3 @@ class ApiObjectInfoFormatter:
     @staticmethod
     def _date(date: int, default_text: str = "No date"):
         return DateFormatter.format_full(date) if date is not None else "<{text}>".format(text=default_text)
-
-    @staticmethod
-    def _is_admin(user: ApiObject, admin_chat_member_list: List[ApiObject]):
-        for admin_chat_member in admin_chat_member_list:
-            if admin_chat_member.user.id == user.id:
-                return True
-        return False
