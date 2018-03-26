@@ -1,5 +1,3 @@
-from typing import List
-
 from bot.action.util.format import DateFormatter
 from bot.action.util.textformat import FormattedText
 from bot.api.api import Api

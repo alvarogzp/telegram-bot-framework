@@ -1,3 +1,5 @@
+from typing import List
+
 from bot.action.standard.info.formatter import ApiObjectInfoFormatter
 from bot.action.util.format import ChatFormatter
 from bot.api.api import Api
