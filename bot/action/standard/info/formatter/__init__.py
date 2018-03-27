@@ -27,8 +27,11 @@ class ApiObjectInfoFormatter:
             .start_format()\
             .normal(label=label)\
             .normal(separator=separator)
-            .bold(value=value)\
-            .end_format()
+        if isinstance(value, FormattedText):
+            info.concat(value=value)
+        else:
+            info.bold(value=value)
+        info = info.end_format()
         if additional_text:
             info.normal(" ").normal(additional_text)
         self._add(info)
