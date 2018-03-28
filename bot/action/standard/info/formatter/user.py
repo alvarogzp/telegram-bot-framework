@@ -65,8 +65,8 @@ class UserInfoFormatter(ApiObjectInfoFormatter):
 
     def __format_user(self, user: ApiObject):
         full_data = UserFormatter(user).full_data
-        first_name = self._text(user.first_name)
-        last_name = self._text(user.last_name)
+        first_name = self._text(user.first_name, "Empty")
+        last_name = self._text(user.last_name, "Empty")
         username = self._username(user.username)
         _id = user.id
         language_code = self._text(user.language_code)
