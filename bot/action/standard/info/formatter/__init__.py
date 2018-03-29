@@ -55,7 +55,7 @@ class ApiObjectInfoFormatter:
         elif data is not None:
             return "No " + no_emoji
         else:
-            return "Unknown " + unknown_emoji
+            return FormattedText().italic("Unknown " + unknown_emoji)
 
     @staticmethod
     def _username(username: str):
