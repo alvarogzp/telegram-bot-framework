@@ -59,7 +59,9 @@ class ApiObjectInfoFormatter:
 
     @staticmethod
     def _username(username: str):
-        return ("@" + username) if username is not None else "<None>"
+        if username is None:
+            return FormattedText().italic("None")
+        return "@" + username
 
     @staticmethod
     def _invite_link(invite_link: str):
