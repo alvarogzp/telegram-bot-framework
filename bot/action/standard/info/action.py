@@ -11,6 +11,20 @@ class MeInfoAction(Action):
         self.api.send_message(response.build_message().to_chat_replying(event.message))
 
 
+class UserInfoAction(Action):
+    def process(self, event):
+        message = event.message
+        replied_message = message.reply_to_message
+        if replied_message is None:
+            user = message.from_
+        else:
+            user = replied_message.from_
+        formatter = UserInfoFormatter(self.api, user, event.chat)
+        formatter.format(member_info=True)
+        response = formatter.get_formatted()
+        self.api.send_message(response.build_message().to_chat_replying(event.message))
+
+
 class ChatInfoAction(Action):
     def process(self, event):
         formatter = ChatInfoFormatter(self.api, event.chat, self.cache.bot_info, event.message.from_)
