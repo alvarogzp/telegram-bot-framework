@@ -71,7 +71,9 @@ class ApiObjectInfoFormatter:
 
     @staticmethod
     def _pinned_message(message: ApiObject):
-        return "<{id}>".format(id=message.message_id) if message is not None else "<None>"
+        if message is None:
+            return FormattedText().italic("None")
+        return "<{id}>".format(id=message.message_id)
 
     @staticmethod
     def _group_sticker_set(sticker_set_name: str):
