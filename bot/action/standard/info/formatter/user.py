@@ -32,7 +32,7 @@ class UserInfoFormatter(ApiObjectInfoFormatter):
         self._add_title("Member info")
         self._add_info("Status", status)
         if status in (MEMBER_STATUS_RESTRICTED, MEMBER_STATUS_KICKED):
-            until = self._date(member.until_date, "Not set")
+            until = self._date(member.until_date, "Forever")
             self._add_info("Until", until)
         if status == MEMBER_STATUS_ADMINISTRATOR:
             can_change_info = self._yes_no(member.can_change_info)
