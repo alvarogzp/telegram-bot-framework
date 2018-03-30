@@ -83,4 +83,6 @@ class ApiObjectInfoFormatter:
 
     @staticmethod
     def _date(date: int, default_text: str = "None"):
-        return DateFormatter.format_full(date) if date is not None else "<{text}>".format(text=default_text)
+        if date is None:
+            return FormattedText().italic(default_text)
+        return DateFormatter.format_full(date)
