@@ -65,16 +65,16 @@ class ApiObjectInfoFormatter:
 
     @staticmethod
     def _invite_link(invite_link: str):
-        return invite_link if invite_link is not None else "<Inaccessible or not defined>"
+        return invite_link if invite_link is not None else "<Inaccessible or non existent>"
 
     @staticmethod
     def _pinned_message(message: ApiObject):
-        return "<{id}>".format(id=message.message_id) if message is not None else "<No pinned message>"
+        return "<{id}>".format(id=message.message_id) if message is not None else "<None>"
 
     @staticmethod
     def _group_sticker_set(sticker_set_name: str):
-        return sticker_set_name if sticker_set_name is not None else "<No group sticker set defined>"
+        return sticker_set_name if sticker_set_name is not None else "<None>"
 
     @staticmethod
-    def _date(date: int, default_text: str = "No date"):
+    def _date(date: int, default_text: str = "None"):
         return DateFormatter.format_full(date) if date is not None else "<{text}>".format(text=default_text)
