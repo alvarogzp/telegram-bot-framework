@@ -51,7 +51,7 @@ class UserInfoFormatter(ApiObjectInfoFormatter):
             self._add_info("Can invite new users", can_invite_users, separator="?")
             self._add_info("Can remove and restrict members", can_restrict_members, separator="?")
             self._add_info("Can pin messages", can_pin_messages, separator="?")
-            self._add_info("Can designate new admins", can_promote_members, separator="?")
+            self._add_info("Can add new admins", can_promote_members, separator="?")
         if status == MEMBER_STATUS_RESTRICTED:
             can_send_messages = self._yes_no(member.can_send_messages)
             can_send_media_messages = self._yes_no(member.can_send_media_messages)
