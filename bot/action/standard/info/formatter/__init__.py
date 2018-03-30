@@ -77,7 +77,9 @@ class ApiObjectInfoFormatter:
 
     @staticmethod
     def _group_sticker_set(sticker_set_name: str):
-        return sticker_set_name if sticker_set_name is not None else "<None>"
+        if sticker_set_name is None:
+            return FormattedText().italic("None")
+        return sticker_set_name
 
     @staticmethod
     def _date(date: int, default_text: str = "None"):
