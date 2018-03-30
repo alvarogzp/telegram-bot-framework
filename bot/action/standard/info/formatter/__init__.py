@@ -65,7 +65,9 @@ class ApiObjectInfoFormatter:
 
     @staticmethod
     def _invite_link(invite_link: str):
-        return invite_link if invite_link is not None else "<Inaccessible or non existent>"
+        if invite_link is None:
+            return FormattedText().italic("Inaccessible or non existent")
+        return invite_link
 
     @staticmethod
     def _pinned_message(message: ApiObject):
