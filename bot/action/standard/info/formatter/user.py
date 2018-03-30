@@ -1,4 +1,5 @@
 from bot.action.standard.info.formatter import ApiObjectInfoFormatter
+from bot.action.standard.info.formatter.chat import CHAT_TYPE_PRIVATE
 from bot.action.util.format import UserFormatter
 from bot.api.api import Api
 from bot.api.domain import ApiObject
@@ -22,7 +23,7 @@ class UserInfoFormatter(ApiObjectInfoFormatter):
         """
         user = self.api_object
         self.__format_user(user)
-        if member_info:
+        if member_info and self.chat.type != CHAT_TYPE_PRIVATE:
             self._add_empty()
             self.__format_member(user)
 
