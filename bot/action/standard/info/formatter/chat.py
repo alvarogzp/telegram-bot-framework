@@ -8,6 +8,7 @@ from bot.api.domain import ApiObject
 
 CHAT_TYPE_PRIVATE = "private"
 CHAT_TYPE_GROUP = "group"
+CHAT_TYPE_CHANNEL = "channel"
 
 
 class ChatInfoFormatter(ApiObjectInfoFormatter):
@@ -49,7 +50,7 @@ class ChatInfoFormatter(ApiObjectInfoFormatter):
         self._add_info("Are you admin", you_admin, separator="?")
 
     def _get_admins(self, chat: ApiObject):
-        if chat.type == CHAT_TYPE_PRIVATE:
+        if chat.type in (CHAT_TYPE_PRIVATE, CHAT_TYPE_CHANNEL):
             return ()
         return list(self.api.getChatAdministrators(chat_id=chat.id))
 
