@@ -20,7 +20,7 @@ class ChatInfoFormatter(ApiObjectInfoFormatter):
     def format(self, full_info: bool = False):
         """
         :param full_info: If True, adds more info about the chat. Please, note that this additional info requires
-            to make THREE synchronous api calls.
+            to make up to THREE synchronous api calls.
         """
         chat = self.api_object
         if full_info:
@@ -35,19 +35,20 @@ class ChatInfoFormatter(ApiObjectInfoFormatter):
         pinned_message = self._pinned_message(chat.pinned_message)
         sticker_set_name = self._group_sticker_set(chat.sticker_set_name)
         member_count = self.api.getChatMembersCount(chat_id=chat.id)
-        admins = self._get_admins(chat)
-        admin_count = len(admins)
-        me_admin = self._yes_no(self._is_admin(self.bot_user, admins))
-        you_admin = self._yes_no(self._is_admin(self.user, admins))
         self.__format_simple(chat)
         self._add_info("Description", description)
         self._add_info("Invite link", invite_link)
         self._add_info("Pinned message", pinned_message)
         self._add_info("Group sticker set", sticker_set_name)
         self._add_info("Members", member_count)
-        self._add_info("Admins", admin_count, additional_text="(not counting other bots)")
-        self._add_info("Am I admin", me_admin, separator="?")
-        self._add_info("Are you admin", you_admin, separator="?")
+        if chat.type not in (CHAT_TYPE_PRIVATE, CHAT_TYPE_CHANNEL):
+            admins = self._get_admins(chat)
+            admin_count = len(admins)
+            me_admin = self._yes_no(self._is_admin(self.bot_user, admins))
+            you_admin = self._yes_no(self._is_admin(self.user, admins))
+            self._add_info("Admins", admin_count, additional_text="(not counting other bots)")
+            self._add_info("Am I admin", me_admin, separator="?")
+            self._add_info("Are you admin", you_admin, separator="?")
 
     def _get_admins(self, chat: ApiObject):
         if chat.type in (CHAT_TYPE_PRIVATE, CHAT_TYPE_CHANNEL):
