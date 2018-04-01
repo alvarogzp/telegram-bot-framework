@@ -19,6 +19,9 @@ class UserInfoAction(Action):
         replied_message = message.reply_to_message
         if replied_message is not None:
             user = replied_message.from_
+            command_args = event.command_args or ""
+            if command_args.lower() == "forward":
+                user = replied_message.forward_from
         if user is None:
             response = self._error_response()
         else:
