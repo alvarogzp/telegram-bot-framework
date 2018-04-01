@@ -1,6 +1,7 @@
 from bot.action.core.action import Action
 from bot.action.standard.info.formatter.chat import ChatInfoFormatter
 from bot.action.standard.info.formatter.user import UserInfoFormatter
+from bot.action.util.textformat import FormattedText
 
 
 class MeInfoAction(Action):
@@ -14,15 +15,21 @@ class MeInfoAction(Action):
 class UserInfoAction(Action):
     def process(self, event):
         message = event.message
+        user = message.from_
         replied_message = message.reply_to_message
-        if replied_message is None:
-            user = message.from_
-        else:
+        if replied_message is not None:
             user = replied_message.from_
-        formatter = UserInfoFormatter(self.api, user, event.chat)
-        formatter.format(member_info=True)
-        response = formatter.get_formatted()
+        if user is None:
+            response = self._error_response()
+        else:
+            formatter = UserInfoFormatter(self.api, user, event.chat)
+            formatter.format(member_info=True)
+            response = formatter.get_formatted()
         self.api.send_message(response.build_message().to_chat_replying(event.message))
+
+    @staticmethod
+    def _error_response():
+        return FormattedText().bold("No user").normal(" (try with /chat)")
 
 
 class ChatInfoAction(Action):
