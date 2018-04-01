@@ -1,5 +1,5 @@
 from bot.action.standard.info.formatter import ApiObjectInfoFormatter
-from bot.action.standard.info.formatter.chat import CHAT_TYPE_PRIVATE
+from bot.action.standard.info.formatter.chat import CHAT_TYPE_PRIVATE, CHAT_TYPE_CHANNEL
 from bot.action.util.format import UserFormatter
 from bot.api.api import Api
 from bot.api.domain import ApiObject
@@ -37,21 +37,23 @@ class UserInfoFormatter(ApiObjectInfoFormatter):
             self._add_info("Until", until)
         if status == MEMBER_STATUS_ADMINISTRATOR:
             can_change_info = self._yes_no(member.can_change_info)
-            can_post_messages = self._yes_no(member.can_post_messages)
-            can_edit_messages = self._yes_no(member.can_edit_messages)
             can_delete_messages = self._yes_no(member.can_delete_messages)
             can_invite_users = self._yes_no(member.can_invite_users)
             can_restrict_members = self._yes_no(member.can_restrict_members)
             can_pin_messages = self._yes_no(member.can_pin_messages)
             can_promote_members = self._yes_no(member.can_promote_members)
             self._add_info("Can change chat info (title, photo, etc.)", can_change_info, separator="?")
-            self._add_info("Can send messages (for channels only)", can_post_messages, separator="?")
-            self._add_info("Can edit messages of other users (for channels only)", can_edit_messages, separator="?")
             self._add_info("Can delete messages of other users", can_delete_messages, separator="?")
             self._add_info("Can invite new users", can_invite_users, separator="?")
             self._add_info("Can remove and restrict members", can_restrict_members, separator="?")
             self._add_info("Can pin messages", can_pin_messages, separator="?")
             self._add_info("Can add new admins", can_promote_members, separator="?")
+            if self.chat.type == CHAT_TYPE_CHANNEL or \
+                    member.can_post_messages is not None or member.can_edit_messages is not None:
+                can_post_messages = self._yes_no(member.can_post_messages)
+                can_edit_messages = self._yes_no(member.can_edit_messages)
+                self._add_info("Can send messages (for channels only)", can_post_messages, separator="?")
+                self._add_info("Can edit messages of other users (for channels only)", can_edit_messages, separator="?")
         if status == MEMBER_STATUS_RESTRICTED:
             can_send_messages = self._yes_no(member.can_send_messages)
             can_send_media_messages = self._yes_no(member.can_send_media_messages)
