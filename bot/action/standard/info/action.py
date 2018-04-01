@@ -27,7 +27,18 @@ class UserInfoAction(Action):
 
 class ChatInfoAction(Action):
     def process(self, event):
-        formatter = ChatInfoFormatter(self.api, event.chat, self.cache.bot_info, event.message.from_)
-        formatter.format(full_info=True)
-        response = formatter.get_formatted()
+        chat = event.chat
+        replied_message = event.message.reply_to_message
+        if replied_message is not None:
+            chat = replied_message.forward_from_chat
+        if chat is None:
+            response = self._error_response()
+        else:
+            formatter = ChatInfoFormatter(self.api, chat, self.cache.bot_info, event.message.from_)
+            formatter.format(full_info=True)
+            response = formatter.get_formatted()
         self.api.send_message(response.build_message().to_chat_replying(event.message))
+
+    @staticmethod
+    def _error_response():
+        return FormattedText().bold("No chat").normal(" (try with /user)")
