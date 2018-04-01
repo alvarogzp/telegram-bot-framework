@@ -10,6 +10,16 @@ class UserInfoAction(Action):
         self.always_sender = always_sender
 
     def process(self, event):
+        user = self._get_user(event)
+        if user is None:
+            response = self._error_response()
+        else:
+            formatter = UserInfoFormatter(self.api, user, event.chat)
+            formatter.format(member_info=True)
+            response = formatter.get_formatted()
+        self.api.send_message(response.build_message().to_chat_replying(event.message))
+
+    def _get_user(self, event):
         message = event.message
         user = message.from_
         replied_message = message.reply_to_message
@@ -18,13 +28,7 @@ class UserInfoAction(Action):
             command_args = event.command_args or ""
             if command_args.lower() == "forward":
                 user = replied_message.forward_from
-        if user is None:
-            response = self._error_response()
-        else:
-            formatter = UserInfoFormatter(self.api, user, event.chat)
-            formatter.format(member_info=True)
-            response = formatter.get_formatted()
-        self.api.send_message(response.build_message().to_chat_replying(event.message))
+        return user
 
     @staticmethod
     def _error_response():
