@@ -22,13 +22,35 @@ class UserInfoAction(Action):
     def _get_user(self, event):
         message = event.message
         user = message.from_
-        replied_message = message.reply_to_message
-        if not self.always_sender and replied_message is not None:
-            user = replied_message.from_
-            command_args = event.command_args or ""
-            if command_args.lower() == "forward":
-                user = replied_message.forward_from
+        if not self.always_sender:
+            replied_message = message.reply_to_message
+            if replied_message is not None:
+                user = replied_message.from_
+            if self._should_use_reply_forward_user(event):
+                # shorthand for: replied_message.forward_from if replied_message is not None else None
+                # the check is needed because this is outside of the previous "if replied_message is not None" block
+                # because we want to take "forward" arg into account even if no replied_message (to display the
+                # error response)
+                user = replied_message and replied_message.forward_from
         return user
+
+    def _should_use_reply_forward_user(self, event):
+        return self._args_equals_to(event, "forward") or self._replied_sender_matches_command_sender(event.message)
+
+    @staticmethod
+    def _args_equals_to(event, expected_args: str):
+        command_args = event.command_args or ""
+        return command_args.lower() == expected_args.lower()
+
+    @staticmethod
+    def _replied_sender_matches_command_sender(message):
+        replied_message = message.reply_to_message
+        if replied_message is not None:
+            command_from = message.from_
+            replied_from = replied_message.from_
+            if command_from is not None and replied_from is not None and command_from.id == replied_from.id:
+                return True
+        return False
 
     @staticmethod
     def _error_response():
