@@ -4,20 +4,16 @@ from bot.action.standard.info.formatter.user import UserInfoFormatter
 from bot.action.util.textformat import FormattedText
 
 
-class MeInfoAction(Action):
-    def process(self, event):
-        formatter = UserInfoFormatter(self.api, event.message.from_, event.chat)
-        formatter.format(member_info=True)
-        response = formatter.get_formatted()
-        self.api.send_message(response.build_message().to_chat_replying(event.message))
-
-
 class UserInfoAction(Action):
+    def __init__(self, always_sender: bool = False):
+        super().__init__()
+        self.always_sender = always_sender
+
     def process(self, event):
         message = event.message
         user = message.from_
         replied_message = message.reply_to_message
-        if replied_message is not None:
+        if not self.always_sender and replied_message is not None:
             user = replied_message.from_
             command_args = event.command_args or ""
             if command_args.lower() == "forward":

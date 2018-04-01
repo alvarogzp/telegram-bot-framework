@@ -22,7 +22,7 @@ from bot.action.standard.chatsettings.action import ChatSettingsAction
 from bot.action.standard.enterexit import GreetAction, LeaveAction
 from bot.action.standard.gapdetector import GlobalGapDetectorAction
 from bot.action.standard.group_admin import GroupAdminAction
-from bot.action.standard.info.action import MeInfoAction, ChatInfoAction, UserInfoAction
+from bot.action.standard.info.action import ChatInfoAction, UserInfoAction
 from bot.action.standard.internationalization import InternationalizationAction
 from bot.action.standard.logger import LoggerAction
 from bot.action.standard.perchat import PerChatAction
@@ -120,7 +120,7 @@ class BotManager:
                                             ),
 
                                             CommandAction("me").then(
-                                                MeInfoAction()
+                                                UserInfoAction(always_sender=True)
                                             ),
 
                                             CommandAction("user").then(
