@@ -74,6 +74,10 @@ class CommandKey:
         return event.chat.id
 
     @staticmethod
+    def _user_id(event):
+        return event.message.from_ and event.message.from_.id
+
+    @staticmethod
     def _command(event):
         return event.command
 
@@ -91,6 +95,18 @@ class NonPersonalCommandKey(CommandKey):
         super().__init__(
             event,
             self._chat_id,
+            self._command,
+            self._command_args,
+            self._reply_to_message_id
+        )
+
+
+class PersonalCommandKey(CommandKey):
+    def __init__(self, event):
+        super().__init__(
+            event,
+            self._chat_id,
+            self._user_id,
             self._command,
             self._command_args,
             self._reply_to_message_id
