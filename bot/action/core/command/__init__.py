@@ -3,7 +3,7 @@ import time
 from bot.action.core.action import IntermediateAction
 from bot.action.core.command.parser import UnderscoredCommandParser, CommandParser
 from bot.action.core.command.throttler import NoThrottler
-from bot.action.core.command.throttler.shortlyrepeatedcommand import ShortlyRepeatedCommandThrottler
+from bot.action.core.command.throttler.shortlyrepeatedcommand.throttler import ShortlyRepeatedCommandThrottler
 from bot.action.util.format import UserFormatter, ChatFormatter, TimeFormatter
 from bot.action.util.textformat import FormattedText
 from bot.api.domain import MessageEntityParser
