@@ -145,10 +145,10 @@ class CommandThrottlingState:
         self.number_of_invocations += 1
 
     def should_execute(self):
-        return self.number_of_invocations <= 1
+        return self.number_of_invocations <= 2
 
     def should_warn(self):
-        return self.number_of_invocations == 2
+        return self.number_of_invocations == 3
 
     def has_expired(self, current_date):
         throttling_seconds = self.chat_settings.get(ChatSettings.THROTTLING_SECONDS)
