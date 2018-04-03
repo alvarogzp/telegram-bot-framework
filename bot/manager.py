@@ -119,11 +119,11 @@ class BotManager:
                                                 AnswerAction("Up and running, sir!")
                                             ),
 
-                                            CommandAction("me").then(
+                                            CommandAction("me", is_personal=True).then(
                                                 UserInfoAction(always_sender=True)
                                             ),
 
-                                            CommandAction("user").then(
+                                            CommandAction("user", is_personal=True).then(
                                                 UserInfoAction()
                                             ),
 
