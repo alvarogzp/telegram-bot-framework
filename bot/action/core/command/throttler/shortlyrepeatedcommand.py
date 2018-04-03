@@ -93,7 +93,7 @@ class CommandKey:
 
     @staticmethod
     def _reply_to_message_id(event):
-        return event.message.reply_to_message.message_id if event.message.reply_to_message else None
+        return event.message.reply_to_message and event.message.reply_to_message.message_id
 
 
 class NonPersonalCommandKey(CommandKey):
