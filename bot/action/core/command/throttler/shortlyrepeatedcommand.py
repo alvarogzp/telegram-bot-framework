@@ -113,6 +113,22 @@ class PersonalCommandKey(CommandKey):
         )
 
 
+class CommandKeyFactory:
+    def __init__(self):
+        self.personal_commands = []
+
+    def add_personal_command(self, command: str):
+        self.personal_commands.append(command.lower())
+
+    def get_command_key(self, event):
+        if self._is_personal(event.command):
+            return PersonalCommandKey(event)
+        return NonPersonalCommandKey(event)
+
+    def _is_personal(self, command: str):
+        return command.lower() in self.personal_commands
+
+
 class CommandThrottlingState:
     def __init__(self, event):
         self.chat_settings = chatsettings.repository.get_for_event(event)
