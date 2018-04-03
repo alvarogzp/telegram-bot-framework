@@ -73,6 +73,8 @@ class CommandKey:
     def __eq__(self, other):
         return self.key == other.key
 
+    # helper methods for subclasses
+
     @staticmethod
     def _chat_id(event):
         return event.chat.id
