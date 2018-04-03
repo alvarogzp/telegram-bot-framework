@@ -17,7 +17,7 @@ class ShortlyRepeatedCommandThrottler(Throttler):
     def should_execute(self, event):
         current_date = event.message.date
         self.__cleanup_recent_commands(current_date)
-        command_key = CommandKey(event)
+        command_key = NonPersonalCommandKey(event)
         if command_key not in self.recent_commands:
             throttling_state = CommandThrottlingState(event)
             if not throttling_state.has_expired(current_date):
@@ -60,12 +60,8 @@ class ShortlyRepeatedCommandThrottler(Throttler):
 
 
 class CommandKey:
-    def __init__(self, event):
-        chat_id = self._chat_id(event)
-        command = self._command(event)
-        command_args = self._command_args(event)
-        reply_to_message_id = self._reply_to_message_id(event)
-        self.key = (chat_id, command, command_args, reply_to_message_id)
+    def __init__(self, event, *funcs_to_apply: callable):
+        self.key = tuple((func(event) for func in funcs_to_apply))
 
     def __hash__(self):
         return hash(self.key)
@@ -88,6 +84,17 @@ class CommandKey:
     @staticmethod
     def _reply_to_message_id(event):
         return event.message.reply_to_message.message_id if event.message.reply_to_message else None
+
+
+class NonPersonalCommandKey(CommandKey):
+    def __init__(self, event):
+        super().__init__(
+            event,
+            self._chat_id,
+            self._command,
+            self._command_args,
+            self._reply_to_message_id
+        )
 
 
 class CommandThrottlingState:
