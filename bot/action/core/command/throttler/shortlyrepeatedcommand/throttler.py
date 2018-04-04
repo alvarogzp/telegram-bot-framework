@@ -1,4 +1,5 @@
 from bot.action.core.command.throttler import Throttler
+from bot.action.core.command.throttler.shortlyrepeatedcommand.command_key import CommandKeyFactory
 from bot.action.standard import chatsettings
 from bot.action.standard.chatsettings import ChatSettings
 from bot.action.util.format import UserFormatter, ChatFormatter
@@ -12,12 +13,16 @@ LOG_TAG = FormattedText().bold("THROTTLER")
 class ShortlyRepeatedCommandThrottler(Throttler):
     def __init__(self, api: Api):
         self.api = api
+        self.command_key_factory = CommandKeyFactory()
         self.recent_commands = {}
+
+    def add_personal_command(self, command: str):
+        self.command_key_factory.add_personal_command(command)
 
     def should_execute(self, event):
         current_date = event.message.date
         self.__cleanup_recent_commands(current_date)
-        command_key = CommandKey(event)
+        command_key = self.command_key_factory.get_command_key(event)
         if command_key not in self.recent_commands:
             throttling_state = CommandThrottlingState(event)
             if not throttling_state.has_expired(current_date):
@@ -59,21 +64,6 @@ class ShortlyRepeatedCommandThrottler(Throttler):
         )
 
 
-class CommandKey:
-    def __init__(self, event):
-        chat_id = event.chat.id
-        command = event.command
-        command_args = event.command_args
-        reply_to_message_id = event.message.reply_to_message.message_id if event.message.reply_to_message else None
-        self.key = (chat_id, command, command_args, reply_to_message_id)
-
-    def __hash__(self):
-        return hash(self.key)
-
-    def __eq__(self, other):
-        return self.key == other.key
-
-
 class CommandThrottlingState:
     def __init__(self, event):
         self.chat_settings = chatsettings.repository.get_for_event(event)
@@ -84,10 +74,10 @@ class CommandThrottlingState:
         self.number_of_invocations += 1
 
     def should_execute(self):
-        return self.number_of_invocations <= 1
+        return self.number_of_invocations <= 2
 
     def should_warn(self):
-        return self.number_of_invocations == 2
+        return self.number_of_invocations == 3
 
     def has_expired(self, current_date):
         throttling_seconds = self.chat_settings.get(ChatSettings.THROTTLING_SECONDS)
