@@ -20,6 +20,7 @@ from bot.action.standard.asynchronous import AsynchronousAction
 from bot.action.standard.benchmark import BenchmarkAction, WorkersAction
 from bot.action.standard.chatsettings.action import ChatSettingsAction
 from bot.action.standard.enterexit import GreetAction, LeaveAction
+from bot.action.standard.admin.fail import FailAction
 from bot.action.standard.gapdetector import GlobalGapDetectorAction
 from bot.action.standard.group_admin import GroupAdminAction
 from bot.action.standard.info.action import ChatInfoAction, UserInfoAction
@@ -166,6 +167,11 @@ class BotManager:
                                             CommandAction("workers").then(
                                                 AdminActionWithErrorMessage().then(
                                                     WorkersAction()
+                                                )
+                                            ),
+                                            CommandAction("fail").then(
+                                                AdminActionWithErrorMessage().then(
+                                                    FailAction()
                                                 )
                                             ),
 
