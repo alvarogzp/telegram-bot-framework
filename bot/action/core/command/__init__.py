@@ -3,7 +3,7 @@ import time
 from bot.action.core.action import IntermediateAction
 from bot.action.core.command.parser import UnderscoredCommandParser, CommandParser
 from bot.action.core.command.throttler import NoThrottler
-from bot.action.core.command.throttler.shortlyrepeatedcommand import ShortlyRepeatedCommandThrottler
+from bot.action.core.command.throttler.shortlyrepeatedcommand.throttler import ShortlyRepeatedCommandThrottler
 from bot.action.util.format import UserFormatter, ChatFormatter, TimeFormatter
 from bot.action.util.textformat import FormattedText
 from bot.api.domain import MessageEntityParser
@@ -13,14 +13,28 @@ COMMAND_LOG_TAG = FormattedText().normal("COMMAND")
 
 
 class CommandAction(IntermediateAction):
-    def __init__(self, command, underscores_as_spaces=True):
+    def __init__(self, command, underscores_as_spaces=True, is_personal=False):
+        """
+        :param is_personal: If True, results are different depending on the user executing it.
+            If False, different users executing it on the same chat will return the same result.
+        """
         super().__init__()
+        self.command = command
         self.parser = (UnderscoredCommandParser if underscores_as_spaces else CommandParser)(command)
         self.throttler = NoThrottler()  # overridden on post_setup where we have access to api
+        self.is_personal = is_personal
 
     def post_setup(self):
         self.parser.build_command_matcher(self.cache.bot_info.username)
-        self.throttler = ShortlyRepeatedCommandThrottler(self.api)
+        self.throttler = self._get_throttler()
+        if self.is_personal:
+            self.throttler.add_personal_command(self.command)
+
+    def _get_throttler(self):
+        shared_throttler = self.cache.command_throttler
+        if shared_throttler is None:
+            shared_throttler = self.cache.command_throttler = ShortlyRepeatedCommandThrottler(self.api)
+        return shared_throttler
 
     def process(self, event):
         for entity in self.get_entities(event):
