@@ -20,7 +20,7 @@ class ChatSettings:
     LANGUAGE = add_setting("language", "en")
     STORE_MESSAGES = add_setting("store_messages", "on")
     OVERRIDE_MESSAGES_OPT_OUT = add_setting("override_messages_opt_out", "off")
-    THROTTLING_SECONDS = add_setting("throttling_seconds", 60, Codecs.INT)
+    THROTTLING_SECONDS = add_setting("throttling_seconds", 15, Codecs.INT)
 
     def __init__(self, settings_state):
         self.settings_state = settings_state
