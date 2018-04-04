@@ -33,6 +33,9 @@ class ConfigStatus:
         log_chat = FormattedText()\
             .normal("Log chat: {chat}").start_format()\
             .bold(chat=self.__formatted_chat(self.config.log_chat_id)).end_format()
+        traceback_chat = FormattedText()\
+            .normal("Traceback chat: {chat}").start_format()\
+            .bold(chat=self.__formatted_chat(self.config.traceback_chat_id())).end_format()
         async = FormattedText()\
             .normal("Async enabled: {bool}").start_format()\
             .bold(bool=self.config.async()).end_format()
@@ -64,6 +67,7 @@ class ConfigStatus:
             admin_user,
             admin_chat,
             log_chat,
+            traceback_chat,
             async,
             reuse_connections,
             debug,

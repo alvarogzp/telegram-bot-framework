@@ -92,6 +92,12 @@ class Config(Storage):
     def send_error_tracebacks(self):
         return self.__is_true("send_error_tracebacks")
 
+    def traceback_chat_id(self):
+        traceback_chat_id = self._getattr("traceback_chat_id")
+        if traceback_chat_id is None and self.send_error_tracebacks():
+            traceback_chat_id = self.admin_chat_id
+        return traceback_chat_id
+
     def async(self):
         return self.__is_true("async")
 

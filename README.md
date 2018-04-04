@@ -45,6 +45,7 @@ The following keys must be present for the bot to work properly (it will refuse 
 The following keys are also recognised by the framework, but they are *OPTIONAL*, and if not present, a default value is used:
 
    - `log_chat_id`, can be set to a `chat_id` where you would like the bot to send log messages. If not set, log messages will be discarded. If set to a group, the bot must be in it.
+   - `traceback_chat_id`, can have the `chat_id` you would like to receive error tracebacks on. If not set, error tracebacks won't be sent anywhere (unless `send_error_tracebacks` is set, in that case they will be sent to `admin_chat_id`). If set to a group, the bot must be in it.
    - `debug`, can have a value of `true` if you want requests and exception tracebacks to be printed on the standard output, and `false` if not. By default, they are enabled.
    - `send_error_tracebacks`, can be `true` to send error tracebacks to `admin_chat_id` or `false` to not send them. By default they are sent.
    - `async`, set it to `true` to enable asynchronous support on the bot, and to `false` to disable it. By default, it is enabled.
