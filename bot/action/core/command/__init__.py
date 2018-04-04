@@ -26,9 +26,15 @@ class CommandAction(IntermediateAction):
 
     def post_setup(self):
         self.parser.build_command_matcher(self.cache.bot_info.username)
-        self.throttler = ShortlyRepeatedCommandThrottler(self.api)
+        self.throttler = self._get_throttler()
         if self.is_personal:
             self.throttler.add_personal_command(self.command)
+
+    def _get_throttler(self):
+        shared_throttler = self.cache.command_throttler
+        if shared_throttler is None:
+            shared_throttler = self.cache.command_throttler = ShortlyRepeatedCommandThrottler(self.api)
+        return shared_throttler
 
     def process(self, event):
         for entity in self.get_entities(event):
