@@ -59,7 +59,7 @@ class CommandKeyFactory:
         self.personal_commands = []
 
     def add_personal_command(self, command: str):
-        self.personal_commands.append(command.lower())
+        self.personal_commands.append("/" + command.lower())
 
     def get_command_key(self, event):
         if self._is_personal(event.command):
