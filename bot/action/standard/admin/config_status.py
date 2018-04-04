@@ -46,7 +46,7 @@ class ConfigStatus:
             .normal("Debug on stdout: {bool}").start_format()\
             .bold(bool=self.config.debug()).end_format()
         error_tracebacks = FormattedText()\
-            .normal("Send traceback on error: {bool}").start_format()\
+            .normal("Send traceback on error (deprecated): {bool}").start_format()\
             .bold(bool=self.config.send_error_tracebacks()).end_format()
         scheduler_events_on_log_chat = FormattedText()\
             .normal("Scheduler events on log chat: {bool}").start_format()\
