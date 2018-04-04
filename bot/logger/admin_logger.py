@@ -17,7 +17,7 @@ INFO_TAG = FormattedText().normal("INFO")
 
 
 class AdminLogger:
-    def __init__(self, api: Api, admin_chat_id: str, print_tracebacks: bool, send_tracebacks: bool):
+    def __init__(self, api: Api, admin_chat_id: str, print_tracebacks: bool, traceback_chat_id: str):
         sender = MessageSenderFactory\
             .get_builder()\
             .with_api(api)\
@@ -29,7 +29,22 @@ class AdminLogger:
             .build()
         self.logger = LoggerFactory.get("formatted", sender)
         self.print_tracebacks = print_tracebacks
-        self.send_tracebacks = send_tracebacks
+        self.traceback_logger = self.__get_traceback_logger(api, traceback_chat_id)
+
+    @staticmethod
+    def __get_traceback_logger(api: Api, traceback_chat_id: str):
+        if not traceback_chat_id:
+            return LoggerFactory.get_no_logger()
+        traceback_sender = MessageSenderFactory\
+            .get_builder()\
+            .with_api(api)\
+            .with_chat_id(traceback_chat_id)\
+            .with_message_builder_type("formatted")\
+            .with_reuse_max_length(999999)\
+            .with_reuse_max_time(0)\
+            .with_reuse_max_number(1)\
+            .build()
+        return LoggerFactory.get("formatted", traceback_sender)
 
     def work_error(self, error: BaseException, work: Work, worker: Worker):
         self.__error(
@@ -49,8 +64,7 @@ class AdminLogger:
         if self.print_tracebacks:
             self.__print_traceback()
         self.logger.log(ERROR_TAG, *texts)
-        if self.send_tracebacks:
-            self.__send_traceback()
+        self.__send_traceback()
 
     @staticmethod
     def __print_traceback():
@@ -58,11 +72,11 @@ class AdminLogger:
 
     def __send_traceback(self):
         try:
-            self.logger.log(TRACEBACK_TAG, FormattedText().code_block(traceback.format_exc()))
+            self.traceback_logger.log(TRACEBACK_TAG, FormattedText().code_block(traceback.format_exc()))
         except ApiException:
             # tracebacks can be very long and reach message length limit
             # retry with a shorter traceback
-            self.logger.log(TRACEBACK_TAG, FormattedText().code_block(traceback.format_exc(limit=1)))
+            self.traceback_logger.log(TRACEBACK_TAG, FormattedText().code_block(traceback.format_exc(limit=1)))
 
     def info(self, info_text: str, *additional_info: str):
         self.__info(

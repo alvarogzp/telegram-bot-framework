@@ -27,7 +27,7 @@ class Bot:
         telegram_api = TelegramBotApi(self.config.auth_token, self.config.reuse_connections(), debug)
         self.api = Api(telegram_api, self.state)
         self.cache.bot_info = self.api.getMe()
-        self.logger = AdminLogger(self.api, self.config.admin_chat_id, debug, self.config.send_error_tracebacks())
+        self.logger = AdminLogger(self.api, self.config.admin_chat_id, debug, self.config.traceback_chat_id())
         self.scheduler = self._create_scheduler()
         self.starting()
         if self.config.async():

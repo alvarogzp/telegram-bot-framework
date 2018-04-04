@@ -71,7 +71,7 @@ class Storage(AttributeObject):
 class Config(Storage):
     DEFAULT_VALUES = {
         "debug": "true",
-        "send_error_tracebacks": "true",
+        "send_error_tracebacks": "false",
         "async": "true",
         "reuse_connections": "true",
         "scheduler_events_on_log_chat": "true",
@@ -90,7 +90,14 @@ class Config(Storage):
         return self.__is_true("debug")
 
     def send_error_tracebacks(self):
+        """ :deprecated: Use :func:`traceback_chat_id` """
         return self.__is_true("send_error_tracebacks")
+
+    def traceback_chat_id(self):
+        traceback_chat_id = self._getattr("traceback_chat_id")
+        if traceback_chat_id is None and self.send_error_tracebacks():
+            traceback_chat_id = self.admin_chat_id
+        return traceback_chat_id
 
     def async(self):
         return self.__is_true("async")
