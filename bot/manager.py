@@ -100,7 +100,9 @@ class BotManager:
                                                     author_handle=project_info.author_handle,
                                                     is_open_source=True,
                                                     source_url=project_info.source_url,
-                                                    license_name=project_info.license_name)
+                                                    license_name=project_info.license_name,
+                                                    license_url=project_info.license_url
+                                                )
                                             ),
 
                                             CommandAction("version").then(
