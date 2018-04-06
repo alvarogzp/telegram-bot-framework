@@ -10,7 +10,7 @@ setup(
     description=project_info.description,
     long_description=project_info.description,
 
-    url=project_info.source_url,
+    url=project_info.url,
 
     author=project_info.author_name,
     author_email=project_info.author_email,

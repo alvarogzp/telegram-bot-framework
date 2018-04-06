@@ -7,23 +7,23 @@ from bot.action.util.textformat import FormattedText
 
 class AboutAction(Action):
     def __init__(self, project_package_name: str, author_handle: str = None, is_open_source: bool = False,
-                 source_url: str = None, license_name: str = None, license_url: str = None):
+                 url: str = None, license_name: str = None, license_url: str = None):
         super().__init__()
         self.version = VersionAction.get_version(project_package_name)
         self.author_handle = author_handle
         self.is_open_source = is_open_source
-        self.source_url = source_url
+        self.url = url
         self.license = self.__get_license(license_name, license_url)
         self.text = FormattedText()
 
     def post_setup(self):
         bot_name = self.cache.bot_info.first_name
         self.text = self.__build_message_text(bot_name, self.version, self.author_handle, self.__get_framework(),
-                                              self.is_open_source, self.license, self.source_url)
+                                              self.is_open_source, self.license, self.url)
 
     @staticmethod
     def __build_message_text(bot_name: str, version: str, author: str, framework: FormattedText,
-                             is_open_source: bool, license: FormattedText, source_url: str):
+                             is_open_source: bool, license: FormattedText, url: str):
         text = FormattedText()\
             .normal("{bot_name}, version {version}.").newline()\
             .newline()\
@@ -35,19 +35,20 @@ class AboutAction(Action):
         if license:
             text.newline().newline()\
                 .normal("It is licensed under the {license} license.")
-        if source_url:
+        if url:
             text.newline().newline()\
-                .normal("You can find the source code on: {source_url}")
+                .normal("Project home:").newline()\
+                .normal("{url}")
         return text.start_format()\
             .bold(bot_name=bot_name, version=version)\
-            .normal(author=author, source_url=source_url)\
+            .normal(author=author, url=url)\
             .concat(framework=framework, license=license)\
             .end_format()
 
     @staticmethod
     def __get_framework():
         framework_name = project_info.name
-        framework_url = project_info.source_url
+        framework_url = project_info.url
         framework_version = VersionAction.get_version(framework_name)
         return FormattedText()\
             .normal("{url} ({version})").start_format()\

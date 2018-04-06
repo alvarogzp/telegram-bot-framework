@@ -99,7 +99,7 @@ class BotManager:
                                                     project_info.name,
                                                     author_handle=project_info.author_handle,
                                                     is_open_source=True,
-                                                    source_url=project_info.source_url,
+                                                    url=project_info.url,
                                                     license_name=project_info.license_name,
                                                     license_url=project_info.license_url
                                                 )
@@ -108,7 +108,7 @@ class BotManager:
                                             CommandAction("version").then(
                                                 VersionAction(
                                                     project_info.name,
-                                                    project_info.source_url + "/releases"
+                                                    project_info.url + "/releases"
                                                 )
                                             ),
 
