@@ -10,5 +10,5 @@ author_name = 'Alvaro Gutierrez Perez'
 author_email = 'alvarogzp@gmail.com'
 author_handle = "@AlvaroGP"
 
-license_name = 'GNU AGPL 3.0'
+license_name = 'GNU AGPLv3.0+'
 license_url = 'https://www.gnu.org/licenses/agpl-3.0.en.html'
