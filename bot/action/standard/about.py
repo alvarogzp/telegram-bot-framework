@@ -10,24 +10,27 @@ from bot.api.domain import Message
 
 class AboutAction(Action):
     def __init__(self, project_package_name: str, authors: Sequence[Sequence[str]] = (), is_open_source: bool = False,
-                 url: str = None, license_name: str = None, license_url: str = None):
+                 url: str = None, license_name: str = None, license_url: str = None,
+                 bitcoin_donation_address: str = None):
         super().__init__()
         self.version = VersionAction.get_version(project_package_name)
         self.authors = self.__get_authors(authors)
         self.is_open_source = is_open_source
         self.url = url
         self.license = self.__get_license(license_name, license_url)
+        self.bitcoin_donation_address = bitcoin_donation_address
         self.message = Message()
 
     def post_setup(self):
         bot_name = self.cache.bot_info.first_name
         self.message = self.__build_message(
-            bot_name, self.version, self.authors, self.__get_framework(), self.is_open_source, self.license, self.url
+            bot_name, self.version, self.authors, self.__get_framework(), self.is_open_source, self.license, self.url,
+            self.bitcoin_donation_address
         )
 
     @staticmethod
     def __build_message(bot_name: str, version: str, authors: FormattedText, framework: FormattedText,
-                        is_open_source: bool, license: FormattedText, url: str):
+                        is_open_source: bool, license: FormattedText, url: str, bitcoin_donation_address: str):
         text = FormattedText()\
             .normal("{bot_name}, version {version}.").newline()\
             .normal("Based on {framework}.")
@@ -47,8 +50,13 @@ class AboutAction(Action):
             text.newline().newline()\
                 .normal("Project home:").newline()\
                 .normal("{url}")
+        if bitcoin_donation_address:
+            text.newline().newline()\
+                .normal("If you find {bot_name} useful and want to support its development, "
+                        "please consider donating to the following {bitcoin} address: {bitcoin_donation_address}")
         return text.start_format()\
-            .bold(bot_name=bot_name, version=version)\
+            .bold(bot_name=bot_name, version=version, bitcoin="Bitcoin",
+                  bitcoin_donation_address=bitcoin_donation_address)\
             .normal(url=url)\
             .concat(framework=framework, authors=authors, license=license)\
             .end_format()\
