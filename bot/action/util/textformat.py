@@ -78,6 +78,9 @@ class FormattedText:
     def length(self):
         return len(self.text)
 
+    def __bool__(self):
+        return self.length() > 0
+
     def clear(self):
         self.text = ""
 
