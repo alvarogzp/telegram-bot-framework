@@ -8,6 +8,9 @@ from bot.action.util.textformat import FormattedText
 from bot.api.domain import Message
 
 
+ABOUT_FRAMEWORK_ARG = "framework"
+
+
 class ProjectInfo:
     def __init__(self, project_package_name: str, authors: Sequence[Sequence[str]], is_open_source: bool,
                  url: str, license_name: str, license_url: str, donation_addresses: Sequence[Sequence[str]]):
@@ -31,6 +34,7 @@ class AboutAction(Action):
             project_package_name, authors, is_open_source, url, license_name, license_url, donation_addresses
         )
         self.message = Message()
+        self.about_framework_message = self._about_framework()
 
     def post_setup(self):
         self.info.name = self.cache.bot_info.first_name
@@ -38,6 +42,19 @@ class AboutAction(Action):
 
     def _about(self):
         return self.__about_message(self.info)
+
+    def _about_framework(self):
+        return self.__about_message(
+            ProjectInfo(
+                project_info.name,
+                project_info.authors_credits,
+                project_info.is_open_source,
+                project_info.url,
+                project_info.license_name,
+                project_info.license_url,
+                project_info.donation_addresses
+            )
+        )
 
     def __about_message(self, info: ProjectInfo):
         name = info.name
@@ -133,7 +150,11 @@ class AboutAction(Action):
             .build_message()
 
     def process(self, event):
-        self.api.send_message(self.message.copy().to_chat_replying(event.message))
+        if event.command_args.lower() == ABOUT_FRAMEWORK_ARG:
+            message = self.about_framework_message
+        else:
+            message = self.message
+        self.api.send_message(message.copy().to_chat_replying(event.message))
 
 
 class VersionAction(Action):
