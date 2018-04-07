@@ -35,11 +35,12 @@ class AboutAction(Action):
                 .normal("{authors}")
         if is_open_source:
             text.newline().newline()\
-                .normal("This bot is Open Source.").newline()\
-                .normal("You can view the code, improve it and launch your own instance (complying with the license).")
+                .normal("{bot_name} is Open Source.").newline()\
+                .normal("You can inspect its code, improve it and launch your own instance "
+                        "(complying with the license).")
         if license:
             text.newline().newline()\
-                .normal("It is licensed under the {license} license.")
+                .normal("{bot_name} is licensed under the {license} license.")
         if url:
             text.newline().newline()\
                 .normal("Project home:").newline()\
