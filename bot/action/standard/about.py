@@ -56,15 +56,16 @@ class AboutAction(Action):
         )
 
     def __about_message(self, info: ProjectInfo):
-        name = info.name
-        version = VersionAction.get_version(info.project_package_name)
-        authors = self.__get_authors(info.authors)
-        framework = info.framework or FormattedText()
-        is_open_source = info.is_open_source
-        license = self.__get_license(info.license_name, info.license_url)
-        url = info.url
-        donation_addresses = self.__get_donation_addresses(info.donation_addresses)
-        return self.__build_message(name, version, authors, framework, is_open_source, license, url, donation_addresses)
+        return self.__build_message(
+            info.name,
+            VersionAction.get_version(info.project_package_name),
+            self.__get_authors(info.authors),
+            info.framework or FormattedText(),
+            info.is_open_source,
+            self.__get_license(info.license_name, info.license_url),
+            info.url,
+            self.__get_donation_addresses(info.donation_addresses)
+        )
 
     @staticmethod
     def __get_framework(event):
