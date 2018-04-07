@@ -42,6 +42,17 @@ class AboutAction(Action):
             self.donation_addresses
         )
 
+    def __about_message(self, info: ProjectInfo):
+        name = info.name
+        version = VersionAction.get_version(info.project_package_name)
+        authors = self.__get_authors(info.authors)
+        framework = info.framework or FormattedText()
+        is_open_source = info.is_open_source
+        license = self.__get_license(info.license_name, info.license_url)
+        url = info.url
+        donation_addresses = self.__get_donation_addresses(info.donation_addresses)
+        return self.__build_message(name, version, authors, framework, is_open_source, license, url, donation_addresses)
+
     @staticmethod
     def __build_message(bot_name: str, version: str, authors: FormattedText, framework: FormattedText,
                         is_open_source: bool, license: FormattedText, url: str, donation_addresses: FormattedText):
