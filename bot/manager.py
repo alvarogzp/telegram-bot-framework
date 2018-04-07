@@ -101,7 +101,8 @@ class BotManager:
                                                     is_open_source=True,
                                                     url=project_info.url,
                                                     license_name=project_info.license_name,
-                                                    license_url=project_info.license_url
+                                                    license_url=project_info.license_url,
+                                                    donation_addresses=project_info.donation_addresses
                                                 )
                                             ),
 
