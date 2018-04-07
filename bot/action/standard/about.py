@@ -8,6 +8,20 @@ from bot.action.util.textformat import FormattedText
 from bot.api.domain import Message
 
 
+class ProjectInfo:
+    def __init__(self, project_package_name: str, authors: Sequence[Sequence[str]], is_open_source: bool,
+                 url: str, license_name: str, license_url: str, donation_addresses: Sequence[Sequence[str]]):
+        self.name = project_package_name
+        self.framework = None  # type: FormattedText
+        self.project_package_name = project_package_name
+        self.authors = authors
+        self.is_open_source = is_open_source
+        self.url = url
+        self.license_name = license_name
+        self.license_url = license_url
+        self.donation_addresses = donation_addresses
+
+
 class AboutAction(Action):
     def __init__(self, project_package_name: str, authors: Sequence[Sequence[str]] = (), is_open_source: bool = False,
                  url: str = None, license_name: str = None, license_url: str = None,
