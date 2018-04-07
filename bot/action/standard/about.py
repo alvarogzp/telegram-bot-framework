@@ -57,8 +57,10 @@ class AboutAction(Action):
     def __build_message(name: str, version: str, authors: FormattedText, framework: FormattedText,
                         is_open_source: bool, license: FormattedText, url: str, donation_addresses: FormattedText):
         text = FormattedText()\
-            .normal("{bot_name}, version {version}.").newline()\
-            .normal("Based on {framework}.")
+            .normal("{name}, version {version}.")
+        if framework:
+            text.newline()\
+                .normal("Based on {framework}.")
         if authors:
             text.newline().newline()\
                 .bold("Authors").normal(":").newline()\
