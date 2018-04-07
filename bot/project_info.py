@@ -14,5 +14,5 @@ authors_credits = (
     ("@KouteiCheke", "i18n & UI/UX support")
 )
 
-license_name = 'GNU AGPLv3.0+'
+license_name = 'GNU AGPL 3.0+'
 license_url = 'https://www.gnu.org/licenses/agpl-3.0.en.html'
