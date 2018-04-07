@@ -6,7 +6,6 @@ from bot import project_info
 from bot.action.core.action import Action
 from bot.action.core.command import UnderscoredCommandBuilder
 from bot.action.util.textformat import FormattedText
-from bot.api.domain import Message
 
 
 ABOUT_FRAMEWORK_ARG = "framework"
@@ -34,14 +33,13 @@ class AboutAction(Action):
         self.info = ProjectInfo(
             project_package_name, authors, is_open_source, url, license_name, license_url, donation_addresses
         )
-        self.message = Message()
         self.about_framework_message = self._about_framework()
 
     def post_setup(self):
         self.info.name = self.cache.bot_info.first_name
-        self.message = self._about()
 
-    def _about(self):
+    def _about(self, event):
+        self.info.framework = self.__get_framework(event)
         return self.__about_message(self.info)
 
     def _about_framework(self):
@@ -154,10 +152,10 @@ class AboutAction(Action):
 
     def process(self, event):
         if event.command_args.lower() == ABOUT_FRAMEWORK_ARG:
-            message = self.about_framework_message
+            message = self.about_framework_message.copy()
         else:
-            message = self.message
-        self.api.send_message(message.copy().to_chat_replying(event.message))
+            message = self._about(event)
+        self.api.send_message(message.to_chat_replying(event.message))
 
 
 class VersionAction(Action):
