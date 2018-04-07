@@ -1,3 +1,5 @@
+from typing import Sequence
+
 import pkg_resources
 
 from bot import project_info
@@ -6,11 +8,11 @@ from bot.action.util.textformat import FormattedText
 
 
 class AboutAction(Action):
-    def __init__(self, project_package_name: str, author_handle: str = None, is_open_source: bool = False,
+    def __init__(self, project_package_name: str, authors: Sequence[Sequence[str]] = (), is_open_source: bool = False,
                  url: str = None, license_name: str = None, license_url: str = None):
         super().__init__()
         self.version = VersionAction.get_version(project_package_name)
-        self.author_handle = author_handle
+        self.authors = self.__get_authors(authors)
         self.is_open_source = is_open_source
         self.url = url
         self.license = self.__get_license(license_name, license_url)
@@ -18,16 +20,19 @@ class AboutAction(Action):
 
     def post_setup(self):
         bot_name = self.cache.bot_info.first_name
-        self.text = self.__build_message_text(bot_name, self.version, self.author_handle, self.__get_framework(),
+        self.text = self.__build_message_text(bot_name, self.version, self.authors, self.__get_framework(),
                                               self.is_open_source, self.license, self.url)
 
     @staticmethod
-    def __build_message_text(bot_name: str, version: str, author: str, framework: FormattedText,
+    def __build_message_text(bot_name: str, version: str, authors: FormattedText, framework: FormattedText,
                              is_open_source: bool, license: FormattedText, url: str):
         text = FormattedText()\
             .normal("{bot_name}, version {version}.").newline()\
-            .newline()\
-            .normal("Created by {author} using {framework}.")
+            .normal("Based on {framework}.")
+        if authors:
+            text.newline().newline()\
+                .bold("Authors").normal(":").newline()\
+                .normal("{authors}")
         if is_open_source:
             text.newline().newline()\
                 .normal("This bot is Open Source.").newline()\
@@ -41,8 +46,8 @@ class AboutAction(Action):
                 .normal("{url}")
         return text.start_format()\
             .bold(bot_name=bot_name, version=version)\
-            .normal(author=author, url=url)\
-            .concat(framework=framework, license=license)\
+            .normal(url=url)\
+            .concat(framework=framework, authors=authors, license=license)\
             .end_format()
 
     @staticmethod
@@ -62,6 +67,19 @@ class AboutAction(Action):
             return FormattedText().url(name or url, url)
         if name:
             return FormattedText().bold(name)
+
+    @staticmethod
+    def __get_authors(authors: Sequence[Sequence[str]]):
+        texts = []
+        for name, credit in authors:
+            texts.append(
+                FormattedText()
+                .normal(" - {name} ({credit})")
+                .start_format()
+                .normal(name=name, credit=credit)
+                .end_format()
+            )
+        return FormattedText().newline().join(texts)
 
     def process(self, event):
         self.api.send_message(self.text.build_message().to_chat_replying(event.message))
