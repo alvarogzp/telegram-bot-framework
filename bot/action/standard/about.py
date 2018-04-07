@@ -54,7 +54,7 @@ class AboutAction(Action):
         return self.__build_message(name, version, authors, framework, is_open_source, license, url, donation_addresses)
 
     @staticmethod
-    def __build_message(bot_name: str, version: str, authors: FormattedText, framework: FormattedText,
+    def __build_message(name: str, version: str, authors: FormattedText, framework: FormattedText,
                         is_open_source: bool, license: FormattedText, url: str, donation_addresses: FormattedText):
         text = FormattedText()\
             .normal("{bot_name}, version {version}.").newline()\
@@ -65,23 +65,23 @@ class AboutAction(Action):
                 .normal("{authors}")
         if is_open_source:
             text.newline().newline()\
-                .normal("{bot_name} is Open Source.").newline()\
+                .normal("{name} is Open Source.").newline()\
                 .normal("You can inspect its code, improve it and launch your own instance "
                         "(complying with the license).")
         if license:
             text.newline().newline()\
-                .normal("{bot_name} is licensed under the {license} license.")
+                .normal("{name} is licensed under the {license} license.")
         if url:
             text.newline().newline()\
                 .normal("Project home:").newline()\
                 .normal("{url}")
         if donation_addresses:
             text.newline().newline()\
-                .normal("If you find {bot_name} useful and want to support its development, "
+                .normal("If you find {name} useful and want to support its development, "
                         "please consider donating to the following addresses:").newline()\
                 .normal("{donation_addresses}")
         return text.start_format()\
-            .bold(bot_name=bot_name, version=version)\
+            .bold(name=name, version=version)\
             .normal(url=url)\
             .concat(framework=framework, authors=authors, license=license, donation_addresses=donation_addresses)\
             .end_format()\
