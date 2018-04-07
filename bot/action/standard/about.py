@@ -34,7 +34,10 @@ class AboutAction(Action):
 
     def post_setup(self):
         self.info.name = self.cache.bot_info.first_name
-        self.message = self.__about_message(self.info)
+        self.message = self._about()
+
+    def _about(self):
+        return self.__about_message(self.info)
 
     def __about_message(self, info: ProjectInfo):
         name = info.name
