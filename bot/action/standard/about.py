@@ -4,6 +4,7 @@ import pkg_resources
 
 from bot import project_info
 from bot.action.core.action import Action
+from bot.action.core.command import UnderscoredCommandBuilder
 from bot.action.util.textformat import FormattedText
 from bot.api.domain import Message
 
@@ -68,14 +69,16 @@ class AboutAction(Action):
         return self.__build_message(name, version, authors, framework, is_open_source, license, url, donation_addresses)
 
     @staticmethod
-    def __get_framework():
+    def __get_framework(event):
         framework_name = project_info.name
         framework_url = project_info.url
         framework_version = VersionAction.get_version(framework_name)
+        about_framework_command = UnderscoredCommandBuilder.build_command(event.command, ABOUT_FRAMEWORK_ARG)
         return FormattedText()\
-            .normal("{url} ({version})").start_format()\
+            .normal("{url} {version} (see {about_framework_command})")\
+            .start_format()\
             .url(framework_name, framework_url, name="url")\
-            .normal(version=framework_version)\
+            .normal(version=framework_version, about_framework_command=about_framework_command)\
             .end_format()
 
     @staticmethod
