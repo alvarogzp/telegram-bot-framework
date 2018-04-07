@@ -54,42 +54,6 @@ class AboutAction(Action):
         return self.__build_message(name, version, authors, framework, is_open_source, license, url, donation_addresses)
 
     @staticmethod
-    def __build_message(name: str, version: str, authors: FormattedText, framework: FormattedText,
-                        is_open_source: bool, license: FormattedText, url: str, donation_addresses: FormattedText):
-        text = FormattedText()\
-            .normal("{name}, version {version}.")
-        if framework:
-            text.newline()\
-                .normal("Based on {framework}.")
-        if authors:
-            text.newline().newline()\
-                .bold("Authors").normal(":").newline()\
-                .normal("{authors}")
-        if is_open_source:
-            text.newline().newline()\
-                .normal("{name} is Open Source.").newline()\
-                .normal("You can inspect its code, improve it and launch your own instance "
-                        "(complying with the license).")
-        if license:
-            text.newline().newline()\
-                .normal("{name} is licensed under the {license} license.")
-        if url:
-            text.newline().newline()\
-                .normal("Project home:").newline()\
-                .normal("{url}")
-        if donation_addresses:
-            text.newline().newline()\
-                .normal("If you find {name} useful and want to support its development, "
-                        "please consider donating to the following addresses:").newline()\
-                .normal("{donation_addresses}")
-        return text.start_format()\
-            .bold(name=name, version=version)\
-            .normal(url=url)\
-            .concat(framework=framework, authors=authors, license=license, donation_addresses=donation_addresses)\
-            .end_format()\
-            .build_message()
-
-    @staticmethod
     def __get_framework():
         framework_name = project_info.name
         framework_url = project_info.url
@@ -134,6 +98,42 @@ class AboutAction(Action):
                 .end_format()
             )
         return FormattedText().newline().join(texts)
+
+    @staticmethod
+    def __build_message(name: str, version: str, authors: FormattedText, framework: FormattedText,
+                        is_open_source: bool, license: FormattedText, url: str, donation_addresses: FormattedText):
+        text = FormattedText()\
+            .normal("{name}, version {version}.")
+        if framework:
+            text.newline()\
+                .normal("Based on {framework}.")
+        if authors:
+            text.newline().newline()\
+                .bold("Authors").normal(":").newline()\
+                .normal("{authors}")
+        if is_open_source:
+            text.newline().newline()\
+                .normal("{name} is Open Source.").newline()\
+                .normal("You can inspect its code, improve it and launch your own instance "
+                        "(complying with the license).")
+        if license:
+            text.newline().newline()\
+                .normal("{name} is licensed under the {license} license.")
+        if url:
+            text.newline().newline()\
+                .normal("Project home:").newline()\
+                .normal("{url}")
+        if donation_addresses:
+            text.newline().newline()\
+                .normal("If you find {name} useful and want to support its development, "
+                        "please consider donating to the following addresses:").newline()\
+                .normal("{donation_addresses}")
+        return text.start_format()\
+            .bold(name=name, version=version)\
+            .normal(url=url)\
+            .concat(framework=framework, authors=authors, license=license, donation_addresses=donation_addresses)\
+            .end_format()\
+            .build_message()
 
     def process(self, event):
         self.api.send_message(self.message.copy().to_chat_replying(event.message))
