@@ -5,6 +5,7 @@ import pkg_resources
 from bot import project_info
 from bot.action.core.action import Action
 from bot.action.util.textformat import FormattedText
+from bot.api.domain import Message
 
 
 class AboutAction(Action):
@@ -16,16 +17,17 @@ class AboutAction(Action):
         self.is_open_source = is_open_source
         self.url = url
         self.license = self.__get_license(license_name, license_url)
-        self.text = FormattedText()
+        self.message = Message()
 
     def post_setup(self):
         bot_name = self.cache.bot_info.first_name
-        self.text = self.__build_message_text(bot_name, self.version, self.authors, self.__get_framework(),
-                                              self.is_open_source, self.license, self.url)
+        self.message = self.__build_message(
+            bot_name, self.version, self.authors, self.__get_framework(), self.is_open_source, self.license, self.url
+        )
 
     @staticmethod
-    def __build_message_text(bot_name: str, version: str, authors: FormattedText, framework: FormattedText,
-                             is_open_source: bool, license: FormattedText, url: str):
+    def __build_message(bot_name: str, version: str, authors: FormattedText, framework: FormattedText,
+                        is_open_source: bool, license: FormattedText, url: str):
         text = FormattedText()\
             .normal("{bot_name}, version {version}.").newline()\
             .normal("Based on {framework}.")
@@ -49,7 +51,8 @@ class AboutAction(Action):
             .bold(bot_name=bot_name, version=version)\
             .normal(url=url)\
             .concat(framework=framework, authors=authors, license=license)\
-            .end_format()
+            .end_format()\
+            .build_message()
 
     @staticmethod
     def __get_framework():
@@ -83,7 +86,7 @@ class AboutAction(Action):
         return FormattedText().newline().join(texts)
 
     def process(self, event):
-        self.api.send_message(self.text.build_message().to_chat_replying(event.message))
+        self.api.send_message(self.message.copy().to_chat_replying(event.message))
 
 
 class VersionAction(Action):
