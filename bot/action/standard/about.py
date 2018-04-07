@@ -27,20 +27,14 @@ class AboutAction(Action):
                  url: str = None, license_name: str = None, license_url: str = None,
                  donation_addresses: Sequence[Sequence[str]] = ()):
         super().__init__()
-        self.version = VersionAction.get_version(project_package_name)
-        self.authors = self.__get_authors(authors)
-        self.is_open_source = is_open_source
-        self.url = url
-        self.license = self.__get_license(license_name, license_url)
-        self.donation_addresses = self.__get_donation_addresses(donation_addresses)
+        self.info = ProjectInfo(
+            project_package_name, authors, is_open_source, url, license_name, license_url, donation_addresses
+        )
         self.message = Message()
 
     def post_setup(self):
-        bot_name = self.cache.bot_info.first_name
-        self.message = self.__build_message(
-            bot_name, self.version, self.authors, self.__get_framework(), self.is_open_source, self.license, self.url,
-            self.donation_addresses
-        )
+        self.info.name = self.cache.bot_info.first_name
+        self.message = self.__about_message(self.info)
 
     def __about_message(self, info: ProjectInfo):
         name = info.name
