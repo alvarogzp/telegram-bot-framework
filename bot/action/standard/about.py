@@ -79,6 +79,7 @@ class AboutAction(Action):
             return FormattedText().url(name or url, url)
         if name:
             return FormattedText().bold(name)
+        return FormattedText()
 
     @staticmethod
     def __get_authors(authors: Sequence[Sequence[str]]):
