@@ -58,6 +58,7 @@ class AboutAction(Action):
     def __about_message(self, info: ProjectInfo):
         return self.__build_message(
             info.name,
+            info.project_name,
             VersionAction.get_version(info.project_name),
             self.__get_authors(info.authors),
             info.framework or FormattedText(),
@@ -116,10 +117,10 @@ class AboutAction(Action):
         return FormattedText().newline().join(texts)
 
     @staticmethod
-    def __build_message(name: str, version: str, authors: FormattedText, framework: FormattedText,
+    def __build_message(name: str, project_name: str, version: str, authors: FormattedText, framework: FormattedText,
                         is_open_source: bool, license: FormattedText, url: str, donation_addresses: FormattedText):
         text = FormattedText()\
-            .normal("{name}, version {version}.")
+            .normal("{project_name}, version {version}.")
         if framework:
             text.newline()\
                 .normal("Based on {framework}.")
@@ -129,15 +130,15 @@ class AboutAction(Action):
                 .normal("{authors}")
         if is_open_source:
             text.newline().newline()\
-                .normal("{name} is Open Source.").newline()\
+                .normal("{project_name} is Open Source.").newline()\
                 .normal("You can inspect its code, improve it and launch your own instance "
                         "(complying with the license).")
         if license:
             text.newline().newline()\
-                .normal("{name} is licensed under the {license} license.")
+                .normal("{project_name} is licensed under the {license} license.")
         if url:
             text.newline().newline()\
-                .normal("Project home:").newline()\
+                .normal("{project_name} home:").newline()\
                 .normal("{url}")
         if donation_addresses:
             text.newline().newline()\
@@ -145,7 +146,7 @@ class AboutAction(Action):
                         "please consider donating to any of the following addresses:").newline()\
                 .normal("{donation_addresses}")
         return text.start_format()\
-            .bold(name=name, version=version)\
+            .bold(name=name, project_name=project_name, version=version)\
             .normal(url=url)\
             .concat(framework=framework, authors=authors, license=license, donation_addresses=donation_addresses)\
             .end_format()\
