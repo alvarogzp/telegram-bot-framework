@@ -13,6 +13,7 @@ from bot.action.extra.random import RandomChoiceAction
 from bot.action.standard.about import AboutAction, VersionAction
 from bot.action.standard.admin import RestartAction, EvalAction, AdminActionWithErrorMessage, AdminAction, HaltAction
 from bot.action.standard.admin.config_status import ConfigStatusAction
+from bot.action.standard.admin.fail import FailAction
 from bot.action.standard.admin.instance import InstanceAction
 from bot.action.standard.admin.state import StateAction
 from bot.action.standard.answer import AnswerAction
@@ -20,7 +21,6 @@ from bot.action.standard.asynchronous import AsynchronousAction
 from bot.action.standard.benchmark import BenchmarkAction, WorkersAction
 from bot.action.standard.chatsettings.action import ChatSettingsAction
 from bot.action.standard.enterexit import GreetAction, LeaveAction
-from bot.action.standard.admin.fail import FailAction
 from bot.action.standard.gapdetector import GlobalGapDetectorAction
 from bot.action.standard.group_admin import GroupAdminAction
 from bot.action.standard.info.action import ChatInfoAction, UserInfoAction
@@ -35,7 +35,7 @@ from bot.bot import Bot
 
 class BotManager:
     def __init__(self):
-        self.bot = Bot()
+        self.bot = Bot(project_info.name)
 
     def setup_actions(self):
         self.bot.set_action(
@@ -97,16 +97,19 @@ class BotManager:
                                             CommandAction("about").then(
                                                 AboutAction(
                                                     project_info.name,
-                                                    author_handle=project_info.author_handle,
-                                                    is_open_source=True,
-                                                    source_url=project_info.source_url,
-                                                    license_name=project_info.license_name)
+                                                    authors=project_info.authors_credits,
+                                                    is_open_source=project_info.is_open_source,
+                                                    url=project_info.url,
+                                                    license_name=project_info.license_name,
+                                                    license_url=project_info.license_url,
+                                                    donation_addresses=project_info.donation_addresses
+                                                )
                                             ),
 
                                             CommandAction("version").then(
                                                 VersionAction(
                                                     project_info.name,
-                                                    project_info.source_url + "/releases"
+                                                    project_info.url + "/releases"
                                                 )
                                             ),
 

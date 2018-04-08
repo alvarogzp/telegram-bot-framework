@@ -1,62 +1,163 @@
+from typing import Sequence
+
 import pkg_resources
 
 from bot import project_info
 from bot.action.core.action import Action
+from bot.action.core.command import UnderscoredCommandBuilder
 from bot.action.util.textformat import FormattedText
 
 
-class AboutAction(Action):
-    def __init__(self, project_package_name: str, author_handle: str = None, is_open_source: bool = False,
-                 source_url: str = None, license_name: str = None):
-        super().__init__()
-        self.version = VersionAction.get_version(project_package_name)
-        self.author_handle = author_handle
+ABOUT_FRAMEWORK_ARG = "framework"
+
+
+class ProjectInfo:
+    def __init__(self, project_name: str, authors: Sequence[Sequence[str]], is_open_source: bool,
+                 url: str, license_name: str, license_url: str, donation_addresses: Sequence[Sequence[str]]):
+        self.name = project_name
+        self.framework = None  # type: FormattedText
+        self.project_name = project_name
+        self.authors = authors
         self.is_open_source = is_open_source
-        self.source_url = source_url
+        self.url = url
         self.license_name = license_name
-        self.text = FormattedText()
+        self.license_url = license_url
+        self.donation_addresses = donation_addresses
+
+
+class AboutAction(Action):
+    def __init__(self, project_name: str, authors: Sequence[Sequence[str]] = (), is_open_source: bool = False,
+                 url: str = None, license_name: str = None, license_url: str = None,
+                 donation_addresses: Sequence[Sequence[str]] = ()):
+        super().__init__()
+        self.info = ProjectInfo(
+            project_name, authors, is_open_source, url, license_name, license_url, donation_addresses
+        )
+        self.about_framework_message = self._about_framework()
 
     def post_setup(self):
-        bot_name = self.cache.bot_info.first_name
-        self.text = self.__build_message_text(bot_name, self.version, self.author_handle, self.__get_framework(),
-                                              self.is_open_source, self.license_name, self.source_url)
+        self.info.name = self.cache.bot_info.first_name
+
+    def _about(self, event):
+        self.info.framework = self.__get_framework(event)
+        return self.__about_message(self.info)
+
+    def _about_framework(self):
+        return self.__about_message(
+            ProjectInfo(
+                project_info.name,
+                project_info.authors_credits,
+                project_info.is_open_source,
+                project_info.url,
+                project_info.license_name,
+                project_info.license_url,
+                project_info.donation_addresses
+            )
+        )
+
+    def __about_message(self, info: ProjectInfo):
+        return self.__build_message(
+            info.name,
+            info.project_name,
+            VersionAction.get_version(info.project_name),
+            self.__get_authors(info.authors),
+            info.framework or FormattedText(),
+            info.is_open_source,
+            self.__get_license(info.license_name, info.license_url),
+            info.url,
+            self.__get_donation_addresses(info.donation_addresses)
+        )
 
     @staticmethod
-    def __build_message_text(bot_name: str, version: str, author: str, framework: FormattedText,
-                             is_open_source: bool, license_name: str, source_url: str):
+    def __get_framework(event):
+        framework_name = project_info.name
+        framework_url = project_info.url
+        framework_version = VersionAction.get_version(framework_name)
+        about_framework_command = UnderscoredCommandBuilder.build_command(event.command, ABOUT_FRAMEWORK_ARG)
+        return FormattedText()\
+            .normal("{url} {version} (see {about_framework_command})")\
+            .start_format()\
+            .url(framework_name, framework_url, name="url")\
+            .normal(version=framework_version, about_framework_command=about_framework_command)\
+            .end_format()
+
+    @staticmethod
+    def __get_license(name: str, url: str):
+        if url:
+            return FormattedText().url(name or url, url)
+        if name:
+            return FormattedText().bold(name)
+        return FormattedText()
+
+    @staticmethod
+    def __get_authors(authors: Sequence[Sequence[str]]):
+        texts = []
+        for name, credit in authors:
+            texts.append(
+                FormattedText()
+                .normal(" - {name} ({credit})")
+                .start_format()
+                .normal(name=name, credit=credit)
+                .end_format()
+            )
+        return FormattedText().newline().join(texts)
+
+    @staticmethod
+    def __get_donation_addresses(donation_addresses: Sequence[Sequence[str]]):
+        texts = []
+        for name, address in donation_addresses:
+            texts.append(
+                FormattedText()
+                .normal(" - {name}: {address}")
+                .start_format()
+                .normal(name=name)
+                .bold(address=address)
+                .end_format()
+            )
+        return FormattedText().newline().join(texts)
+
+    @staticmethod
+    def __build_message(name: str, project_name: str, version: str, authors: FormattedText, framework: FormattedText,
+                        is_open_source: bool, license: FormattedText, url: str, donation_addresses: FormattedText):
         text = FormattedText()\
-            .normal("{bot_name}, version {version}.").newline()\
-            .newline()\
-            .normal("Created by {author} using {framework}.")
+            .normal("{project_name}, version {version}.")
+        if framework:
+            text.newline()\
+                .normal("Based on {framework}.")
+        if authors:
+            text.newline().newline()\
+                .bold("Authors").normal(":").newline()\
+                .normal("{authors}")
         if is_open_source:
             text.newline().newline()\
-                .normal("This bot is Open Source.").newline()\
-                .normal("You can view the code, improve it and launch your own instance (complying with the license).")
-        if license_name:
+                .normal("{project_name} is Open Source.").newline()\
+                .normal("You can inspect its code, improve it and launch your own instance "
+                        "(complying with the license).")
+        if license:
             text.newline().newline()\
-                .normal("It is licensed under the {license} license.")
-        if source_url:
+                .normal("{project_name} is licensed under the {license} license.")
+        if url:
             text.newline().newline()\
-                .normal("You can find the source code on: {source_url}")
+                .normal("{project_name} home:").newline()\
+                .normal("{url}")
+        if donation_addresses:
+            text.newline().newline()\
+                .normal("If you find {name} useful and want to support its development, "
+                        "please consider donating to any of the following addresses:").newline()\
+                .normal("{donation_addresses}")
         return text.start_format()\
-            .bold(bot_name=bot_name, version=version, license=license_name)\
-            .normal(author=author, source_url=source_url)\
-            .concat(framework=framework)\
-            .end_format()
-
-    @staticmethod
-    def __get_framework():
-        framework_name = project_info.name
-        framework_url = project_info.source_url
-        framework_version = VersionAction.get_version(framework_name)
-        return FormattedText()\
-            .normal("{url} ({version})").start_format()\
-            .url(framework_name, framework_url, name="url")\
-            .normal(version=framework_version)\
-            .end_format()
+            .bold(name=name, project_name=project_name, version=version)\
+            .normal(url=url)\
+            .concat(framework=framework, authors=authors, license=license, donation_addresses=donation_addresses)\
+            .end_format()\
+            .build_message()
 
     def process(self, event):
-        self.api.send_message(self.text.build_message().to_chat_replying(event.message))
+        if event.command_args.lower() == ABOUT_FRAMEWORK_ARG:
+            message = self.about_framework_message.copy()
+        else:
+            message = self._about(event)
+        self.api.send_message(message.to_chat_replying(event.message))
 
 
 class VersionAction(Action):
