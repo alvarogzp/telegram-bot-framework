@@ -107,7 +107,7 @@ class AboutAction(Action):
         for name, address in donation_addresses:
             texts.append(
                 FormattedText()
-                .normal(" - {name}:️ {address}")
+                .normal(" - {name}: {address}")
                 .start_format()
                 .normal(name=name)
                 .bold(address=address)
