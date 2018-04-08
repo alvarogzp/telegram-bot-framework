@@ -2,6 +2,7 @@ import time
 
 from bot.action.core.action import Action
 from bot.action.core.update import Update
+from bot.action.standard.about import VersionAction
 from bot.action.standard.admin.config_status import ConfigStatus
 from bot.action.util.textformat import FormattedText
 from bot.api.api import Api
@@ -19,7 +20,10 @@ STATE_DIR = "state"
 
 
 class Bot:
-    def __init__(self):
+    def __init__(self, project_name: str = ""):
+        """
+        :param project_name: Optional name to be displayed on starting message on admin chat.
+        """
         self.config = Config(CONFIG_DIR)
         self.state = State(STATE_DIR)
         self.cache = Cache()
@@ -29,7 +33,7 @@ class Bot:
         self.cache.bot_info = self.api.getMe()
         self.logger = AdminLogger(self.api, self.config.admin_chat_id, debug, self.config.traceback_chat_id())
         self.scheduler = self._create_scheduler()
-        self.starting()
+        self.starting(project_name)
         if self.config.async():
             self.scheduler.setup()
             self.api.enable_async(AsyncApi(self.api, self.scheduler))
@@ -62,10 +66,19 @@ class Bot:
         finally:
             self.shutdown()
 
-    def starting(self):
+    def starting(self, project_name: str):
+        starting_info = ConfigStatus(self.config, self.state).get_config_status()
+        if project_name:
+            version = VersionAction.get_version(project_name)
+            project = FormattedText()\
+                .normal("Running: {name} {version}")\
+                .start_format()\
+                .bold(name=project_name, version=version)\
+                .end_format()
+            starting_info = (project,) + starting_info
         self.logger.info_formatted_text(
             FormattedText().bold("Starting"),
-            *ConfigStatus(self.config, self.state).get_config_status()
+            *starting_info
         )
 
     def main_loop(self):
