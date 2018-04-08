@@ -4,10 +4,22 @@ name = 'telegram-bot-framework'
 
 description = 'Python Telegram bot API framework'
 
-source_url = 'https://github.com/alvarogzp/telegram-bot-framework'
+url = 'https://github.com/alvarogzp/telegram-bot-framework'
 
 author_name = 'Alvaro Gutierrez Perez'
 author_email = 'alvarogzp@gmail.com'
-author_handle = "@AlvaroGP"
 
-license_name = 'GNU AGPL 3.0'
+authors_credits = (
+    ("@AlvaroGP", "main developer"),
+    ("@KouteiCheke", "i18n & UI/UX support")
+)
+
+is_open_source = True
+
+license_name = 'GNU AGPL 3.0+'
+license_url = 'https://www.gnu.org/licenses/agpl-3.0.en.html'
+
+donation_addresses = (
+    ("Bitcoin", "36rwcSgcU1H9fuMvZoebZD3auus6h9wVXk"),
+    ("Bitcoin (bech32 format)", "bc1q4943c5p5dl0hujmmcg2g0568hetynajd3qqtv0")
+)
