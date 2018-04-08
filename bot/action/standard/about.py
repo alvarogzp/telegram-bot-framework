@@ -142,7 +142,7 @@ class AboutAction(Action):
         if donation_addresses:
             text.newline().newline()\
                 .normal("If you find {name} useful and want to support its development, "
-                        "please consider donating to the following addresses:").newline()\
+                        "please consider donating to any of the following addresses:").newline()\
                 .normal("{donation_addresses}")
         return text.start_format()\
             .bold(name=name, version=version)\
