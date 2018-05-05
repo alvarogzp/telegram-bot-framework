@@ -64,7 +64,7 @@ class BenchmarkAction(Action):
         ))
 
     def __benchmark_send_message(self, message: Message):
-        return self.__benchmark(lambda: self.api.send_message(message))
+        return self.__benchmark(lambda: self.api.no_async.send_message(message))
 
     def __benchmark_code_execution(self):
         return self.__benchmark(lambda: [i*j*i*j for i in range(100) for j in range(100)])
