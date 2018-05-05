@@ -21,5 +21,4 @@ license_url = 'https://www.gnu.org/licenses/agpl-3.0.en.html'
 
 donation_addresses = (
     ("Bitcoin", "36rwcSgcU1H9fuMvZoebZD3auus6h9wVXk"),
-    ("Bitcoin (bech32 format)", "bc1q4943c5p5dl0hujmmcg2g0568hetynajd3qqtv0")
 )
