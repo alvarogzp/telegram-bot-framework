@@ -42,233 +42,233 @@ class BotManager:
         self.bot.set_action(
             ActionGroup(
                 LoggerAction().then(
-                    GlobalGapDetectorAction().then(
+                    AsyncApiAction().then(
+                        GlobalGapDetectorAction().then(
 
-                        # # ALWAYS (or SAVE) ACTIONS # #
+                            # # ALWAYS (or SAVE) ACTIONS # #
 
-                        MessageAction().then(
-                            SaveUserAction(),
-
-                            PerChatAction().then(
-                                NoForwardedMessage().then(
-                                    VoiceMessageAction().then(
-                                        SaveVoiceAction()
-                                    )
-                                ),
-
-                                SaveMessageAction(),
-                                SavePoleAction(),
-
-                                ToggleableFeatureAction("pole").then(
-                                    LegacyPoleAction()
-                                ),
-
-                                TextMessageAction().then(
-                                    SaveHashtagsAction()
-                                )
-                            )
-                        ),
-
-                        EditedMessageAction().then(
-                            PerChatAction().then(
-                                SaveMessageAction()
-                            )
-                        ),
-
-                        # # INTERACTIVE ACTIONS # #
-
-                        NoPendingAction().then(
                             MessageAction().then(
+                                SaveUserAction(),
+
                                 PerChatAction().then(
-                                    InternationalizationAction().then(
+                                    NoForwardedMessage().then(
+                                        VoiceMessageAction().then(
+                                            SaveVoiceAction()
+                                        )
+                                    ),
 
-                                        ToggleableFeatureAction("greet").then(
-                                            GreetAction()
-                                        ),
-                                        ToggleableFeatureAction("leave").then(
-                                            LeaveAction()
-                                        ),
+                                    SaveMessageAction(),
+                                    SavePoleAction(),
 
+                                    ToggleableFeatureAction("pole").then(
+                                        LegacyPoleAction()
+                                    ),
+
+                                    TextMessageAction().then(
+                                        SaveHashtagsAction()
+                                    )
+                                )
+                            ),
+
+                            EditedMessageAction().then(
+                                PerChatAction().then(
+                                    SaveMessageAction()
+                                )
+                            ),
+
+                            # # INTERACTIVE ACTIONS # #
+
+                            NoPendingAction().then(
+                                MessageAction().then(
+                                    PerChatAction().then(
+                                        InternationalizationAction().then(
+
+                                            ToggleableFeatureAction("greet").then(
+                                                GreetAction()
+                                            ),
+                                            ToggleableFeatureAction("leave").then(
+                                                LeaveAction()
+                                            ),
+
+                                            TextMessageAction().then(
+
+                                                CommandAction("start").then(
+                                                    AnswerAction("Hello! I am " + self.bot.cache.bot_info.first_name + " and I am here to serve you.")
+                                                ),
+
+                                                CommandAction("about").then(
+                                                    AboutAction(
+                                                        project_info.name,
+                                                        authors=project_info.authors_credits,
+                                                        is_open_source=project_info.is_open_source,
+                                                        url=project_info.url,
+                                                        license_name=project_info.license_name,
+                                                        license_url=project_info.license_url,
+                                                        donation_addresses=project_info.donation_addresses
+                                                    )
+                                                ),
+
+                                                CommandAction("version").then(
+                                                    VersionAction(
+                                                        project_info.name,
+                                                        project_info.url + "/releases"
+                                                    )
+                                                ),
+
+                                                CommandAction("benchmark").then(
+                                                    AsynchronousAction("benchmark").then(
+                                                        BenchmarkAction()
+                                                    )
+                                                ),
+
+                                                CommandAction("ping").then(
+                                                    AnswerAction("Up and running, sir!")
+                                                ),
+
+                                                CommandAction("me", is_personal=True).then(
+                                                    UserInfoAction(always_sender=True)
+                                                ),
+
+                                                CommandAction("user", is_personal=True).then(
+                                                    UserInfoAction()
+                                                ),
+
+                                                CommandAction("chat").then(
+                                                    ChatInfoAction()
+                                                ),
+
+                                                # ADMIN ACTIONS #
+
+                                                CommandAction("restart").then(
+                                                    AdminActionWithErrorMessage().then(
+                                                        RestartAction()
+                                                    )
+                                                ),
+                                                CommandAction("halt").then(
+                                                    AdminActionWithErrorMessage().then(
+                                                        HaltAction()
+                                                    )
+                                                ),
+                                                CommandAction("eval").then(
+                                                    AdminActionWithErrorMessage().then(
+                                                        EvalAction()
+                                                    )
+                                                ),
+                                                CommandAction("state").then(
+                                                    AdminActionWithErrorMessage().then(
+                                                        StateAction()
+                                                    )
+                                                ),
+                                                CommandAction("config").then(
+                                                    AdminActionWithErrorMessage().then(
+                                                        ConfigStatusAction()
+                                                    )
+                                                ),
+                                                CommandAction("instance").then(
+                                                    AdminActionWithErrorMessage().then(
+                                                        InstanceAction()
+                                                    )
+                                                ),
+                                                CommandAction("workers").then(
+                                                    AdminActionWithErrorMessage().then(
+                                                        WorkersAction()
+                                                    )
+                                                ),
+                                                CommandAction("fail").then(
+                                                    AdminActionWithErrorMessage().then(
+                                                        FailAction()
+                                                    )
+                                                ),
+
+                                                # FEATURES #
+
+                                                CommandAction("settings").then(
+                                                    GroupAdminAction().then(
+                                                        ChatSettingsAction()
+                                                    )
+                                                ),
+
+                                                CommandAction("silence").then(
+                                                    GroupAdminAction().then(
+                                                        SilenceAction()
+                                                    )
+                                                ),
+
+                                                CommandAction("hashtags").then(
+                                                    ListHashtagsAction()
+                                                ),
+
+                                                CommandAction("feature").then(
+                                                    GetSetFeatureAction()
+                                                ),
+
+                                                CommandAction("polestzman").then(
+                                                    GroupAdminAction().then(
+                                                        ManagePoleTimezonesAction()
+                                                    )
+                                                ),
+
+                                                CommandAction("poles").then(
+                                                    ListPoleAction("poles")
+                                                ),
+
+                                                CommandAction("subpoles").then(
+                                                    ListPoleAction("subpoles")
+                                                ),
+
+                                                CommandAction("subsubpoles").then(
+                                                    ListPoleAction("subsubpoles")
+                                                ),
+
+                                                CommandAction("messages").then(
+                                                    ListMessageAction()
+                                                ),
+
+                                                CommandAction("message").then(
+                                                    ShowMessageAction()
+                                                ),
+
+                                                CommandAction("audios").then(
+                                                    ListVoiceAction()
+                                                ),
+
+                                                CommandAction("random").then(
+                                                    RandomChoiceAction()
+                                                )
+
+                                            )
+
+                                        )
+                                    )
+                                )
+                            ),
+
+                            # # PENDING ACTIONS # #
+
+                            PendingAction().then(
+                                MessageAction().then(
+                                    PerChatAction().then(
                                         TextMessageAction().then(
 
-                                            CommandAction("start").then(
-                                                AsyncApiAction().then(
-                                                    AnswerAction("Hello! I am " + self.bot.cache.bot_info.first_name + " and I am here to serve you.")
-                                                )
-                                            ),
-
-                                            CommandAction("about").then(
-                                                AboutAction(
-                                                    project_info.name,
-                                                    authors=project_info.authors_credits,
-                                                    is_open_source=project_info.is_open_source,
-                                                    url=project_info.url,
-                                                    license_name=project_info.license_name,
-                                                    license_url=project_info.license_url,
-                                                    donation_addresses=project_info.donation_addresses
-                                                )
-                                            ),
-
-                                            CommandAction("version").then(
-                                                VersionAction(
-                                                    project_info.name,
-                                                    project_info.url + "/releases"
-                                                )
-                                            ),
-
-                                            CommandAction("benchmark").then(
-                                                AsynchronousAction("benchmark").then(
-                                                    BenchmarkAction()
-                                                )
-                                            ),
-
                                             CommandAction("ping").then(
-                                                AnswerAction("Up and running, sir!")
+                                                AnswerAction("I'm back! Sorry for the delay...")
                                             ),
 
-                                            CommandAction("me", is_personal=True).then(
-                                                UserInfoAction(always_sender=True)
-                                            ),
-
-                                            CommandAction("user", is_personal=True).then(
-                                                UserInfoAction()
-                                            ),
-
-                                            CommandAction("chat").then(
-                                                ChatInfoAction()
-                                            ),
-
-                                            # ADMIN ACTIONS #
-
-                                            CommandAction("restart").then(
-                                                AdminActionWithErrorMessage().then(
+                                            AdminAction().then(
+                                                CommandAction("restart").then(
                                                     RestartAction()
-                                                )
-                                            ),
-                                            CommandAction("halt").then(
-                                                AdminActionWithErrorMessage().then(
+                                                ),
+                                                CommandAction("halt").then(
                                                     HaltAction()
                                                 )
-                                            ),
-                                            CommandAction("eval").then(
-                                                AdminActionWithErrorMessage().then(
-                                                    EvalAction()
-                                                )
-                                            ),
-                                            CommandAction("state").then(
-                                                AdminActionWithErrorMessage().then(
-                                                    StateAction()
-                                                )
-                                            ),
-                                            CommandAction("config").then(
-                                                AdminActionWithErrorMessage().then(
-                                                    ConfigStatusAction()
-                                                )
-                                            ),
-                                            CommandAction("instance").then(
-                                                AdminActionWithErrorMessage().then(
-                                                    InstanceAction()
-                                                )
-                                            ),
-                                            CommandAction("workers").then(
-                                                AdminActionWithErrorMessage().then(
-                                                    WorkersAction()
-                                                )
-                                            ),
-                                            CommandAction("fail").then(
-                                                AdminActionWithErrorMessage().then(
-                                                    FailAction()
-                                                )
-                                            ),
-
-                                            # FEATURES #
-
-                                            CommandAction("settings").then(
-                                                GroupAdminAction().then(
-                                                    ChatSettingsAction()
-                                                )
-                                            ),
-
-                                            CommandAction("silence").then(
-                                                GroupAdminAction().then(
-                                                    SilenceAction()
-                                                )
-                                            ),
-
-                                            CommandAction("hashtags").then(
-                                                ListHashtagsAction()
-                                            ),
-
-                                            CommandAction("feature").then(
-                                                GetSetFeatureAction()
-                                            ),
-
-                                            CommandAction("polestzman").then(
-                                                GroupAdminAction().then(
-                                                    ManagePoleTimezonesAction()
-                                                )
-                                            ),
-
-                                            CommandAction("poles").then(
-                                                ListPoleAction("poles")
-                                            ),
-
-                                            CommandAction("subpoles").then(
-                                                ListPoleAction("subpoles")
-                                            ),
-
-                                            CommandAction("subsubpoles").then(
-                                                ListPoleAction("subsubpoles")
-                                            ),
-
-                                            CommandAction("messages").then(
-                                                ListMessageAction()
-                                            ),
-
-                                            CommandAction("message").then(
-                                                ShowMessageAction()
-                                            ),
-
-                                            CommandAction("audios").then(
-                                                ListVoiceAction()
-                                            ),
-
-                                            CommandAction("random").then(
-                                                RandomChoiceAction()
                                             )
 
                                         )
-
                                     )
                                 )
                             )
-                        ),
 
-                        # # PENDING ACTIONS # #
-
-                        PendingAction().then(
-                            MessageAction().then(
-                                PerChatAction().then(
-                                    TextMessageAction().then(
-
-                                        CommandAction("ping").then(
-                                            AnswerAction("I'm back! Sorry for the delay...")
-                                        ),
-
-                                        AdminAction().then(
-                                            CommandAction("restart").then(
-                                                RestartAction()
-                                            ),
-                                            CommandAction("halt").then(
-                                                HaltAction()
-                                            )
-                                        )
-
-                                    )
-                                )
-                            )
                         )
-
                     )
                 )
             )
