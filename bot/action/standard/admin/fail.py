@@ -4,7 +4,7 @@ from bot.action.util.textformat import FormattedText
 
 class FailAction(Action):
     def process(self, event):
-        api = self.api
+        api = self.api.no_async
         error = NotARealError("simulated error")
         response = FormattedText().bold("Simulating bot error...")
         args = event.command_args.split()
