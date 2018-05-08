@@ -14,7 +14,7 @@ class UserInfoAction(Action):
         if user is None:
             response = self._error_response()
         else:
-            formatter = UserInfoFormatter(self.api, user, event.chat)
+            formatter = UserInfoFormatter(self.api.no_async, user, event.chat)
             formatter.format(member_info=True)
             response = formatter.get_formatted()
         self.api.send_message(response.build_message().to_chat_replying(event.message))
@@ -66,7 +66,7 @@ class ChatInfoAction(Action):
         if chat is None:
             response = self._error_response()
         else:
-            formatter = ChatInfoFormatter(self.api, chat, self.cache.bot_info, event.message.from_)
+            formatter = ChatInfoFormatter(self.api.no_async, chat, self.cache.bot_info, event.message.from_)
             formatter.format(full_info=True)
             response = formatter.get_formatted()
         self.api.send_message(response.build_message().to_chat_replying(event.message))

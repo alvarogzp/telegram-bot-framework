@@ -47,7 +47,7 @@ class ShortlyRepeatedCommandThrottler(Throttler):
             .code_inline(remaining_seconds).normal(" seconds.")\
             .build_message()
         message.to_chat_replying(event.message)
-        self.api.send_message(message)
+        self.api.async.send_message(message)
 
     @staticmethod
     def __log_throttling(event, remaining_seconds):

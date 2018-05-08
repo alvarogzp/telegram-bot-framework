@@ -80,6 +80,5 @@ The following keys are also recognised by the framework, but they are *OPTIONAL*
 If you find this project useful and want to support its development economically, you can do so at any of the following addresses:
 
  - Bitcoin: **[3CYLixYRc4anUweHy2u4gDa8F76MN5UQnC](bitcoin:3CYLixYRc4anUweHy2u4gDa8F76MN5UQnC)**
- - Bitcoin (bech32 format): **[bc1qvpe65k3cugvlu3dmfmrr39prm6plnsv6v3juld](bitcoin:bc1qvpe65k3cugvlu3dmfmrr39prm6plnsv6v3juld)**
 
 Please, contact the authors identifying yourself after donating, so that we can thank you.

@@ -7,6 +7,8 @@ class AsyncApi:
     def __init__(self, api: Api, scheduler: SchedulerApi):
         self.api = api
         self.scheduler = scheduler
+        self.async = self
+        self.no_async = api
 
     def __getattr__(self, item):
         return self.__get_call_hook_for(item)

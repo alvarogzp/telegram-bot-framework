@@ -11,7 +11,7 @@ EXIT_STATUS_TO_HALT_BOT = 55
 class RestartAction(Action):
     def process(self, event):
         response_text = "Restarting bot...\nCommands might not work while restarting."
-        self.api.send_message(Message.create_reply(event.message, response_text))
+        self.api.no_async.send_message(Message.create_reply(event.message, response_text))
         raise KeyboardInterrupt()
 
 
@@ -25,13 +25,13 @@ class EvalAction(Action):
             response.normal("Error: {error}").start_format().bold(error=ExceptionFormatter.format(e)).end_format()
         else:
             response.normal("Result: {result}").start_format().bold(result=result).end_format()
-        self.api.send_message(response.build_message().to_chat_replying(event.message))
+        self.api.no_async.send_message(response.build_message().to_chat_replying(event.message))
 
 
 class HaltAction(Action):
     def process(self, event):
         response_text = "Bot stopped.\nYou need to launch it manually for it to work again."
-        self.api.send_message(Message.create_reply(event.message, response_text))
+        self.api.no_async.send_message(Message.create_reply(event.message, response_text))
         sys.exit(EXIT_STATUS_TO_HALT_BOT)
 
 

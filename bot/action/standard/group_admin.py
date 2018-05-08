@@ -11,7 +11,7 @@ class GroupAdminAction(IntermediateAction):
         else:
             user = event.message.from_
             if user is not None:
-                chat_member = self.api.getChatMember(chat_id=chat.id, user_id=user.id)
+                chat_member = self.api.no_async.getChatMember(chat_id=chat.id, user_id=user.id)
                 if chat_member.status in ("creator", "administrator"):
                     self._continue(event)
                 else:
