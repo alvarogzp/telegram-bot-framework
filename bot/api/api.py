@@ -11,6 +11,7 @@ class Api:
         self.telegram_api = telegram_api
         self.state = state
         self.async = self
+        self.no_async = self
 
     def enable_async(self, async_api):
         self.async = async_api
