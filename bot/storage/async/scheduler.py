@@ -4,11 +4,8 @@ from bot.storage.async.operation import StorageOperation
 
 
 class StorageScheduler:
-    def __init__(self, worker: Worker):
+    def __init__(self, worker: Worker, context_manager):
         self.worker = worker
-        self.context_manager = None
-
-    def set_context_manager(self, context_manager):
         self.context_manager = context_manager
 
     def schedule_no_result(self, func: callable, name: str):
