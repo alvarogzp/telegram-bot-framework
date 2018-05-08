@@ -1,5 +1,6 @@
 import time
 
+from bot import project_info
 from bot.action.core.action import Action
 from bot.action.core.update import Update
 from bot.action.standard.about import VersionAction
@@ -67,15 +68,26 @@ class Bot:
             self.shutdown()
 
     def starting(self, project_name: str):
-        starting_info = ConfigStatus(self.config, self.state).get_config_status()
+        starting_info = []
         if project_name:
             version = VersionAction.get_version(project_name)
-            project = FormattedText()\
-                .normal("Running: {name} {version}")\
-                .start_format()\
-                .bold(name=project_name, version=version)\
+            starting_info.append(
+                FormattedText()
+                .normal("Running: {name} {version}")
+                .start_format()
+                .bold(name=project_name, version=version)
                 .end_format()
-            starting_info = (project,) + starting_info
+            )
+        framework_version = VersionAction.get_version(project_info.name)
+        starting_info.append(
+            FormattedText()
+            .normal("Framework: {name} {version}")
+            .start_format()
+            .bold(name=project_info.name, version=framework_version)
+            .end_format()
+        )
+        config_status = ConfigStatus(self.config, self.state).get_config_status()
+        starting_info.extend(config_status)
         self.logger.info_formatted_text(
             FormattedText().bold("Starting"),
             *starting_info

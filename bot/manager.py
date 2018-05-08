@@ -17,6 +17,7 @@ from bot.action.standard.admin.fail import FailAction
 from bot.action.standard.admin.instance import InstanceAction
 from bot.action.standard.admin.state import StateAction
 from bot.action.standard.answer import AnswerAction
+from bot.action.standard.async import AsyncApiAction
 from bot.action.standard.asynchronous import AsynchronousAction
 from bot.action.standard.benchmark import BenchmarkAction, WorkersAction
 from bot.action.standard.chatsettings.action import ChatSettingsAction
@@ -91,7 +92,9 @@ class BotManager:
                                         TextMessageAction().then(
 
                                             CommandAction("start").then(
-                                                AnswerAction("Hello! I am " + self.bot.cache.bot_info.first_name + " and I am here to serve you.")
+                                                AsyncApiAction().then(
+                                                    AnswerAction("Hello! I am " + self.bot.cache.bot_info.first_name + " and I am here to serve you.")
+                                                )
                                             ),
 
                                             CommandAction("about").then(
