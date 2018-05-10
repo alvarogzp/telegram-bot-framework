@@ -5,9 +5,9 @@ from bot.storage.data_source.data_source import StorageDataSource
 
 
 class SqliteStorageDataSource(StorageDataSource):
-    def __init__(self, database_filename: str, debug: bool, logger: SqliteLogger):
+    def __init__(self, session: SqliteSession, logger: SqliteLogger):
         super().__init__()
-        self.session = SqliteSession(database_filename, debug)
+        self.session = session
         self.logger = logger
 
     def init(self):
