@@ -21,10 +21,12 @@ class InlineKeyboardButton:
             data["switch_inline_query_current_chat"] = switch_inline_query_current_chat
         return InlineKeyboardButton(data)
 
-    @staticmethod
-    def switch_inline_query(text: str, query: str = "", current_chat: bool = True):
-        switch_inline_query_key = "switch_inline_query_current_chat" if current_chat else "switch_inline_query"
-        return InlineKeyboardButton({
-            "text": text,
-            switch_inline_query_key: query
-        })
+    @classmethod
+    def switch_inline_query(cls, text: str, query: str = "", current_chat: bool = True):
+        switch_inline_query = query if not current_chat else None
+        switch_inline_query_current_chat = query if current_chat else None
+        return cls.create(
+            text,
+            switch_inline_query=switch_inline_query,
+            switch_inline_query_current_chat=switch_inline_query_current_chat
+        )
