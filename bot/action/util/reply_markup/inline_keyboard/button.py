@@ -30,3 +30,7 @@ class InlineKeyboardButton:
             switch_inline_query=switch_inline_query,
             switch_inline_query_current_chat=switch_inline_query_current_chat
         )
+
+    @classmethod
+    def callback(cls, text: str, data: str):
+        return cls.create(text, callback_data=data)
