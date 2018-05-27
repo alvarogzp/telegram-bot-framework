@@ -98,6 +98,10 @@ class Message(OutApiObject):
         self.data["reply_markup"] = reply_markup
         return self
 
+    def inline_message_id(self, inline_message_id: int):
+        self.data["inline_message_id"] = inline_message_id
+        return self
+
     def copy(self):
         # we rely on ** unpacking to avoid having to copy the dict
         return Message(_type=Message, **self.data)

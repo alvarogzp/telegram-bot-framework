@@ -59,6 +59,14 @@ class InlineQueryAction(IntermediateAction):
             self._continue(event)
 
 
+class CallbackQueryAction(IntermediateAction):
+    def process(self, event):
+        callback_query = event.update.callback_query
+        if callback_query is not None:
+            event.query = callback_query
+            self._continue(event)
+
+
 class NoPendingAction(IntermediateAction):
     def process(self, event):
         if not event.is_pending:
