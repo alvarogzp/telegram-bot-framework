@@ -5,9 +5,10 @@ from bot.action.util.textformat import FormattedText
 
 
 class UserInfoAction(Action):
-    def __init__(self, always_sender: bool = False):
+    def __init__(self, always_sender: bool = False, member_info: bool = True):
         super().__init__()
         self.always_sender = always_sender
+        self.member_info = member_info
 
     def process(self, event):
         user = self._get_user(event)
@@ -15,7 +16,7 @@ class UserInfoAction(Action):
             response = self._error_response()
         else:
             formatter = UserInfoFormatter(self.api.no_async, user, event.chat)
-            formatter.format(member_info=True)
+            formatter.format(member_info=self.member_info)
             response = formatter.get_formatted()
         self.api.send_message(response.build_message().to_chat_replying(event.message))
 
