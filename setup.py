@@ -24,6 +24,7 @@ setup(
     ],
 
     install_requires=[
+        'sqlite-framework',
         'requests',
         'pytz',
         'psutil'
