@@ -53,6 +53,9 @@ class Storage(AttributeObject):
             return []
         return os.listdir(self._base_dir)
 
+    def setup(self):
+        self.__create_dirs_if_needed()
+
     def __get_value_path(self, key):
         return os.path.join(self._base_dir, key)
 
