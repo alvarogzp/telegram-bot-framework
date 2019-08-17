@@ -1,4 +1,5 @@
 import collections
+import time
 
 from bot.action.core.action import Action
 from bot.action.core.command import UnderscoredCommandBuilder
@@ -133,10 +134,16 @@ class ListHashtagsAction(Action):
         return self.__build_success_response_message(event, "Most recent hashtags:", printable_hashtags, ranking_hashtags_text)
 
     def get_response_popular(self, event, hashtags, time_interval_in_seconds, number_of_hashtags_to_display, raw_interval):
+        if time_interval_in_seconds != HASHTAGS_NO_FILTER_BY_TIME:
+            oldest_requested_hashtag = int(time.time()) - time_interval_in_seconds
+            hashtags = hashtags.filter_older_than(oldest_requested_hashtag)
+            title = FormattedText().normal("Most popular hashtags during the last {interval}:").start_format().bold(interval=raw_interval).end_format()
+        else:
+            title = "Most popular hashtags:"
         printable_hashtags = hashtags.grouped_by_popularity(number_of_hashtags_to_display).printable_version()
         recent_hashtags_command = UnderscoredCommandBuilder.build_command(event.command, "recent")
         recent_hashtags_text = FormattedText().normal("Write ").normal(recent_hashtags_command).normal(" to see recent hashtags.")
-        return self.__build_success_response_message(event, "Most popular hashtags:", printable_hashtags, recent_hashtags_text)
+        return self.__build_success_response_message(event, title, printable_hashtags, recent_hashtags_text)
 
     def get_response_ranking(self, event, hashtags, number_of_users_to_display):
         user_storage_handler = UserStorageHandler.get_instance(self.state)
@@ -145,13 +152,14 @@ class ListHashtagsAction(Action):
 
     @staticmethod
     def __build_success_response_message(event, title, printable_hashtags, footer_text=None):
-        header = FormattedText().normal(title).newline()
+        if not isinstance(title, FormattedText):
+            title = FormattedText().normal(title)
         footer = FormattedText().newline().newline()
         if footer_text is not None:
             footer.concat(footer_text)
         else:
             footer.normal("Write ").bold(event.command + " help").normal(" to see more options.")
-        return FormattedText().concat(header).normal(printable_hashtags).concat(footer).build_message()
+        return FormattedText().concat(title).newline().normal(printable_hashtags).concat(footer).build_message()
 
 
 class Hashtag:
