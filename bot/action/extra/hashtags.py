@@ -85,6 +85,9 @@ class ListHashtagsAction(Action):
                 if interval is not None:
                     action = "popular"
                     action_param = (interval, 10, args[1])
+                elif args[1].isnumeric():
+                    action = "popular"
+                    action_param = (HASHTAGS_NO_FILTER_BY_TIME, int(args[1]), "")
             elif args[1].isnumeric():
                 action_param = int(args[1])
                 action = args[0]
