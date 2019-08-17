@@ -160,6 +160,9 @@ class HashtagList:
         # for now, assume they are already sorted by date
         return HashtagList(reversed(self.hashtags[-limit:]))
 
+    def filter_older_than(self, timestamp):
+        return HashtagList(filter(lambda hashtag: hashtag.date > timestamp, self.hashtags))
+
     def printable_version(self, user_storage_handler):
         return "\n".join((hashtag.printable_version(user_storage_handler) for hashtag in self.hashtags))
 
