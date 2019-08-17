@@ -120,11 +120,11 @@ class ListHashtagsAction(Action):
 class Hashtag:
     def __init__(self, hashtag, date=None, user_id=None):
         self.hashtag = hashtag
-        self.date = date
+        self.date = int(date) if date is not None else -1
         self.user_id = user_id
 
     def printable_version(self, user_storage_handler):
-        formatted_date = DateFormatter.format(self.date) if self.date is not None else "???"
+        formatted_date = DateFormatter.format(self.date) if self.date != -1 else "???"
         formatted_user = UserFormatter.retrieve_and_format(self.user_id, user_storage_handler) if self.user_id is not None else "???"
         return "%s  (%s by %s)" % (self.hashtag, formatted_date, formatted_user)
 
