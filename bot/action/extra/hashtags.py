@@ -5,6 +5,7 @@ from bot.action.core.action import Action
 from bot.action.core.command import UnderscoredCommandBuilder
 from bot.action.core.command.usagemessage import CommandUsageMessage
 from bot.action.standard.userinfo import UserStorageHandler
+from bot.action.util.counter import case_insensitive_counter
 from bot.action.util.format import DateFormatter, UserFormatter
 from bot.action.util.textformat import FormattedText
 from bot.api.domain import Message, MessageEntityParser
@@ -196,7 +197,7 @@ class HashtagList:
 
     def grouped_by_popularity(self, max_to_return):
         hashtags_names = (hashtag.hashtag for hashtag in self.hashtags)
-        return HashtagGroup(collections.Counter(hashtags_names).most_common(max_to_return))
+        return HashtagGroup(case_insensitive_counter(hashtags_names).most_common(max_to_return))
 
     def grouped_by_user(self, max_to_return):
         hashtags_users = (hashtag.user_id for hashtag in self.hashtags)
