@@ -1,6 +1,8 @@
 import collections
 import time
 
+import pytimeparse
+
 from bot.action.core.action import Action
 from bot.action.core.command import UnderscoredCommandBuilder
 from bot.action.core.command.usagemessage import CommandUsageMessage
@@ -106,9 +108,8 @@ class ListHashtagsAction(Action):
             return 30 * 24 * 3600  # 30 days
         elif interval == "year":
             return 365 * 24 * 3600  # 365 days
-        elif interval[-1] == "d" and interval[:-1].isnumeric():
-            return int(interval[:-1]) * 24 * 3600
-        return None
+        else:
+            return pytimeparse.parse(interval)
 
     @staticmethod
     def get_response_help(event, help_args):
