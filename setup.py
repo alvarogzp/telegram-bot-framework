@@ -27,7 +27,8 @@ setup(
         'sqlite-framework',
         'requests',
         'pytz',
-        'psutil'
+        'psutil',
+        'pytimeparse'
     ],
 
     python_requires='>=3',

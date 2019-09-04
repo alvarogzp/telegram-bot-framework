@@ -1,10 +1,12 @@
 import collections
-import time
+
+import pytimeparse
 
 from bot.action.core.action import Action
 from bot.action.core.command import UnderscoredCommandBuilder
 from bot.action.core.command.usagemessage import CommandUsageMessage
 from bot.action.standard.userinfo import UserStorageHandler
+from bot.action.util.counter import case_insensitive_counter
 from bot.action.util.format import DateFormatter, UserFormatter
 from bot.action.util.textformat import FormattedText
 from bot.api.domain import Message, MessageEntityParser
@@ -106,9 +108,8 @@ class ListHashtagsAction(Action):
             return 30 * 24 * 3600  # 30 days
         elif interval == "year":
             return 365 * 24 * 3600  # 365 days
-        elif interval[-1] == "d" and interval[:-1].isnumeric():
-            return int(interval[:-1]) * 24 * 3600
-        return None
+        else:
+            return pytimeparse.parse(interval)
 
     @staticmethod
     def get_response_help(event, help_args):
@@ -138,7 +139,7 @@ class ListHashtagsAction(Action):
 
     def get_response_popular(self, event, hashtags, time_interval_in_seconds, number_of_hashtags_to_display, raw_interval):
         if time_interval_in_seconds != HASHTAGS_NO_FILTER_BY_TIME:
-            oldest_requested_hashtag = int(time.time()) - time_interval_in_seconds
+            oldest_requested_hashtag = event.message.date - time_interval_in_seconds
             hashtags = hashtags.filter_older_than(oldest_requested_hashtag)
             title = FormattedText().normal("Most popular hashtags during the last {interval}:").start_format().bold(interval=raw_interval).end_format()
         else:
@@ -196,7 +197,7 @@ class HashtagList:
 
     def grouped_by_popularity(self, max_to_return):
         hashtags_names = (hashtag.hashtag for hashtag in self.hashtags)
-        return HashtagGroup(collections.Counter(hashtags_names).most_common(max_to_return))
+        return HashtagGroup(case_insensitive_counter(hashtags_names).most_common(max_to_return))
 
     def grouped_by_user(self, max_to_return):
         hashtags_users = (hashtag.user_id for hashtag in self.hashtags)
