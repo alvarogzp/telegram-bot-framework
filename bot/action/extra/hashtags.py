@@ -138,7 +138,7 @@ class ListHashtagsAction(Action):
 
     def get_response_popular(self, event, hashtags, time_interval_in_seconds, number_of_hashtags_to_display, raw_interval):
         if time_interval_in_seconds != HASHTAGS_NO_FILTER_BY_TIME:
-            oldest_requested_hashtag = int(time.time()) - time_interval_in_seconds
+            oldest_requested_hashtag = event.message.date - time_interval_in_seconds
             hashtags = hashtags.filter_older_than(oldest_requested_hashtag)
             title = FormattedText().normal("Most popular hashtags during the last {interval}:").start_format().bold(interval=raw_interval).end_format()
         else:
