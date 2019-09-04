@@ -11,8 +11,8 @@ def case_insensitive_counter(elements):
 
     for _, cases in elements_lower.items():
         if len(cases) > 1:
-            most_used_case = max(cases, key=lambda case: counter[case])
-            total_occurrences = sum((counter[case] for case in cases))
+            most_used_case = max(cases, key=counter.get)
+            total_occurrences = sum(map(counter.get, cases))
             counter[most_used_case] = total_occurrences
             for case in cases:
                 if case != most_used_case:
