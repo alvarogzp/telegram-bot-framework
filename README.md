@@ -79,6 +79,7 @@ The following keys are also recognised by the framework, but they are *OPTIONAL*
 
 If you find this project useful and want to support its development economically, you can do so at any of the following addresses:
 
+ - PayPal: **[paypal.me/AlvaroGP](https://www.paypal.me/AlvaroGP)**
  - Bitcoin: **[3CYLixYRc4anUweHy2u4gDa8F76MN5UQnC](bitcoin:3CYLixYRc4anUweHy2u4gDa8F76MN5UQnC)**
 
 Please, contact the authors identifying yourself after donating, so that we can thank you.
