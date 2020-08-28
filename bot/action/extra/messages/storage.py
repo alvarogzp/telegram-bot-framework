@@ -3,8 +3,8 @@ import json
 from bot.action.extra.messages.mapper import StoredMessageMapper
 from bot.action.extra.messages.operations import MessageList, MessageIdOperations
 
-MIN_MESSAGES_TO_KEEP = 1000
-MAX_MESSAGES_TO_KEEP = 10000
+MIN_MESSAGES_TO_KEEP = 50
+MAX_MESSAGES_TO_KEEP = 100
 
 
 class MessageStorageHandler:
