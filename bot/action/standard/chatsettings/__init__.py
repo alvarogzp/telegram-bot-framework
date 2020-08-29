@@ -18,7 +18,7 @@ class ChatSettings:
     # List of chat settings
     # To add one: SETTING = add_setting("name", "default_value")
     LANGUAGE = add_setting("language", "en")
-    STORE_MESSAGES = add_setting("store_messages", "on")
+    STORE_MESSAGES = add_setting("store_messages", "off")
     OVERRIDE_MESSAGES_OPT_OUT = add_setting("override_messages_opt_out", "off")
     THROTTLING_SECONDS = add_setting("throttling_seconds", 15, Codecs.INT)
 
