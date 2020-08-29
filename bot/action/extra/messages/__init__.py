@@ -20,7 +20,7 @@ def is_store_messages_enabled(event):
 class SaveMessageAction(Action):
     def process(self, event):
         if is_store_messages_enabled(event):
-            storage_handler = MessageStorageHandler(event)
+            storage_handler = MessageStorageHandler(self.config, event)
             storage_handler.save_message(event.message)
             storage_handler.delete_old_messages()
 
